@@ -49,7 +49,7 @@
     "searchEngine": false,
     "serverPort": "8081",
     "serverSideOptions": [],
-    "serviceDiscoveryType": "eureka",
+    "serviceDiscoveryType": "consul",
     "skipCheckLengthOfIdentifier": false,
     "skipClient": true,
     "skipFakeData": false,
