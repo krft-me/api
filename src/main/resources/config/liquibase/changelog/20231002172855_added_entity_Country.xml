@@ -7,18 +7,15 @@
                         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
     <!--
-        Added the entity City.
+        Added the entity Country.
     -->
-    <changeSet id="20230928170015-1" author="jhipster">
-        <createTable tableName="city">
+    <changeSet id="20231002172855-1" author="jhipster">
+        <createTable tableName="country">
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="name" type="varchar(255)">
                 <constraints nullable="false" />
-            </column>
-            <column name="region_id" type="bigint">
-                <constraints nullable="true" />
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
@@ -34,11 +31,11 @@
           This can be customized by adding or removing 'faker' in the 'spring.liquibase.contexts'
           Spring Boot configuration key.
     -->
-    <changeSet id="20230928170015-1-data" author="jhipster" context="faker">
+    <changeSet id="20231002172855-1-data" author="jhipster" context="faker">
         <loadData
-                  file="config/liquibase/fake-data/city.csv"
+                  file="config/liquibase/fake-data/country.csv"
                   separator=";"
-                  tableName="city"
+                  tableName="country"
                   usePreparedStatements="true">
             <column name="id" type="numeric"/>
             <column name="name" type="string"/>

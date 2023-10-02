@@ -6,7 +6,7 @@
     <!--
         Added the constraints for entity ApplicationUserOffer.
     -->
-    <changeSet id="20230928170022-2" author="jhipster">
+    <changeSet id="20231002172900-2" author="jhipster">
 
         <addForeignKeyConstraint baseColumnNames="offer_id"
                                  baseTableName="application_user_offer"

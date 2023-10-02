@@ -4,14 +4,14 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
     <!--
-        Added the constraints for entity Machine.
+        Added the constraints for entity Region.
     -->
-    <changeSet id="20230928170020-2" author="jhipster">
+    <changeSet id="20231002172854-2" author="jhipster">
 
-        <addForeignKeyConstraint baseColumnNames="offer_id"
-                                 baseTableName="machine"
-                                 constraintName="fk_machine__offer_id"
+        <addForeignKeyConstraint baseColumnNames="country_id"
+                                 baseTableName="region"
+                                 constraintName="fk_region__country_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="offer"/>
+                                 referencedTableName="country"/>
     </changeSet>
 </databaseChangeLog>

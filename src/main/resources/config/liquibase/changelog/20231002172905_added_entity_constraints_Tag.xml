@@ -6,7 +6,7 @@
     <!--
         Added the constraints for entity Tag.
     -->
-    <changeSet id="20230928170027-2" author="jhipster">
+    <changeSet id="20231002172905-2" author="jhipster">
 
         <addForeignKeyConstraint baseColumnNames="application_user_offer_id"
                                  baseTableName="tag"

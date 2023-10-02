@@ -1,6 +1,6 @@
 {
   "applications": "*",
-  "changelogDate": "20230928170025",
+  "changelogDate": "20231002172903",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
   "dto": "no",
