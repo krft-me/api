@@ -30,4 +30,4 @@ jobs:
               echo No SONAR_TOKEN, skipping...
           fi
       - name: Package application
-        run: run java:jar:prod
+        run: npm run java:jar:prod
