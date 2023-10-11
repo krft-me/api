@@ -36,7 +36,7 @@ public class Machine implements Serializable {
     private Set<Category> categories = new HashSet<>();
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "machines" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "machines", "followers" }, allowSetters = true)
     private Offer offer;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

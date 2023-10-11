@@ -2,6 +2,7 @@ package me.krft.api.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -82,7 +83,9 @@ class CityResourceIT {
         int databaseSizeBeforeCreate = cityRepository.findAll().size();
         // Create the City
         restCityMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(city)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(city))
+            )
             .andExpect(status().isCreated());
 
         // Validate the City in the database
@@ -102,7 +105,9 @@ class CityResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restCityMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(city)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(city))
+            )
             .andExpect(status().isBadRequest());
 
         // Validate the City in the database
@@ -120,7 +125,9 @@ class CityResourceIT {
         // Create the City, which fails.
 
         restCityMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(city)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(city))
+            )
             .andExpect(status().isBadRequest());
 
         List<City> cityList = cityRepository.findAll();
@@ -181,6 +188,7 @@ class CityResourceIT {
         restCityMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, updatedCity.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(updatedCity))
             )
@@ -203,6 +211,7 @@ class CityResourceIT {
         restCityMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, city.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(city))
             )
@@ -223,6 +232,7 @@ class CityResourceIT {
         restCityMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(city))
             )
@@ -241,7 +251,9 @@ class CityResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restCityMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(city)))
+            .perform(
+                put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(city))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the City in the database
@@ -264,6 +276,7 @@ class CityResourceIT {
         restCityMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedCity.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedCity))
             )
@@ -293,6 +306,7 @@ class CityResourceIT {
         restCityMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedCity.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedCity))
             )
@@ -315,6 +329,7 @@ class CityResourceIT {
         restCityMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, city.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(city))
             )
@@ -335,6 +350,7 @@ class CityResourceIT {
         restCityMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(city))
             )
@@ -353,7 +369,12 @@ class CityResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restCityMockMvc
-            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(city)))
+            .perform(
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(city))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the City in the database
@@ -371,7 +392,7 @@ class CityResourceIT {
 
         // Delete the city
         restCityMockMvc
-            .perform(delete(ENTITY_API_URL_ID, city.getId()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, city.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

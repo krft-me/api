@@ -2,6 +2,7 @@ package me.krft.api.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -88,7 +89,9 @@ class OrderResourceIT {
         int databaseSizeBeforeCreate = orderRepository.findAll().size();
         // Create the Order
         restOrderMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(order)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(order))
+            )
             .andExpect(status().isCreated());
 
         // Validate the Order in the database
@@ -109,7 +112,9 @@ class OrderResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restOrderMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(order)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(order))
+            )
             .andExpect(status().isBadRequest());
 
         // Validate the Order in the database
@@ -127,7 +132,9 @@ class OrderResourceIT {
         // Create the Order, which fails.
 
         restOrderMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(order)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(order))
+            )
             .andExpect(status().isBadRequest());
 
         List<Order> orderList = orderRepository.findAll();
@@ -144,7 +151,9 @@ class OrderResourceIT {
         // Create the Order, which fails.
 
         restOrderMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(order)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(order))
+            )
             .andExpect(status().isBadRequest());
 
         List<Order> orderList = orderRepository.findAll();
@@ -207,6 +216,7 @@ class OrderResourceIT {
         restOrderMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, updatedOrder.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(updatedOrder))
             )
@@ -230,6 +240,7 @@ class OrderResourceIT {
         restOrderMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, order.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(order))
             )
@@ -250,6 +261,7 @@ class OrderResourceIT {
         restOrderMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(order))
             )
@@ -268,7 +280,9 @@ class OrderResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOrderMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(order)))
+            .perform(
+                put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(order))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Order in the database
@@ -293,6 +307,7 @@ class OrderResourceIT {
         restOrderMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedOrder.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedOrder))
             )
@@ -323,6 +338,7 @@ class OrderResourceIT {
         restOrderMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedOrder.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedOrder))
             )
@@ -346,6 +362,7 @@ class OrderResourceIT {
         restOrderMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, order.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(order))
             )
@@ -366,6 +383,7 @@ class OrderResourceIT {
         restOrderMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(order))
             )
@@ -384,7 +402,12 @@ class OrderResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOrderMockMvc
-            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(order)))
+            .perform(
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(order))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Order in the database
@@ -402,7 +425,7 @@ class OrderResourceIT {
 
         // Delete the order
         restOrderMockMvc
-            .perform(delete(ENTITY_API_URL_ID, order.getId()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, order.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

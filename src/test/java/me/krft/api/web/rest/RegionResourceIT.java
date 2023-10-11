@@ -2,6 +2,7 @@ package me.krft.api.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -82,7 +83,9 @@ class RegionResourceIT {
         int databaseSizeBeforeCreate = regionRepository.findAll().size();
         // Create the Region
         restRegionMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(region)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(region))
+            )
             .andExpect(status().isCreated());
 
         // Validate the Region in the database
@@ -102,7 +105,9 @@ class RegionResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restRegionMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(region)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(region))
+            )
             .andExpect(status().isBadRequest());
 
         // Validate the Region in the database
@@ -120,7 +125,9 @@ class RegionResourceIT {
         // Create the Region, which fails.
 
         restRegionMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(region)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(region))
+            )
             .andExpect(status().isBadRequest());
 
         List<Region> regionList = regionRepository.findAll();
@@ -181,6 +188,7 @@ class RegionResourceIT {
         restRegionMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, updatedRegion.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(updatedRegion))
             )
@@ -203,6 +211,7 @@ class RegionResourceIT {
         restRegionMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, region.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(region))
             )
@@ -223,6 +232,7 @@ class RegionResourceIT {
         restRegionMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(region))
             )
@@ -241,7 +251,9 @@ class RegionResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restRegionMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(region)))
+            .perform(
+                put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(region))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Region in the database
@@ -266,6 +278,7 @@ class RegionResourceIT {
         restRegionMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedRegion.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedRegion))
             )
@@ -295,6 +308,7 @@ class RegionResourceIT {
         restRegionMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedRegion.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedRegion))
             )
@@ -317,6 +331,7 @@ class RegionResourceIT {
         restRegionMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, region.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(region))
             )
@@ -337,6 +352,7 @@ class RegionResourceIT {
         restRegionMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(region))
             )
@@ -355,7 +371,12 @@ class RegionResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restRegionMockMvc
-            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(region)))
+            .perform(
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(region))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Region in the database
@@ -373,7 +394,7 @@ class RegionResourceIT {
 
         // Delete the region
         restRegionMockMvc
-            .perform(delete(ENTITY_API_URL_ID, region.getId()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, region.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

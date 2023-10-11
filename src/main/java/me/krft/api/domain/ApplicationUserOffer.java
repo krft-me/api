@@ -46,11 +46,14 @@ public class ApplicationUserOffer implements Serializable {
     private Set<Tag> tags = new HashSet<>();
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "machines" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "machines", "followers" }, allowSetters = true)
     private Offer offer;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "city" }, allowSetters = true)
+    @JsonIgnoreProperties(
+        value = { "internalUser", "city", "favoriteApplicationUsers", "favoriteOffers", "followers" },
+        allowSetters = true
+    )
     private ApplicationUser applicationUser;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

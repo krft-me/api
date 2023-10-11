@@ -2,6 +2,7 @@ package me.krft.api.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -86,6 +87,7 @@ class ApplicationUserBadgeResourceIT {
         restApplicationUserBadgeMockMvc
             .perform(
                 post(ENTITY_API_URL)
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
             )
@@ -110,6 +112,7 @@ class ApplicationUserBadgeResourceIT {
         restApplicationUserBadgeMockMvc
             .perform(
                 post(ENTITY_API_URL)
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
             )
@@ -132,6 +135,7 @@ class ApplicationUserBadgeResourceIT {
         restApplicationUserBadgeMockMvc
             .perform(
                 post(ENTITY_API_URL)
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
             )
@@ -195,6 +199,7 @@ class ApplicationUserBadgeResourceIT {
         restApplicationUserBadgeMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, updatedApplicationUserBadge.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(updatedApplicationUserBadge))
             )
@@ -217,6 +222,7 @@ class ApplicationUserBadgeResourceIT {
         restApplicationUserBadgeMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, applicationUserBadge.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
             )
@@ -237,6 +243,7 @@ class ApplicationUserBadgeResourceIT {
         restApplicationUserBadgeMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
             )
@@ -256,7 +263,10 @@ class ApplicationUserBadgeResourceIT {
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserBadgeMockMvc
             .perform(
-                put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
+                put(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -282,6 +292,7 @@ class ApplicationUserBadgeResourceIT {
         restApplicationUserBadgeMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedApplicationUserBadge.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedApplicationUserBadge))
             )
@@ -311,6 +322,7 @@ class ApplicationUserBadgeResourceIT {
         restApplicationUserBadgeMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedApplicationUserBadge.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedApplicationUserBadge))
             )
@@ -333,6 +345,7 @@ class ApplicationUserBadgeResourceIT {
         restApplicationUserBadgeMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, applicationUserBadge.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
             )
@@ -353,6 +366,7 @@ class ApplicationUserBadgeResourceIT {
         restApplicationUserBadgeMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
             )
@@ -373,6 +387,7 @@ class ApplicationUserBadgeResourceIT {
         restApplicationUserBadgeMockMvc
             .perform(
                 patch(ENTITY_API_URL)
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
             )
@@ -393,7 +408,7 @@ class ApplicationUserBadgeResourceIT {
 
         // Delete the applicationUserBadge
         restApplicationUserBadgeMockMvc
-            .perform(delete(ENTITY_API_URL_ID, applicationUserBadge.getId()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, applicationUserBadge.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

@@ -9,12 +9,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import me.krft.api.domain.ApplicationUser;
 import me.krft.api.repository.ApplicationUserRepository;
+import me.krft.api.repository.UserRepository;
 import me.krft.api.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -24,7 +24,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
-@Transactional
 public class ApplicationUserResource {
 
     private final Logger log = LoggerFactory.getLogger(ApplicationUserResource.class);
@@ -36,8 +35,11 @@ public class ApplicationUserResource {
 
     private final ApplicationUserRepository applicationUserRepository;
 
-    public ApplicationUserResource(ApplicationUserRepository applicationUserRepository) {
+    private final UserRepository userRepository;
+
+    public ApplicationUserResource(ApplicationUserRepository applicationUserRepository, UserRepository userRepository) {
         this.applicationUserRepository = applicationUserRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -54,6 +56,12 @@ public class ApplicationUserResource {
         if (applicationUser.getId() != null) {
             throw new BadRequestAlertException("A new applicationUser cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        if (applicationUser.getInternalUser() != null) {
+            // Save user in case it's new and only exists in gateway
+            userRepository.save(applicationUser.getInternalUser());
+        }
+
         ApplicationUser result = applicationUserRepository.save(applicationUser);
         return ResponseEntity
             .created(new URI("/api/application-users/" + result.getId()))
@@ -86,6 +94,11 @@ public class ApplicationUserResource {
 
         if (!applicationUserRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        if (applicationUser.getInternalUser() != null) {
+            // Save user in case it's new and only exists in gateway
+            userRepository.save(applicationUser.getInternalUser());
         }
 
         ApplicationUser result = applicationUserRepository.save(applicationUser);
@@ -123,6 +136,11 @@ public class ApplicationUserResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
+        if (applicationUser.getInternalUser() != null) {
+            // Save user in case it's new and only exists in gateway
+            userRepository.save(applicationUser.getInternalUser());
+        }
+
         Optional<ApplicationUser> result = applicationUserRepository
             .findById(applicationUser.getId())
             .map(existingApplicationUser -> {
@@ -152,12 +170,17 @@ public class ApplicationUserResource {
     /**
      * {@code GET  /application-users} : get all the applicationUsers.
      *
+     * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of applicationUsers in body.
      */
     @GetMapping("/application-users")
-    public List<ApplicationUser> getAllApplicationUsers() {
+    public List<ApplicationUser> getAllApplicationUsers(@RequestParam(required = false, defaultValue = "false") boolean eagerload) {
         log.debug("REST request to get all ApplicationUsers");
-        return applicationUserRepository.findAll();
+        if (eagerload) {
+            return applicationUserRepository.findAllWithEagerRelationships();
+        } else {
+            return applicationUserRepository.findAll();
+        }
     }
 
     /**
@@ -169,7 +192,7 @@ public class ApplicationUserResource {
     @GetMapping("/application-users/{id}")
     public ResponseEntity<ApplicationUser> getApplicationUser(@PathVariable Long id) {
         log.debug("REST request to get ApplicationUser : {}", id);
-        Optional<ApplicationUser> applicationUser = applicationUserRepository.findById(id);
+        Optional<ApplicationUser> applicationUser = applicationUserRepository.findOneWithEagerRelationships(id);
         return ResponseUtil.wrapOrNotFound(applicationUser);
     }
 

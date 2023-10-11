@@ -1,7 +1,7 @@
 {
   "generator-jhipster": {
     "applicationType": "microservice",
-    "authenticationType": "jwt",
+    "authenticationType": "oauth2",
     "baseName": "krftme",
     "blueprints": [],
     "buildTool": "maven",

@@ -2,6 +2,8 @@ package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
@@ -40,9 +42,44 @@ public class ApplicationUser implements Serializable {
     @Column(name = "average_rating", nullable = false)
     private Double averageRating;
 
+    @OneToOne
+    @JoinColumn(unique = true)
+    private User internalUser;
+
     @ManyToOne
     @JsonIgnoreProperties(value = { "region" }, allowSetters = true)
     private City city;
+
+    @ManyToMany
+    @JoinTable(
+        name = "rel_application_user__favorite_application_user",
+        joinColumns = @JoinColumn(name = "application_user_id"),
+        inverseJoinColumns = @JoinColumn(name = "favorite_application_user_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(
+        value = { "internalUser", "city", "favoriteApplicationUsers", "favoriteOffers", "followers" },
+        allowSetters = true
+    )
+    private Set<ApplicationUser> favoriteApplicationUsers = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+        name = "rel_application_user__favorite_offer",
+        joinColumns = @JoinColumn(name = "application_user_id"),
+        inverseJoinColumns = @JoinColumn(name = "favorite_offer_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "machines", "followers" }, allowSetters = true)
+    private Set<Offer> favoriteOffers = new HashSet<>();
+
+    @ManyToMany(mappedBy = "favoriteApplicationUsers")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(
+        value = { "internalUser", "city", "favoriteApplicationUsers", "favoriteOffers", "followers" },
+        allowSetters = true
+    )
+    private Set<ApplicationUser> followers = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -111,6 +148,19 @@ public class ApplicationUser implements Serializable {
         this.averageRating = averageRating;
     }
 
+    public User getInternalUser() {
+        return this.internalUser;
+    }
+
+    public void setInternalUser(User user) {
+        this.internalUser = user;
+    }
+
+    public ApplicationUser internalUser(User user) {
+        this.setInternalUser(user);
+        return this;
+    }
+
     public City getCity() {
         return this.city;
     }
@@ -121,6 +171,87 @@ public class ApplicationUser implements Serializable {
 
     public ApplicationUser city(City city) {
         this.setCity(city);
+        return this;
+    }
+
+    public Set<ApplicationUser> getFavoriteApplicationUsers() {
+        return this.favoriteApplicationUsers;
+    }
+
+    public void setFavoriteApplicationUsers(Set<ApplicationUser> applicationUsers) {
+        this.favoriteApplicationUsers = applicationUsers;
+    }
+
+    public ApplicationUser favoriteApplicationUsers(Set<ApplicationUser> applicationUsers) {
+        this.setFavoriteApplicationUsers(applicationUsers);
+        return this;
+    }
+
+    public ApplicationUser addFavoriteApplicationUser(ApplicationUser applicationUser) {
+        this.favoriteApplicationUsers.add(applicationUser);
+        applicationUser.getFollowers().add(this);
+        return this;
+    }
+
+    public ApplicationUser removeFavoriteApplicationUser(ApplicationUser applicationUser) {
+        this.favoriteApplicationUsers.remove(applicationUser);
+        applicationUser.getFollowers().remove(this);
+        return this;
+    }
+
+    public Set<Offer> getFavoriteOffers() {
+        return this.favoriteOffers;
+    }
+
+    public void setFavoriteOffers(Set<Offer> offers) {
+        this.favoriteOffers = offers;
+    }
+
+    public ApplicationUser favoriteOffers(Set<Offer> offers) {
+        this.setFavoriteOffers(offers);
+        return this;
+    }
+
+    public ApplicationUser addFavoriteOffer(Offer offer) {
+        this.favoriteOffers.add(offer);
+        offer.getFollowers().add(this);
+        return this;
+    }
+
+    public ApplicationUser removeFavoriteOffer(Offer offer) {
+        this.favoriteOffers.remove(offer);
+        offer.getFollowers().remove(this);
+        return this;
+    }
+
+    public Set<ApplicationUser> getFollowers() {
+        return this.followers;
+    }
+
+    public void setFollowers(Set<ApplicationUser> applicationUsers) {
+        if (this.followers != null) {
+            this.followers.forEach(i -> i.removeFavoriteApplicationUser(this));
+        }
+        if (applicationUsers != null) {
+            applicationUsers.forEach(i -> i.addFavoriteApplicationUser(this));
+        }
+        this.followers = applicationUsers;
+    }
+
+    public ApplicationUser followers(Set<ApplicationUser> applicationUsers) {
+        this.setFollowers(applicationUsers);
+        return this;
+    }
+
+    public ApplicationUser addFollowers(ApplicationUser applicationUser) {
+        this.followers.add(applicationUser);
+        applicationUser.getFavoriteApplicationUsers().add(this);
+        return this;
+    }
+
+    public ApplicationUser removeFollowers(ApplicationUser applicationUser) {
+        this.followers.remove(applicationUser);
+        applicationUser.getFavoriteApplicationUsers().remove(this);
         return this;
     }
 

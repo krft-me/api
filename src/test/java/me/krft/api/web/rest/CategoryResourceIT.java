@@ -2,6 +2,7 @@ package me.krft.api.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -82,7 +83,12 @@ class CategoryResourceIT {
         int databaseSizeBeforeCreate = categoryRepository.findAll().size();
         // Create the Category
         restCategoryMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(category)))
+            .perform(
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(category))
+            )
             .andExpect(status().isCreated());
 
         // Validate the Category in the database
@@ -102,7 +108,12 @@ class CategoryResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restCategoryMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(category)))
+            .perform(
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(category))
+            )
             .andExpect(status().isBadRequest());
 
         // Validate the Category in the database
@@ -120,7 +131,12 @@ class CategoryResourceIT {
         // Create the Category, which fails.
 
         restCategoryMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(category)))
+            .perform(
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(category))
+            )
             .andExpect(status().isBadRequest());
 
         List<Category> categoryList = categoryRepository.findAll();
@@ -181,6 +197,7 @@ class CategoryResourceIT {
         restCategoryMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, updatedCategory.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(updatedCategory))
             )
@@ -203,6 +220,7 @@ class CategoryResourceIT {
         restCategoryMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, category.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(category))
             )
@@ -223,6 +241,7 @@ class CategoryResourceIT {
         restCategoryMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(category))
             )
@@ -241,7 +260,12 @@ class CategoryResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restCategoryMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(category)))
+            .perform(
+                put(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(category))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Category in the database
@@ -266,6 +290,7 @@ class CategoryResourceIT {
         restCategoryMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedCategory.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedCategory))
             )
@@ -295,6 +320,7 @@ class CategoryResourceIT {
         restCategoryMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedCategory.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedCategory))
             )
@@ -317,6 +343,7 @@ class CategoryResourceIT {
         restCategoryMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, category.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(category))
             )
@@ -337,6 +364,7 @@ class CategoryResourceIT {
         restCategoryMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(category))
             )
@@ -355,7 +383,12 @@ class CategoryResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restCategoryMockMvc
-            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(category)))
+            .perform(
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(category))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Category in the database
@@ -373,7 +406,7 @@ class CategoryResourceIT {
 
         // Delete the category
         restCategoryMockMvc
-            .perform(delete(ENTITY_API_URL_ID, category.getId()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, category.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

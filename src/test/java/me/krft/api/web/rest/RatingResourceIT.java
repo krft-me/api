@@ -2,6 +2,7 @@ package me.krft.api.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -85,7 +86,9 @@ class RatingResourceIT {
         int databaseSizeBeforeCreate = ratingRepository.findAll().size();
         // Create the Rating
         restRatingMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(rating)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(rating))
+            )
             .andExpect(status().isCreated());
 
         // Validate the Rating in the database
@@ -106,7 +109,9 @@ class RatingResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restRatingMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(rating)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(rating))
+            )
             .andExpect(status().isBadRequest());
 
         // Validate the Rating in the database
@@ -124,7 +129,9 @@ class RatingResourceIT {
         // Create the Rating, which fails.
 
         restRatingMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(rating)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(rating))
+            )
             .andExpect(status().isBadRequest());
 
         List<Rating> ratingList = ratingRepository.findAll();
@@ -187,6 +194,7 @@ class RatingResourceIT {
         restRatingMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, updatedRating.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(updatedRating))
             )
@@ -210,6 +218,7 @@ class RatingResourceIT {
         restRatingMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, rating.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(rating))
             )
@@ -230,6 +239,7 @@ class RatingResourceIT {
         restRatingMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(rating))
             )
@@ -248,7 +258,9 @@ class RatingResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restRatingMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(rating)))
+            .perform(
+                put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(rating))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Rating in the database
@@ -273,6 +285,7 @@ class RatingResourceIT {
         restRatingMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedRating.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedRating))
             )
@@ -303,6 +316,7 @@ class RatingResourceIT {
         restRatingMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedRating.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedRating))
             )
@@ -326,6 +340,7 @@ class RatingResourceIT {
         restRatingMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, rating.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(rating))
             )
@@ -346,6 +361,7 @@ class RatingResourceIT {
         restRatingMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(rating))
             )
@@ -364,7 +380,12 @@ class RatingResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restRatingMockMvc
-            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(rating)))
+            .perform(
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(rating))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Rating in the database
@@ -382,7 +403,7 @@ class RatingResourceIT {
 
         // Delete the rating
         restRatingMockMvc
-            .perform(delete(ENTITY_API_URL_ID, rating.getId()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, rating.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

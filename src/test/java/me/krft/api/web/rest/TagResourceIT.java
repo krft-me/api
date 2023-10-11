@@ -2,6 +2,7 @@ package me.krft.api.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -82,7 +83,9 @@ class TagResourceIT {
         int databaseSizeBeforeCreate = tagRepository.findAll().size();
         // Create the Tag
         restTagMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(tag)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(tag))
+            )
             .andExpect(status().isCreated());
 
         // Validate the Tag in the database
@@ -102,7 +105,9 @@ class TagResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restTagMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(tag)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(tag))
+            )
             .andExpect(status().isBadRequest());
 
         // Validate the Tag in the database
@@ -120,7 +125,9 @@ class TagResourceIT {
         // Create the Tag, which fails.
 
         restTagMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(tag)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(tag))
+            )
             .andExpect(status().isBadRequest());
 
         List<Tag> tagList = tagRepository.findAll();
@@ -181,6 +188,7 @@ class TagResourceIT {
         restTagMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, updatedTag.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(updatedTag))
             )
@@ -202,7 +210,10 @@ class TagResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restTagMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, tag.getId()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(tag))
+                put(ENTITY_API_URL_ID, tag.getId())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(tag))
             )
             .andExpect(status().isBadRequest());
 
@@ -221,6 +232,7 @@ class TagResourceIT {
         restTagMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(tag))
             )
@@ -239,7 +251,9 @@ class TagResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTagMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(tag)))
+            .perform(
+                put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(tag))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Tag in the database
@@ -264,6 +278,7 @@ class TagResourceIT {
         restTagMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedTag.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedTag))
             )
@@ -293,6 +308,7 @@ class TagResourceIT {
         restTagMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedTag.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedTag))
             )
@@ -315,6 +331,7 @@ class TagResourceIT {
         restTagMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, tag.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(tag))
             )
@@ -335,6 +352,7 @@ class TagResourceIT {
         restTagMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(tag))
             )
@@ -353,7 +371,12 @@ class TagResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTagMockMvc
-            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(tag)))
+            .perform(
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(tag))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Tag in the database
@@ -370,7 +393,9 @@ class TagResourceIT {
         int databaseSizeBeforeDelete = tagRepository.findAll().size();
 
         // Delete the tag
-        restTagMockMvc.perform(delete(ENTITY_API_URL_ID, tag.getId()).accept(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
+        restTagMockMvc
+            .perform(delete(ENTITY_API_URL_ID, tag.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
         List<Tag> tagList = tagRepository.findAll();
