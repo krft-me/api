@@ -1,0 +1,13 @@
+POST http://localhost:8081/api/authenticate
+Content-Type: application/json
+
+{"password":"admin","username":"admin"}
+
+###
+
+
+GET http://localhost:8081/api/application-users
+Accept: application/json
+Authorization:
+
+###

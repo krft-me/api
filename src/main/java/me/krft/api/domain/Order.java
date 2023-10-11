@@ -40,7 +40,7 @@ public class Order implements Serializable {
     private ApplicationUserOffer provider;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "city" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "city", "favoriteApplicationUsers", "favoriteOffers", "followers" }, allowSetters = true)
     private ApplicationUser client;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

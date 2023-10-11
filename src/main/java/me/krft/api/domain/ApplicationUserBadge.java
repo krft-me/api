@@ -30,7 +30,7 @@ public class ApplicationUserBadge implements Serializable {
     private Instant obtentionDate;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "city" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "city", "favoriteApplicationUsers", "favoriteOffers", "followers" }, allowSetters = true)
     private ApplicationUser applicationUser;
 
     @ManyToOne
