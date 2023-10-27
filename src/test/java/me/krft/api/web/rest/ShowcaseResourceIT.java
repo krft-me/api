@@ -2,6 +2,7 @@ package me.krft.api.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -83,7 +84,12 @@ class ShowcaseResourceIT {
         int databaseSizeBeforeCreate = showcaseRepository.findAll().size();
         // Create the Showcase
         restShowcaseMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(showcase)))
+            .perform(
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(showcase))
+            )
             .andExpect(status().isCreated());
 
         // Validate the Showcase in the database
@@ -103,7 +109,12 @@ class ShowcaseResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restShowcaseMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(showcase)))
+            .perform(
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(showcase))
+            )
             .andExpect(status().isBadRequest());
 
         // Validate the Showcase in the database
@@ -121,7 +132,12 @@ class ShowcaseResourceIT {
         // Create the Showcase, which fails.
 
         restShowcaseMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(showcase)))
+            .perform(
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(showcase))
+            )
             .andExpect(status().isBadRequest());
 
         List<Showcase> showcaseList = showcaseRepository.findAll();
@@ -182,6 +198,7 @@ class ShowcaseResourceIT {
         restShowcaseMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, updatedShowcase.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(updatedShowcase))
             )
@@ -204,6 +221,7 @@ class ShowcaseResourceIT {
         restShowcaseMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, showcase.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(showcase))
             )
@@ -224,6 +242,7 @@ class ShowcaseResourceIT {
         restShowcaseMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(showcase))
             )
@@ -242,7 +261,12 @@ class ShowcaseResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restShowcaseMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(showcase)))
+            .perform(
+                put(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(showcase))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Showcase in the database
@@ -267,6 +291,7 @@ class ShowcaseResourceIT {
         restShowcaseMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedShowcase.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedShowcase))
             )
@@ -296,6 +321,7 @@ class ShowcaseResourceIT {
         restShowcaseMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedShowcase.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedShowcase))
             )
@@ -318,6 +344,7 @@ class ShowcaseResourceIT {
         restShowcaseMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, showcase.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(showcase))
             )
@@ -338,6 +365,7 @@ class ShowcaseResourceIT {
         restShowcaseMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(showcase))
             )
@@ -356,7 +384,12 @@ class ShowcaseResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restShowcaseMockMvc
-            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(showcase)))
+            .perform(
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(showcase))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Showcase in the database
@@ -374,7 +407,7 @@ class ShowcaseResourceIT {
 
         // Delete the showcase
         restShowcaseMockMvc
-            .perform(delete(ENTITY_API_URL_ID, showcase.getId()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, showcase.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

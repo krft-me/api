@@ -2,6 +2,7 @@ package me.krft.api.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -82,7 +83,12 @@ class CountryResourceIT {
         int databaseSizeBeforeCreate = countryRepository.findAll().size();
         // Create the Country
         restCountryMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(country)))
+            .perform(
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(country))
+            )
             .andExpect(status().isCreated());
 
         // Validate the Country in the database
@@ -102,7 +108,12 @@ class CountryResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restCountryMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(country)))
+            .perform(
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(country))
+            )
             .andExpect(status().isBadRequest());
 
         // Validate the Country in the database
@@ -120,7 +131,12 @@ class CountryResourceIT {
         // Create the Country, which fails.
 
         restCountryMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(country)))
+            .perform(
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(country))
+            )
             .andExpect(status().isBadRequest());
 
         List<Country> countryList = countryRepository.findAll();
@@ -181,6 +197,7 @@ class CountryResourceIT {
         restCountryMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, updatedCountry.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(updatedCountry))
             )
@@ -203,6 +220,7 @@ class CountryResourceIT {
         restCountryMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, country.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(country))
             )
@@ -223,6 +241,7 @@ class CountryResourceIT {
         restCountryMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(country))
             )
@@ -241,7 +260,9 @@ class CountryResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restCountryMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(country)))
+            .perform(
+                put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(country))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Country in the database
@@ -266,6 +287,7 @@ class CountryResourceIT {
         restCountryMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedCountry.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedCountry))
             )
@@ -295,6 +317,7 @@ class CountryResourceIT {
         restCountryMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedCountry.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedCountry))
             )
@@ -317,6 +340,7 @@ class CountryResourceIT {
         restCountryMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, country.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(country))
             )
@@ -337,6 +361,7 @@ class CountryResourceIT {
         restCountryMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(country))
             )
@@ -355,7 +380,12 @@ class CountryResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restCountryMockMvc
-            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(country)))
+            .perform(
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(country))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Country in the database
@@ -373,7 +403,7 @@ class CountryResourceIT {
 
         // Delete the country
         restCountryMockMvc
-            .perform(delete(ENTITY_API_URL_ID, country.getId()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, country.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

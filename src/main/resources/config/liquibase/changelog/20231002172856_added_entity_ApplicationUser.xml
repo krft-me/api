@@ -26,6 +26,9 @@
             <column name="average_rating" type="double">
                 <constraints nullable="false" />
             </column>
+            <column name="internal_user_id" type="varchar(100)">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_application_user__internal_user_id" />
+            </column>
             <column name="city_id" type="bigint">
                 <constraints nullable="true" />
             </column>

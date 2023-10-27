@@ -2,6 +2,7 @@ package me.krft.api.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -82,7 +83,9 @@ class OfferResourceIT {
         int databaseSizeBeforeCreate = offerRepository.findAll().size();
         // Create the Offer
         restOfferMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(offer)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(offer))
+            )
             .andExpect(status().isCreated());
 
         // Validate the Offer in the database
@@ -102,7 +105,9 @@ class OfferResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restOfferMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(offer)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(offer))
+            )
             .andExpect(status().isBadRequest());
 
         // Validate the Offer in the database
@@ -120,7 +125,9 @@ class OfferResourceIT {
         // Create the Offer, which fails.
 
         restOfferMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(offer)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(offer))
+            )
             .andExpect(status().isBadRequest());
 
         List<Offer> offerList = offerRepository.findAll();
@@ -181,6 +188,7 @@ class OfferResourceIT {
         restOfferMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, updatedOffer.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(updatedOffer))
             )
@@ -203,6 +211,7 @@ class OfferResourceIT {
         restOfferMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, offer.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(offer))
             )
@@ -223,6 +232,7 @@ class OfferResourceIT {
         restOfferMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(offer))
             )
@@ -241,7 +251,9 @@ class OfferResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOfferMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(offer)))
+            .perform(
+                put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(offer))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Offer in the database
@@ -264,6 +276,7 @@ class OfferResourceIT {
         restOfferMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedOffer.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedOffer))
             )
@@ -293,6 +306,7 @@ class OfferResourceIT {
         restOfferMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedOffer.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedOffer))
             )
@@ -315,6 +329,7 @@ class OfferResourceIT {
         restOfferMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, offer.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(offer))
             )
@@ -335,6 +350,7 @@ class OfferResourceIT {
         restOfferMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(offer))
             )
@@ -353,7 +369,12 @@ class OfferResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOfferMockMvc
-            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(offer)))
+            .perform(
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(offer))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Offer in the database
@@ -371,7 +392,7 @@ class OfferResourceIT {
 
         // Delete the offer
         restOfferMockMvc
-            .perform(delete(ENTITY_API_URL_ID, offer.getId()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, offer.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

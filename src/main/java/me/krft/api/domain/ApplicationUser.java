@@ -42,6 +42,10 @@ public class ApplicationUser implements Serializable {
     @Column(name = "average_rating", nullable = false)
     private Double averageRating;
 
+    @OneToOne
+    @JoinColumn(unique = true)
+    private User internalUser;
+
     @ManyToOne
     @JsonIgnoreProperties(value = { "region" }, allowSetters = true)
     private City city;
@@ -53,7 +57,10 @@ public class ApplicationUser implements Serializable {
         inverseJoinColumns = @JoinColumn(name = "favorite_application_user_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "city", "favoriteApplicationUsers", "favoriteOffers", "followers" }, allowSetters = true)
+    @JsonIgnoreProperties(
+        value = { "internalUser", "city", "favoriteApplicationUsers", "favoriteOffers", "followers" },
+        allowSetters = true
+    )
     private Set<ApplicationUser> favoriteApplicationUsers = new HashSet<>();
 
     @ManyToMany
@@ -68,7 +75,10 @@ public class ApplicationUser implements Serializable {
 
     @ManyToMany(mappedBy = "favoriteApplicationUsers")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "city", "favoriteApplicationUsers", "favoriteOffers", "followers" }, allowSetters = true)
+    @JsonIgnoreProperties(
+        value = { "internalUser", "city", "favoriteApplicationUsers", "favoriteOffers", "followers" },
+        allowSetters = true
+    )
     private Set<ApplicationUser> followers = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -136,6 +146,19 @@ public class ApplicationUser implements Serializable {
 
     public void setAverageRating(Double averageRating) {
         this.averageRating = averageRating;
+    }
+
+    public User getInternalUser() {
+        return this.internalUser;
+    }
+
+    public void setInternalUser(User user) {
+        this.internalUser = user;
+    }
+
+    public ApplicationUser internalUser(User user) {
+        this.setInternalUser(user);
+        return this;
     }
 
     public City getCity() {

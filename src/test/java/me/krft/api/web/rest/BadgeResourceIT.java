@@ -2,6 +2,7 @@ package me.krft.api.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -88,7 +89,9 @@ class BadgeResourceIT {
         int databaseSizeBeforeCreate = badgeRepository.findAll().size();
         // Create the Badge
         restBadgeMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(badge)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(badge))
+            )
             .andExpect(status().isCreated());
 
         // Validate the Badge in the database
@@ -110,7 +113,9 @@ class BadgeResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restBadgeMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(badge)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(badge))
+            )
             .andExpect(status().isBadRequest());
 
         // Validate the Badge in the database
@@ -128,7 +133,9 @@ class BadgeResourceIT {
         // Create the Badge, which fails.
 
         restBadgeMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(badge)))
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(badge))
+            )
             .andExpect(status().isBadRequest());
 
         List<Badge> badgeList = badgeRepository.findAll();
@@ -193,6 +200,7 @@ class BadgeResourceIT {
         restBadgeMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, updatedBadge.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(updatedBadge))
             )
@@ -217,6 +225,7 @@ class BadgeResourceIT {
         restBadgeMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, badge.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(badge))
             )
@@ -237,6 +246,7 @@ class BadgeResourceIT {
         restBadgeMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(badge))
             )
@@ -255,7 +265,9 @@ class BadgeResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBadgeMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(badge)))
+            .perform(
+                put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(badge))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Badge in the database
@@ -280,6 +292,7 @@ class BadgeResourceIT {
         restBadgeMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedBadge.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedBadge))
             )
@@ -311,6 +324,7 @@ class BadgeResourceIT {
         restBadgeMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedBadge.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedBadge))
             )
@@ -335,6 +349,7 @@ class BadgeResourceIT {
         restBadgeMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, badge.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(badge))
             )
@@ -355,6 +370,7 @@ class BadgeResourceIT {
         restBadgeMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(badge))
             )
@@ -373,7 +389,12 @@ class BadgeResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBadgeMockMvc
-            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(badge)))
+            .perform(
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(badge))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Badge in the database
@@ -391,7 +412,7 @@ class BadgeResourceIT {
 
         // Delete the badge
         restBadgeMockMvc
-            .perform(delete(ENTITY_API_URL_ID, badge.getId()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, badge.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

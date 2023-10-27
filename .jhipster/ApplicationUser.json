@@ -36,6 +36,12 @@
   "readOnly": false,
   "relationships": [
     {
+      "otherEntityName": "user",
+      "ownerSide": true,
+      "relationshipName": "internalUser",
+      "relationshipType": "one-to-one"
+    },
+    {
       "otherEntityName": "city",
       "relationshipName": "city",
       "relationshipType": "many-to-one"

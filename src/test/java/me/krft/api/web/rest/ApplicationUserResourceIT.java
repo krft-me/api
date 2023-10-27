@@ -3,6 +3,7 @@ package me.krft.api.web.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -14,6 +15,7 @@ import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.ApplicationUser;
 import me.krft.api.repository.ApplicationUserRepository;
+import me.krft.api.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -58,6 +60,9 @@ class ApplicationUserResourceIT {
 
     @Autowired
     private ApplicationUserRepository applicationUserRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Mock
     private ApplicationUserRepository applicationUserRepositoryMock;
@@ -112,7 +117,10 @@ class ApplicationUserResourceIT {
         // Create the ApplicationUser
         restApplicationUserMockMvc
             .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(applicationUser))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
             .andExpect(status().isCreated());
 
@@ -137,7 +145,10 @@ class ApplicationUserResourceIT {
         // An entity with an existing ID cannot be created, so this API call must fail
         restApplicationUserMockMvc
             .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(applicationUser))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
             .andExpect(status().isBadRequest());
 
@@ -157,7 +168,10 @@ class ApplicationUserResourceIT {
 
         restApplicationUserMockMvc
             .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(applicationUser))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
             .andExpect(status().isBadRequest());
 
@@ -176,7 +190,10 @@ class ApplicationUserResourceIT {
 
         restApplicationUserMockMvc
             .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(applicationUser))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
             .andExpect(status().isBadRequest());
 
@@ -195,7 +212,10 @@ class ApplicationUserResourceIT {
 
         restApplicationUserMockMvc
             .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(applicationUser))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
             .andExpect(status().isBadRequest());
 
@@ -214,7 +234,10 @@ class ApplicationUserResourceIT {
 
         restApplicationUserMockMvc
             .perform(
-                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(applicationUser))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
             .andExpect(status().isBadRequest());
 
@@ -303,6 +326,7 @@ class ApplicationUserResourceIT {
         restApplicationUserMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, updatedApplicationUser.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(updatedApplicationUser))
             )
@@ -328,6 +352,7 @@ class ApplicationUserResourceIT {
         restApplicationUserMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, applicationUser.getId())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
@@ -348,6 +373,7 @@ class ApplicationUserResourceIT {
         restApplicationUserMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
@@ -367,7 +393,10 @@ class ApplicationUserResourceIT {
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserMockMvc
             .perform(
-                put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(applicationUser))
+                put(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -393,6 +422,7 @@ class ApplicationUserResourceIT {
         restApplicationUserMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedApplicationUser.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedApplicationUser))
             )
@@ -429,6 +459,7 @@ class ApplicationUserResourceIT {
         restApplicationUserMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedApplicationUser.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedApplicationUser))
             )
@@ -454,6 +485,7 @@ class ApplicationUserResourceIT {
         restApplicationUserMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, applicationUser.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
@@ -474,6 +506,7 @@ class ApplicationUserResourceIT {
         restApplicationUserMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
@@ -494,6 +527,7 @@ class ApplicationUserResourceIT {
         restApplicationUserMockMvc
             .perform(
                 patch(ENTITY_API_URL)
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
@@ -514,7 +548,7 @@ class ApplicationUserResourceIT {
 
         // Delete the applicationUser
         restApplicationUserMockMvc
-            .perform(delete(ENTITY_API_URL_ID, applicationUser.getId()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, applicationUser.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
