@@ -9,7 +9,7 @@
     "clientFramework": "no",
     "creationTimestamp": 1695905819992,
     "databaseType": "sql",
-    "devDatabaseType": "h2Disk",
+    "devDatabaseType": "postgresql",
     "dtoSuffix": "DTO",
     "enableGradleEnterprise": false,
     "enableHibernateCache": true,

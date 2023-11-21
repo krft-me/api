@@ -58,7 +58,7 @@ spring:
       client:
         provider:
           oidc:
-            issuer-uri: http://localhost:9080/realms/krftme
+            issuer-uri: http://localhost:9080/realms/jhipster
         registration:
           oidc:
             client-id: web_app
