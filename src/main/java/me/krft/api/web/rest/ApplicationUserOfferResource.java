@@ -192,4 +192,5 @@ public class ApplicationUserOfferResource {
         log.debug("REST request to get all CardOffers");
         return applicationUserOfferRepository.findAll().stream().map(ApplicationUserOffer::toOfferCard).collect(Collectors.toList());
     }
+
 }
