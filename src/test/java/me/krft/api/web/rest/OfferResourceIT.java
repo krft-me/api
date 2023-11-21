@@ -11,6 +11,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
+import me.krft.api.domain.Machine;
 import me.krft.api.domain.Offer;
 import me.krft.api.repository.OfferRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +59,16 @@ class OfferResourceIT {
      */
     public static Offer createEntity(EntityManager em) {
         Offer offer = new Offer().name(DEFAULT_NAME);
+        // Add required entity
+        Machine machine;
+        if (TestUtil.findAll(em, Machine.class).isEmpty()) {
+            machine = MachineResourceIT.createEntity(em);
+            em.persist(machine);
+            em.flush();
+        } else {
+            machine = TestUtil.findAll(em, Machine.class).get(0);
+        }
+        offer.setMachine(machine);
         return offer;
     }
 
@@ -69,6 +80,16 @@ class OfferResourceIT {
      */
     public static Offer createUpdatedEntity(EntityManager em) {
         Offer offer = new Offer().name(UPDATED_NAME);
+        // Add required entity
+        Machine machine;
+        if (TestUtil.findAll(em, Machine.class).isEmpty()) {
+            machine = MachineResourceIT.createUpdatedEntity(em);
+            em.persist(machine);
+            em.flush();
+        } else {
+            machine = TestUtil.findAll(em, Machine.class).get(0);
+        }
+        offer.setMachine(machine);
         return offer;
     }
 

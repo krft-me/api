@@ -1,11 +1,11 @@
-id;name
-1;c Practical
-2;Jordanian
-3;Tasty users
-4;De-engineered
-5;Practical
-6;Gorgeous
-7;payment Refined payment
-8;Steel Sleek b
-9;state
-10;GB optical Account
+id;name;country_id
+1;Normandie;1
+2;Bretagne;1
+3;Pays de la Loire;1
+4;Centre Val de Loire;1
+5;Ile-de-France;1
+6;Bourgogne-Franche-Comté;1
+7;Grand Est;1
+8;Hauts-de-France;1
+9;Nouvelle-Aquitaine;1
+10;Occitanie;1

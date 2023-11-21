@@ -1,11 +1,11 @@
-id;name
-1;aggregate
-2;a generate Salad
-3;Polarised Bangladesh
-4;Limousin ubiquitous a
-5;pink b Loan
-6;Saint-Vincent-et-les-Grenadines Dinar content
-7;b
-8;b Cambridgeshire Coordinateur
-9;c
-10;Peso
+id;name;region_id
+1;Caen;1
+2;Cormelles-le-Royal;1
+3;Ifs;1
+4;Epron;1
+5;Mondeville;1
+6;Fleury-sur-Orne;1
+7;Blainville-sur-Orne;1
+8;Colombelles;1
+9;Giberville;1
+10;Esquay-Notre-Dame;1

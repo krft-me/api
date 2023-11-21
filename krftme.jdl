@@ -14,7 +14,6 @@ entity ApplicationUser {
     firstName String required
     lastName String required
     pseudo String required
-    averageRating Double required
 }
 
 entity Rating {
@@ -74,23 +73,23 @@ relationship OneToOne {
 }
 
 relationship OneToMany {
-    ApplicationUserOffer{rating} to Rating
     ApplicationUserOffer{showcase} to Showcase
-    Offer{machine} to Machine
-    Machine{category} to Category
     ApplicationUserOffer{tag} to Tag
 }
 
 relationship ManyToOne {
-    ApplicationUserOffer{offer} to Offer
-    ApplicationUserOffer{applicationUser} to ApplicationUser
+    ApplicationUserOffer{applicationUser required} to ApplicationUser
     ApplicationUserBadge{applicationUser} to ApplicationUser
     ApplicationUserBadge{badge} to Badge
     Order{provider} to ApplicationUserOffer
     Order{client} to ApplicationUser
-    ApplicationUser{city} to City
-    City{region} to Region
-    Region{country} to Country
+    ApplicationUser{city required} to City
+    City{region required} to Region
+    Region{country required} to Country
+    Machine{category required} to Category
+    Offer{machine required} to Machine
+    ApplicationUserOffer{offer required} to Offer
+    Rating{applicationUserOffer required} to ApplicationUserOffer
 }
 
 relationship ManyToMany {

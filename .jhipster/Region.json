@@ -23,7 +23,8 @@
     {
       "otherEntityName": "country",
       "relationshipName": "country",
-      "relationshipType": "many-to-one"
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
     }
   ],
   "service": "no"

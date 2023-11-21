@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.ApplicationUser;
+import me.krft.api.domain.City;
 import me.krft.api.repository.ApplicationUserRepository;
 import me.krft.api.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,9 +50,6 @@ class ApplicationUserResourceIT {
     private static final String DEFAULT_PSEUDO = "AAAAAAAAAA";
     private static final String UPDATED_PSEUDO = "BBBBBBBBBB";
 
-    private static final Double DEFAULT_AVERAGE_RATING = 1D;
-    private static final Double UPDATED_AVERAGE_RATING = 2D;
-
     private static final String ENTITY_API_URL = "/api/application-users";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
@@ -85,8 +83,17 @@ class ApplicationUserResourceIT {
         ApplicationUser applicationUser = new ApplicationUser()
             .firstName(DEFAULT_FIRST_NAME)
             .lastName(DEFAULT_LAST_NAME)
-            .pseudo(DEFAULT_PSEUDO)
-            .averageRating(DEFAULT_AVERAGE_RATING);
+            .pseudo(DEFAULT_PSEUDO);
+        // Add required entity
+        City city;
+        if (TestUtil.findAll(em, City.class).isEmpty()) {
+            city = CityResourceIT.createEntity(em);
+            em.persist(city);
+            em.flush();
+        } else {
+            city = TestUtil.findAll(em, City.class).get(0);
+        }
+        applicationUser.setCity(city);
         return applicationUser;
     }
 
@@ -100,8 +107,17 @@ class ApplicationUserResourceIT {
         ApplicationUser applicationUser = new ApplicationUser()
             .firstName(UPDATED_FIRST_NAME)
             .lastName(UPDATED_LAST_NAME)
-            .pseudo(UPDATED_PSEUDO)
-            .averageRating(UPDATED_AVERAGE_RATING);
+            .pseudo(UPDATED_PSEUDO);
+        // Add required entity
+        City city;
+        if (TestUtil.findAll(em, City.class).isEmpty()) {
+            city = CityResourceIT.createUpdatedEntity(em);
+            em.persist(city);
+            em.flush();
+        } else {
+            city = TestUtil.findAll(em, City.class).get(0);
+        }
+        applicationUser.setCity(city);
         return applicationUser;
     }
 
@@ -131,7 +147,6 @@ class ApplicationUserResourceIT {
         assertThat(testApplicationUser.getFirstName()).isEqualTo(DEFAULT_FIRST_NAME);
         assertThat(testApplicationUser.getLastName()).isEqualTo(DEFAULT_LAST_NAME);
         assertThat(testApplicationUser.getPseudo()).isEqualTo(DEFAULT_PSEUDO);
-        assertThat(testApplicationUser.getAverageRating()).isEqualTo(DEFAULT_AVERAGE_RATING);
     }
 
     @Test
@@ -225,28 +240,6 @@ class ApplicationUserResourceIT {
 
     @Test
     @Transactional
-    void checkAverageRatingIsRequired() throws Exception {
-        int databaseSizeBeforeTest = applicationUserRepository.findAll().size();
-        // set the field null
-        applicationUser.setAverageRating(null);
-
-        // Create the ApplicationUser, which fails.
-
-        restApplicationUserMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
-            )
-            .andExpect(status().isBadRequest());
-
-        List<ApplicationUser> applicationUserList = applicationUserRepository.findAll();
-        assertThat(applicationUserList).hasSize(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
     void getAllApplicationUsers() throws Exception {
         // Initialize the database
         applicationUserRepository.saveAndFlush(applicationUser);
@@ -259,8 +252,7 @@ class ApplicationUserResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(applicationUser.getId().intValue())))
             .andExpect(jsonPath("$.[*].firstName").value(hasItem(DEFAULT_FIRST_NAME)))
             .andExpect(jsonPath("$.[*].lastName").value(hasItem(DEFAULT_LAST_NAME)))
-            .andExpect(jsonPath("$.[*].pseudo").value(hasItem(DEFAULT_PSEUDO)))
-            .andExpect(jsonPath("$.[*].averageRating").value(hasItem(DEFAULT_AVERAGE_RATING.doubleValue())));
+            .andExpect(jsonPath("$.[*].pseudo").value(hasItem(DEFAULT_PSEUDO)));
     }
 
     @SuppressWarnings({ "unchecked" })
@@ -294,8 +286,7 @@ class ApplicationUserResourceIT {
             .andExpect(jsonPath("$.id").value(applicationUser.getId().intValue()))
             .andExpect(jsonPath("$.firstName").value(DEFAULT_FIRST_NAME))
             .andExpect(jsonPath("$.lastName").value(DEFAULT_LAST_NAME))
-            .andExpect(jsonPath("$.pseudo").value(DEFAULT_PSEUDO))
-            .andExpect(jsonPath("$.averageRating").value(DEFAULT_AVERAGE_RATING.doubleValue()));
+            .andExpect(jsonPath("$.pseudo").value(DEFAULT_PSEUDO));
     }
 
     @Test
@@ -317,11 +308,7 @@ class ApplicationUserResourceIT {
         ApplicationUser updatedApplicationUser = applicationUserRepository.findById(applicationUser.getId()).get();
         // Disconnect from session so that the updates on updatedApplicationUser are not directly saved in db
         em.detach(updatedApplicationUser);
-        updatedApplicationUser
-            .firstName(UPDATED_FIRST_NAME)
-            .lastName(UPDATED_LAST_NAME)
-            .pseudo(UPDATED_PSEUDO)
-            .averageRating(UPDATED_AVERAGE_RATING);
+        updatedApplicationUser.firstName(UPDATED_FIRST_NAME).lastName(UPDATED_LAST_NAME).pseudo(UPDATED_PSEUDO);
 
         restApplicationUserMockMvc
             .perform(
@@ -339,7 +326,6 @@ class ApplicationUserResourceIT {
         assertThat(testApplicationUser.getFirstName()).isEqualTo(UPDATED_FIRST_NAME);
         assertThat(testApplicationUser.getLastName()).isEqualTo(UPDATED_LAST_NAME);
         assertThat(testApplicationUser.getPseudo()).isEqualTo(UPDATED_PSEUDO);
-        assertThat(testApplicationUser.getAverageRating()).isEqualTo(UPDATED_AVERAGE_RATING);
     }
 
     @Test
@@ -435,7 +421,6 @@ class ApplicationUserResourceIT {
         assertThat(testApplicationUser.getFirstName()).isEqualTo(DEFAULT_FIRST_NAME);
         assertThat(testApplicationUser.getLastName()).isEqualTo(UPDATED_LAST_NAME);
         assertThat(testApplicationUser.getPseudo()).isEqualTo(UPDATED_PSEUDO);
-        assertThat(testApplicationUser.getAverageRating()).isEqualTo(DEFAULT_AVERAGE_RATING);
     }
 
     @Test
@@ -450,11 +435,7 @@ class ApplicationUserResourceIT {
         ApplicationUser partialUpdatedApplicationUser = new ApplicationUser();
         partialUpdatedApplicationUser.setId(applicationUser.getId());
 
-        partialUpdatedApplicationUser
-            .firstName(UPDATED_FIRST_NAME)
-            .lastName(UPDATED_LAST_NAME)
-            .pseudo(UPDATED_PSEUDO)
-            .averageRating(UPDATED_AVERAGE_RATING);
+        partialUpdatedApplicationUser.firstName(UPDATED_FIRST_NAME).lastName(UPDATED_LAST_NAME).pseudo(UPDATED_PSEUDO);
 
         restApplicationUserMockMvc
             .perform(
@@ -472,7 +453,6 @@ class ApplicationUserResourceIT {
         assertThat(testApplicationUser.getFirstName()).isEqualTo(UPDATED_FIRST_NAME);
         assertThat(testApplicationUser.getLastName()).isEqualTo(UPDATED_LAST_NAME);
         assertThat(testApplicationUser.getPseudo()).isEqualTo(UPDATED_PSEUDO);
-        assertThat(testApplicationUser.getAverageRating()).isEqualTo(UPDATED_AVERAGE_RATING);
     }
 
     @Test

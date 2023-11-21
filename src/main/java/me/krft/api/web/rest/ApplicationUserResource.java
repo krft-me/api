@@ -153,9 +153,6 @@ public class ApplicationUserResource {
                 if (applicationUser.getPseudo() != null) {
                     existingApplicationUser.setPseudo(applicationUser.getPseudo());
                 }
-                if (applicationUser.getAverageRating() != null) {
-                    existingApplicationUser.setAverageRating(applicationUser.getAverageRating());
-                }
 
                 return existingApplicationUser;
             })

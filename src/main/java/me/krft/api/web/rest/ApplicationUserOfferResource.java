@@ -5,10 +5,12 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.repository.ApplicationUserOfferRepository;
+import me.krft.api.service.dto.OfferCard;
 import me.krft.api.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,5 +180,16 @@ public class ApplicationUserOfferResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    /**
+     * {@code GET  /card-offers} : get all the cardOffers.
+     *
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of cardOffers in body.
+     */
+    @GetMapping("/card-offers")
+    public List<OfferCard> getAllCardOffers() {
+        log.debug("REST request to get all CardOffers");
+        return applicationUserOfferRepository.findAll().stream().map(ApplicationUserOffer::toOfferCard).collect(Collectors.toList());
     }
 }

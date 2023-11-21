@@ -36,7 +36,7 @@ public class Order implements Serializable {
     private State state;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "ratings", "showcases", "tags", "offer", "applicationUser" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "showcases", "tags", "applicationUser", "offer" }, allowSetters = true)
     private ApplicationUserOffer provider;
 
     @ManyToOne

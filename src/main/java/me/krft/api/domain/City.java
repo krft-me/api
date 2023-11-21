@@ -28,7 +28,8 @@ public class City implements Serializable {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @NotNull
     @JsonIgnoreProperties(value = { "country" }, allowSetters = true)
     private Region region;
 

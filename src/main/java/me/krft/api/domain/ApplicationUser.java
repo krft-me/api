@@ -38,15 +38,12 @@ public class ApplicationUser implements Serializable {
     @Column(name = "pseudo", nullable = false)
     private String pseudo;
 
-    @NotNull
-    @Column(name = "average_rating", nullable = false)
-    private Double averageRating;
-
     @OneToOne
     @JoinColumn(unique = true)
     private User internalUser;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @NotNull
     @JsonIgnoreProperties(value = { "region" }, allowSetters = true)
     private City city;
 
@@ -70,7 +67,7 @@ public class ApplicationUser implements Serializable {
         inverseJoinColumns = @JoinColumn(name = "favorite_offer_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "machines", "followers" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "machine", "followers" }, allowSetters = true)
     private Set<Offer> favoriteOffers = new HashSet<>();
 
     @ManyToMany(mappedBy = "favoriteApplicationUsers")
@@ -133,19 +130,6 @@ public class ApplicationUser implements Serializable {
 
     public void setPseudo(String pseudo) {
         this.pseudo = pseudo;
-    }
-
-    public Double getAverageRating() {
-        return this.averageRating;
-    }
-
-    public ApplicationUser averageRating(Double averageRating) {
-        this.setAverageRating(averageRating);
-        return this;
-    }
-
-    public void setAverageRating(Double averageRating) {
-        this.averageRating = averageRating;
     }
 
     public User getInternalUser() {
@@ -282,7 +266,6 @@ public class ApplicationUser implements Serializable {
             ", firstName='" + getFirstName() + "'" +
             ", lastName='" + getLastName() + "'" +
             ", pseudo='" + getPseudo() + "'" +
-            ", averageRating=" + getAverageRating() +
             "}";
     }
 }

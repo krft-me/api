@@ -11,6 +11,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
+import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.domain.Rating;
 import me.krft.api.repository.RatingRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,6 +62,16 @@ class RatingResourceIT {
      */
     public static Rating createEntity(EntityManager em) {
         Rating rating = new Rating().rate(DEFAULT_RATE).comment(DEFAULT_COMMENT);
+        // Add required entity
+        ApplicationUserOffer applicationUserOffer;
+        if (TestUtil.findAll(em, ApplicationUserOffer.class).isEmpty()) {
+            applicationUserOffer = ApplicationUserOfferResourceIT.createEntity(em);
+            em.persist(applicationUserOffer);
+            em.flush();
+        } else {
+            applicationUserOffer = TestUtil.findAll(em, ApplicationUserOffer.class).get(0);
+        }
+        rating.setApplicationUserOffer(applicationUserOffer);
         return rating;
     }
 
@@ -72,6 +83,16 @@ class RatingResourceIT {
      */
     public static Rating createUpdatedEntity(EntityManager em) {
         Rating rating = new Rating().rate(UPDATED_RATE).comment(UPDATED_COMMENT);
+        // Add required entity
+        ApplicationUserOffer applicationUserOffer;
+        if (TestUtil.findAll(em, ApplicationUserOffer.class).isEmpty()) {
+            applicationUserOffer = ApplicationUserOfferResourceIT.createUpdatedEntity(em);
+            em.persist(applicationUserOffer);
+            em.flush();
+        } else {
+            applicationUserOffer = TestUtil.findAll(em, ApplicationUserOffer.class).get(0);
+        }
+        rating.setApplicationUserOffer(applicationUserOffer);
         return rating;
     }
 

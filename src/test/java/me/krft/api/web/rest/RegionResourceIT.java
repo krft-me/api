@@ -11,6 +11,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
+import me.krft.api.domain.Country;
 import me.krft.api.domain.Region;
 import me.krft.api.repository.RegionRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +59,16 @@ class RegionResourceIT {
      */
     public static Region createEntity(EntityManager em) {
         Region region = new Region().name(DEFAULT_NAME);
+        // Add required entity
+        Country country;
+        if (TestUtil.findAll(em, Country.class).isEmpty()) {
+            country = CountryResourceIT.createEntity(em);
+            em.persist(country);
+            em.flush();
+        } else {
+            country = TestUtil.findAll(em, Country.class).get(0);
+        }
+        region.setCountry(country);
         return region;
     }
 
@@ -69,6 +80,16 @@ class RegionResourceIT {
      */
     public static Region createUpdatedEntity(EntityManager em) {
         Region region = new Region().name(UPDATED_NAME);
+        // Add required entity
+        Country country;
+        if (TestUtil.findAll(em, Country.class).isEmpty()) {
+            country = CountryResourceIT.createUpdatedEntity(em);
+            em.persist(country);
+            em.flush();
+        } else {
+            country = TestUtil.findAll(em, Country.class).get(0);
+        }
+        region.setCountry(country);
         return region;
     }
 

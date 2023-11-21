@@ -23,14 +23,11 @@
             <column name="pseudo" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
-            <column name="average_rating" type="double">
-                <constraints nullable="false" />
-            </column>
             <column name="internal_user_id" type="varchar(100)">
                 <constraints nullable="true" unique="true" uniqueConstraintName="ux_application_user__internal_user_id" />
             </column>
             <column name="city_id" type="bigint">
-                <constraints nullable="true" />
+                <constraints nullable="false" />
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
@@ -81,7 +78,7 @@
             <column name="first_name" type="string"/>
             <column name="last_name" type="string"/>
             <column name="pseudo" type="string"/>
-            <column name="average_rating" type="numeric"/>
+            <column name="city_id" type="numeric"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

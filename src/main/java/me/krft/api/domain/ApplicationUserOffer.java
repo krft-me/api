@@ -4,8 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.*;
 import javax.validation.constraints.*;
+
+import me.krft.api.service.dto.OfferCard;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -45,16 +48,18 @@ public class ApplicationUserOffer implements Serializable {
     @JsonIgnoreProperties(value = { "applicationUserOffer" }, allowSetters = true)
     private Set<Tag> tags = new HashSet<>();
 
-    @ManyToOne
-    @JsonIgnoreProperties(value = { "machines", "followers" }, allowSetters = true)
-    private Offer offer;
-
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @NotNull
     @JsonIgnoreProperties(
         value = { "internalUser", "city", "favoriteApplicationUsers", "favoriteOffers", "followers" },
         allowSetters = true
     )
     private ApplicationUser applicationUser;
+
+    @ManyToOne(optional = false)
+    @NotNull
+    @JsonIgnoreProperties(value = { "machine", "followers" }, allowSetters = true)
+    private Offer offer;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -177,19 +182,6 @@ public class ApplicationUserOffer implements Serializable {
         return this;
     }
 
-    public Offer getOffer() {
-        return this.offer;
-    }
-
-    public void setOffer(Offer offer) {
-        this.offer = offer;
-    }
-
-    public ApplicationUserOffer offer(Offer offer) {
-        this.setOffer(offer);
-        return this;
-    }
-
     public ApplicationUser getApplicationUser() {
         return this.applicationUser;
     }
@@ -203,7 +195,24 @@ public class ApplicationUserOffer implements Serializable {
         return this;
     }
 
+    public Offer getOffer() {
+        return this.offer;
+    }
+
+    public void setOffer(Offer offer) {
+        this.offer = offer;
+    }
+
+    public ApplicationUserOffer offer(Offer offer) {
+        this.setOffer(offer);
+        return this;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+
+    public OfferCard toOfferCard() {
+        return new OfferCard(this.offer.getMachine().getName(), this.id, this.offer.getName(), "link", this.description, this.tags.stream().map(Tag::getLabel).collect(Collectors.toList()), this.ratings.stream().mapToDouble(Rating::getRate).average().orElse(0.0), this.ratings.size(), 10.00, "link", this.applicationUser.getPseudo(), this.applicationUser.getCity().getName(), false);
+    }
 
     @Override
     public boolean equals(Object o) {

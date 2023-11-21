@@ -29,7 +29,7 @@ public class Tag implements Serializable {
     private String label;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "ratings", "showcases", "tags", "offer", "applicationUser" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "showcases", "tags", "applicationUser", "offer" }, allowSetters = true)
     private ApplicationUserOffer applicationUserOffer;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

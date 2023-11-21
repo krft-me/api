@@ -26,9 +26,9 @@
   "relationships": [
     {
       "otherEntityName": "applicationUserOffer",
-      "otherEntityRelationshipName": "rating",
       "relationshipName": "applicationUserOffer",
-      "relationshipType": "many-to-one"
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
     }
   ],
   "service": "no"

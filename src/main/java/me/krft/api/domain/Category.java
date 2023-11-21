@@ -1,6 +1,5 @@
 package me.krft.api.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -28,10 +27,6 @@ public class Category implements Serializable {
     @Column(name = "label", nullable = false)
     private String label;
 
-    @ManyToOne
-    @JsonIgnoreProperties(value = { "categories", "offer" }, allowSetters = true)
-    private Machine machine;
-
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -58,19 +53,6 @@ public class Category implements Serializable {
 
     public void setLabel(String label) {
         this.label = label;
-    }
-
-    public Machine getMachine() {
-        return this.machine;
-    }
-
-    public void setMachine(Machine machine) {
-        this.machine = machine;
-    }
-
-    public Category machine(Machine machine) {
-        this.setMachine(machine);
-        return this;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

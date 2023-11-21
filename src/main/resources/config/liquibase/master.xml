@@ -42,7 +42,7 @@
     <include file="config/liquibase/changelog/20231002172903_added_entity_constraints_ApplicationUserBadge.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20231002172904_added_entity_constraints_Order.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20231002172905_added_entity_constraints_Tag.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20231002172906_added_entity_constraints_Category.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20231002172859_added_entity_constraints_Offer.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

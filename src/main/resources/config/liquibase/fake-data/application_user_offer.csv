@@ -1,11 +1,9 @@
-id;description
-1;action-items
-2;Kong
-3;collaborative services adapter
-4;contingency des invoice
-5;Consultant Loan
-6;blue deploy Outdoors
-7;HDD
-8;orchestration b
-9;payment Wooden
-10;generate Buckinghamshire
+id;description;application_user_id;offer_id
+1;Desc AppUseOff 1;1;1
+2;Desc AppUseOff 2;1;1
+3;Desc AppUseOff 3;2;2
+4;Desc AppUseOff 4;2;2
+5;Desc AppUseOff 5;3;3
+6;Desc AppUseOff 6;3;3
+7;Desc AppUseOff 7;4;4
+8;Desc AppUseOff 8;4;4

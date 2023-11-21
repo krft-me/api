@@ -30,10 +30,10 @@ public class Offer implements Serializable {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "offer")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "categories", "offer" }, allowSetters = true)
-    private Set<Machine> machines = new HashSet<>();
+    @ManyToOne(optional = false)
+    @NotNull
+    @JsonIgnoreProperties(value = { "category" }, allowSetters = true)
+    private Machine machine;
 
     @ManyToMany(mappedBy = "favoriteOffers")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -71,34 +71,16 @@ public class Offer implements Serializable {
         this.name = name;
     }
 
-    public Set<Machine> getMachines() {
-        return this.machines;
+    public Machine getMachine() {
+        return this.machine;
     }
 
-    public void setMachines(Set<Machine> machines) {
-        if (this.machines != null) {
-            this.machines.forEach(i -> i.setOffer(null));
-        }
-        if (machines != null) {
-            machines.forEach(i -> i.setOffer(this));
-        }
-        this.machines = machines;
+    public void setMachine(Machine machine) {
+        this.machine = machine;
     }
 
-    public Offer machines(Set<Machine> machines) {
-        this.setMachines(machines);
-        return this;
-    }
-
-    public Offer addMachine(Machine machine) {
-        this.machines.add(machine);
-        machine.setOffer(this);
-        return this;
-    }
-
-    public Offer removeMachine(Machine machine) {
-        this.machines.remove(machine);
-        machine.setOffer(null);
+    public Offer machine(Machine machine) {
+        this.setMachine(machine);
         return this;
     }
 

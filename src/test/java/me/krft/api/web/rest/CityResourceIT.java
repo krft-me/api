@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.City;
+import me.krft.api.domain.Region;
 import me.krft.api.repository.CityRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,6 +59,16 @@ class CityResourceIT {
      */
     public static City createEntity(EntityManager em) {
         City city = new City().name(DEFAULT_NAME);
+        // Add required entity
+        Region region;
+        if (TestUtil.findAll(em, Region.class).isEmpty()) {
+            region = RegionResourceIT.createEntity(em);
+            em.persist(region);
+            em.flush();
+        } else {
+            region = TestUtil.findAll(em, Region.class).get(0);
+        }
+        city.setRegion(region);
         return city;
     }
 
@@ -69,6 +80,16 @@ class CityResourceIT {
      */
     public static City createUpdatedEntity(EntityManager em) {
         City city = new City().name(UPDATED_NAME);
+        // Add required entity
+        Region region;
+        if (TestUtil.findAll(em, Region.class).isEmpty()) {
+            region = RegionResourceIT.createUpdatedEntity(em);
+            em.persist(region);
+            em.flush();
+        } else {
+            region = TestUtil.findAll(em, Region.class).get(0);
+        }
+        city.setRegion(region);
         return city;
     }
 

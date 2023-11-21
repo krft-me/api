@@ -1,11 +1,11 @@
-id;first_name;last_name;pseudo;average_rating
-1;Fulbert;Laurent;standardization Mandatory;15534
-2;Annonciade;Lopez;Account array and;57278
-3;Victorien;Mercier;quantify Designer;69428
-4;Antonin;Laine;CSS benchmark d'Argenteuil;21576
-5;Johan;Julien;mobile;54461
-6;Emmelie;Schmitt;a;61196
-7;Aphélie;Martin;solutions;70361
-8;Hubert;Henry;la JSON array;53372
-9;Euphrasie;Vasseur;Movies database users;41861
-10;Aricie;Barre;Jordanian;61168
+id;first_name;last_name;pseudo;city_id
+1;Valentin;Lebarbanchon;EniXo;1
+2;Julien;Lemoine;Jujulem;4
+3;Victor;Brionne;vixi9;1
+4;Antoine;Guespin;Kiwi;1
+5;Lucas;Thomassin;LuCastagne;1
+6;Arthur;Maurice;ThreZ;1
+7;Thibaut;Leval;Tibz;2
+8;Theault;Harruis;Pepe;1
+9;Lucas;Keller;LuKK;10
+10;Jade;Christien;JadeGPT;1

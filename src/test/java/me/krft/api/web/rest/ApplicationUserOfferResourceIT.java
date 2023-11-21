@@ -11,7 +11,9 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
+import me.krft.api.domain.ApplicationUser;
 import me.krft.api.domain.ApplicationUserOffer;
+import me.krft.api.domain.Offer;
 import me.krft.api.repository.ApplicationUserOfferRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,6 +60,26 @@ class ApplicationUserOfferResourceIT {
      */
     public static ApplicationUserOffer createEntity(EntityManager em) {
         ApplicationUserOffer applicationUserOffer = new ApplicationUserOffer().description(DEFAULT_DESCRIPTION);
+        // Add required entity
+        ApplicationUser applicationUser;
+        if (TestUtil.findAll(em, ApplicationUser.class).isEmpty()) {
+            applicationUser = ApplicationUserResourceIT.createEntity(em);
+            em.persist(applicationUser);
+            em.flush();
+        } else {
+            applicationUser = TestUtil.findAll(em, ApplicationUser.class).get(0);
+        }
+        applicationUserOffer.setApplicationUser(applicationUser);
+        // Add required entity
+        Offer offer;
+        if (TestUtil.findAll(em, Offer.class).isEmpty()) {
+            offer = OfferResourceIT.createEntity(em);
+            em.persist(offer);
+            em.flush();
+        } else {
+            offer = TestUtil.findAll(em, Offer.class).get(0);
+        }
+        applicationUserOffer.setOffer(offer);
         return applicationUserOffer;
     }
 
@@ -69,6 +91,26 @@ class ApplicationUserOfferResourceIT {
      */
     public static ApplicationUserOffer createUpdatedEntity(EntityManager em) {
         ApplicationUserOffer applicationUserOffer = new ApplicationUserOffer().description(UPDATED_DESCRIPTION);
+        // Add required entity
+        ApplicationUser applicationUser;
+        if (TestUtil.findAll(em, ApplicationUser.class).isEmpty()) {
+            applicationUser = ApplicationUserResourceIT.createUpdatedEntity(em);
+            em.persist(applicationUser);
+            em.flush();
+        } else {
+            applicationUser = TestUtil.findAll(em, ApplicationUser.class).get(0);
+        }
+        applicationUserOffer.setApplicationUser(applicationUser);
+        // Add required entity
+        Offer offer;
+        if (TestUtil.findAll(em, Offer.class).isEmpty()) {
+            offer = OfferResourceIT.createUpdatedEntity(em);
+            em.persist(offer);
+            em.flush();
+        } else {
+            offer = TestUtil.findAll(em, Offer.class).get(0);
+        }
+        applicationUserOffer.setOffer(offer);
         return applicationUserOffer;
     }
 

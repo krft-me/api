@@ -22,9 +22,9 @@
   "relationships": [
     {
       "otherEntityName": "machine",
-      "otherEntityRelationshipName": "offer",
       "relationshipName": "machine",
-      "relationshipType": "one-to-many"
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
     },
     {
       "otherEntityName": "applicationUser",

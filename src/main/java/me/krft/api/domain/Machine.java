@@ -1,9 +1,6 @@
 package me.krft.api.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
@@ -30,14 +27,9 @@ public class Machine implements Serializable {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "machine")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "machine" }, allowSetters = true)
-    private Set<Category> categories = new HashSet<>();
-
-    @ManyToOne
-    @JsonIgnoreProperties(value = { "machines", "followers" }, allowSetters = true)
-    private Offer offer;
+    @ManyToOne(optional = false)
+    @NotNull
+    private Category category;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -67,47 +59,16 @@ public class Machine implements Serializable {
         this.name = name;
     }
 
-    public Set<Category> getCategories() {
-        return this.categories;
+    public Category getCategory() {
+        return this.category;
     }
 
-    public void setCategories(Set<Category> categories) {
-        if (this.categories != null) {
-            this.categories.forEach(i -> i.setMachine(null));
-        }
-        if (categories != null) {
-            categories.forEach(i -> i.setMachine(this));
-        }
-        this.categories = categories;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
-    public Machine categories(Set<Category> categories) {
-        this.setCategories(categories);
-        return this;
-    }
-
-    public Machine addCategory(Category category) {
-        this.categories.add(category);
-        category.setMachine(this);
-        return this;
-    }
-
-    public Machine removeCategory(Category category) {
-        this.categories.remove(category);
-        category.setMachine(null);
-        return this;
-    }
-
-    public Offer getOffer() {
-        return this.offer;
-    }
-
-    public void setOffer(Offer offer) {
-        this.offer = offer;
-    }
-
-    public Machine offer(Offer offer) {
-        this.setOffer(offer);
+    public Machine category(Category category) {
+        this.setCategory(category);
         return this;
     }
 

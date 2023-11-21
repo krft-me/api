@@ -11,6 +11,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
+import me.krft.api.domain.Category;
 import me.krft.api.domain.Machine;
 import me.krft.api.repository.MachineRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +59,16 @@ class MachineResourceIT {
      */
     public static Machine createEntity(EntityManager em) {
         Machine machine = new Machine().name(DEFAULT_NAME);
+        // Add required entity
+        Category category;
+        if (TestUtil.findAll(em, Category.class).isEmpty()) {
+            category = CategoryResourceIT.createEntity(em);
+            em.persist(category);
+            em.flush();
+        } else {
+            category = TestUtil.findAll(em, Category.class).get(0);
+        }
+        machine.setCategory(category);
         return machine;
     }
 
@@ -69,6 +80,16 @@ class MachineResourceIT {
      */
     public static Machine createUpdatedEntity(EntityManager em) {
         Machine machine = new Machine().name(UPDATED_NAME);
+        // Add required entity
+        Category category;
+        if (TestUtil.findAll(em, Category.class).isEmpty()) {
+            category = CategoryResourceIT.createUpdatedEntity(em);
+            em.persist(category);
+            em.flush();
+        } else {
+            category = TestUtil.findAll(em, Category.class).get(0);
+        }
+        machine.setCategory(category);
         return machine;
     }
 

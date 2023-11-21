@@ -23,7 +23,8 @@
     {
       "otherEntityName": "region",
       "relationshipName": "region",
-      "relationshipType": "many-to-one"
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
     }
   ],
   "service": "no"
