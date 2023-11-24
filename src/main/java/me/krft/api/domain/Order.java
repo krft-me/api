@@ -13,7 +13,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  * A Order.
  */
 @Entity
-@Table(name = "jhi_order")
+@Table(name = "krftme_order")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Order implements Serializable {

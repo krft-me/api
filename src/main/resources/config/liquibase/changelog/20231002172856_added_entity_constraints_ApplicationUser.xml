@@ -12,7 +12,7 @@
                                  baseTableName="application_user"
                                  constraintName="fk_application_user__internal_user_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="jhi_user"/>
+                                 referencedTableName="krftme_user"/>
 
         <addForeignKeyConstraint baseColumnNames="city_id"
                                  baseTableName="application_user"
