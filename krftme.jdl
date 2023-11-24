@@ -216,7 +216,7 @@ enum State {
 }
 
 relationship OneToOne {
-    ApplicationUser{internalUser} to User
+    ApplicationUser{internalUser} to User with builtInEntity
 }
 
 relationship OneToMany {
