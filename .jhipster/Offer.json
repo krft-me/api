@@ -1,0 +1,33 @@
+{
+  "applications": "*",
+  "changelogDate": "20231002172859",
+  "clientRootFolder": "krftme",
+  "databaseType": "sql",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "offer",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "minlength", "unique"],
+      "fieldValidateRulesMinlength": "1"
+    }
+  ],
+  "fluentMethods": true,
+  "javadoc": "Offer entity representing a service stereotype",
+  "jpaMetamodelFiltering": false,
+  "microserviceName": "krftme",
+  "name": "Offer",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "offerCategory",
+      "otherEntityRelationshipName": "offer",
+      "relationshipName": "category",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceImpl"
+}

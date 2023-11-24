@@ -1,0 +1,48 @@
+{
+  "applications": "*",
+  "changelogDate": "20231002172904",
+  "clientRootFolder": "krftme",
+  "databaseType": "sql",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "krftme_order",
+  "fields": [
+    {
+      "fieldName": "date",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"],
+      "javadoc": "Date the order was placed"
+    },
+    {
+      "fieldName": "state",
+      "fieldType": "State",
+      "fieldTypeJavadoc": "State enum\\nRepresents the state of an order",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "WAITING,UNSIGNED,SIGNED,IN_PROGRESS,CANCELLED,DONE",
+      "javadoc": "State of the order"
+    }
+  ],
+  "fluentMethods": true,
+  "javadoc": "Order entity\\nRepresents an order placed by a customer for an offer",
+  "jpaMetamodelFiltering": false,
+  "microserviceName": "krftme",
+  "name": "Order",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "applicationUserOffer",
+      "otherEntityRelationshipName": "orders",
+      "relationshipName": "offer",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    },
+    {
+      "otherEntityName": "applicationUser",
+      "otherEntityRelationshipName": "orders",
+      "relationshipName": "customer",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceImpl"
+}

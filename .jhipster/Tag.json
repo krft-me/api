@@ -1,0 +1,33 @@
+{
+  "applications": "*",
+  "changelogDate": "20231002172905",
+  "clientRootFolder": "krftme",
+  "databaseType": "sql",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "tag",
+  "fields": [
+    {
+      "fieldName": "label",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique", "minlength"],
+      "fieldValidateRulesMinlength": "1"
+    }
+  ],
+  "fluentMethods": true,
+  "javadoc": "Tag entity\\nRepresents a preset keyword for an offer",
+  "jpaMetamodelFiltering": false,
+  "microserviceName": "krftme",
+  "name": "Tag",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "applicationUserOffer",
+      "otherEntityRelationshipName": "tags",
+      "relationshipName": "applicationUserOffer",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceImpl"
+}

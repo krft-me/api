@@ -1,0 +1,31 @@
+{
+  "applications": "*",
+  "changelogDate": "20231002172906",
+  "clientRootFolder": "krftme",
+  "databaseType": "sql",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "category",
+  "fields": [
+    {
+      "fieldName": "label",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "microserviceName": "krftme",
+  "name": "Category",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "machine",
+      "otherEntityRelationshipName": "category",
+      "relationshipName": "machine",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "no"
+}

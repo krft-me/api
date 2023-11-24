@@ -1,0 +1,122 @@
+package me.krft.api.domain;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.io.Serializable;
+import javax.persistence.*;
+import javax.validation.constraints.*;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+/**
+ * Machine entity
+ */
+@Entity
+@Table(name = "machine")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@SuppressWarnings("common-java:DuplicatedBlocks")
+public class Machine implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
+    @Column(name = "id")
+    private Long id;
+
+    @NotNull
+    @Size(min = 1)
+    @Column(name = "name", nullable = false, unique = true)
+    private String name;
+
+    @ManyToOne(optional = false)
+    @NotNull
+    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "machines", "applicationUser" }, allowSetters = true)
+    private ApplicationUserOffer offer;
+
+    @ManyToOne
+    @JsonIgnoreProperties(value = { "machines" }, allowSetters = true)
+    private MachineCategory category;
+
+    // jhipster-needle-entity-add-field - JHipster will add fields here
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public Machine id(Long id) {
+        this.setId(id);
+        return this;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public Machine name(String name) {
+        this.setName(name);
+        return this;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public ApplicationUserOffer getOffer() {
+        return this.offer;
+    }
+
+    public void setOffer(ApplicationUserOffer applicationUserOffer) {
+        this.offer = applicationUserOffer;
+    }
+
+    public Machine offer(ApplicationUserOffer applicationUserOffer) {
+        this.setOffer(applicationUserOffer);
+        return this;
+    }
+
+    public MachineCategory getCategory() {
+        return this.category;
+    }
+
+    public void setCategory(MachineCategory machineCategory) {
+        this.category = machineCategory;
+    }
+
+    public Machine category(MachineCategory machineCategory) {
+        this.setCategory(machineCategory);
+        return this;
+    }
+
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Machine)) {
+            return false;
+        }
+        return id != null && id.equals(((Machine) o).id);
+    }
+
+    @Override
+    public int hashCode() {
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "Machine{" +
+            "id=" + getId() +
+            ", name='" + getName() + "'" +
+            "}";
+    }
+}
