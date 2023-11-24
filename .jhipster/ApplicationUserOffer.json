@@ -3,17 +3,34 @@
   "changelogDate": "20231002172900",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
-  "dto": "no",
+  "dto": "mapstruct",
   "embedded": false,
   "entityTableName": "application_user_offer",
   "fields": [
     {
       "fieldName": "description",
       "fieldType": "String",
-      "fieldValidateRules": ["required"]
+      "fieldValidateRules": ["required", "minlength", "maxlength"],
+      "fieldValidateRulesMaxlength": "512",
+      "fieldValidateRulesMinlength": "1",
+      "javadoc": "Description of the service provided, written by the user providing it"
+    },
+    {
+      "fieldName": "price",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required", "min"],
+      "fieldValidateRulesMin": "0",
+      "javadoc": "The price of the service, set by the user providing it"
+    },
+    {
+      "fieldName": "active",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"],
+      "javadoc": "Active means the offer is visible to the users, we shouldn't delete it"
     }
   ],
   "fluentMethods": true,
+  "javadoc": "Association entity between user, offer and machine",
   "jpaMetamodelFiltering": false,
   "microserviceName": "krftme",
   "name": "ApplicationUserOffer",
@@ -21,33 +38,41 @@
   "readOnly": false,
   "relationships": [
     {
-      "otherEntityName": "rating",
+      "otherEntityName": "review",
       "otherEntityRelationshipName": "applicationUserOffer",
-      "relationshipName": "rating",
+      "relationshipName": "reviews",
       "relationshipType": "one-to-many"
     },
     {
       "otherEntityName": "showcase",
       "otherEntityRelationshipName": "applicationUserOffer",
-      "relationshipName": "showcase",
+      "relationshipName": "showcases",
       "relationshipType": "one-to-many"
     },
     {
       "otherEntityName": "tag",
       "otherEntityRelationshipName": "applicationUserOffer",
-      "relationshipName": "tag",
+      "relationshipName": "tags",
       "relationshipType": "one-to-many"
     },
     {
-      "otherEntityName": "offer",
-      "relationshipName": "offer",
-      "relationshipType": "many-to-one"
+      "otherEntityName": "order",
+      "otherEntityRelationshipName": "offer",
+      "relationshipName": "orders",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "machine",
+      "otherEntityRelationshipName": "offer",
+      "relationshipName": "machines",
+      "relationshipType": "one-to-many"
     },
     {
       "otherEntityName": "applicationUser",
+      "otherEntityRelationshipName": "offers",
       "relationshipName": "applicationUser",
       "relationshipType": "many-to-one"
     }
   ],
-  "service": "no"
+  "service": "serviceImpl"
 }

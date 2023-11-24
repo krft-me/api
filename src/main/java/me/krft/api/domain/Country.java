@@ -1,13 +1,16 @@
 package me.krft.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Country.
+ * Country entity
  */
 @Entity
 @Table(name = "country")
@@ -23,9 +26,24 @@ public class Country implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @NotNull
-    @Column(name = "name", nullable = false)
+    /**
+     * The country's name in english
+     */
+    @Column(name = "name")
     private String name;
+
+    /**
+     * ISO 3166-1 alpha-2\n@see https:
+     */
+    @NotNull
+    @Size(max = 3)
+    @Column(name = "iso_code", length = 3, nullable = false, unique = true)
+    private String isoCode;
+
+    @OneToMany(mappedBy = "country")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "cities", "country" }, allowSetters = true)
+    private Set<Region> regions = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -55,6 +73,50 @@ public class Country implements Serializable {
         this.name = name;
     }
 
+    public String getIsoCode() {
+        return this.isoCode;
+    }
+
+    public Country isoCode(String isoCode) {
+        this.setIsoCode(isoCode);
+        return this;
+    }
+
+    public void setIsoCode(String isoCode) {
+        this.isoCode = isoCode;
+    }
+
+    public Set<Region> getRegions() {
+        return this.regions;
+    }
+
+    public void setRegions(Set<Region> regions) {
+        if (this.regions != null) {
+            this.regions.forEach(i -> i.setCountry(null));
+        }
+        if (regions != null) {
+            regions.forEach(i -> i.setCountry(this));
+        }
+        this.regions = regions;
+    }
+
+    public Country regions(Set<Region> regions) {
+        this.setRegions(regions);
+        return this;
+    }
+
+    public Country addRegions(Region region) {
+        this.regions.add(region);
+        region.setCountry(this);
+        return this;
+    }
+
+    public Country removeRegions(Region region) {
+        this.regions.remove(region);
+        region.setCountry(null);
+        return this;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -80,6 +142,7 @@ public class Country implements Serializable {
         return "Country{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
+            ", isoCode='" + getIsoCode() + "'" +
             "}";
     }
 }

@@ -10,7 +10,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A ApplicationUserOffer.
+ * Association entity between user, offer and machine
  */
 @Entity
 @Table(name = "application_user_offer")
@@ -26,14 +26,33 @@ public class ApplicationUserOffer implements Serializable {
     @Column(name = "id")
     private Long id;
 
+    /**
+     * Description of the service provided, written by the user providing it
+     */
     @NotNull
-    @Column(name = "description", nullable = false)
+    @Size(min = 1, max = 512)
+    @Column(name = "description", length = 512, nullable = false)
     private String description;
+
+    /**
+     * The price of the service, set by the user providing it
+     */
+    @NotNull
+    @Min(value = 0)
+    @Column(name = "price", nullable = false)
+    private Integer price;
+
+    /**
+     * Active means the offer is visible to the users, we shouldn't delete it
+     */
+    @NotNull
+    @Column(name = "active", nullable = false)
+    private Boolean active;
 
     @OneToMany(mappedBy = "applicationUserOffer")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "applicationUserOffer" }, allowSetters = true)
-    private Set<Rating> ratings = new HashSet<>();
+    private Set<Review> reviews = new HashSet<>();
 
     @OneToMany(mappedBy = "applicationUserOffer")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -45,15 +64,18 @@ public class ApplicationUserOffer implements Serializable {
     @JsonIgnoreProperties(value = { "applicationUserOffer" }, allowSetters = true)
     private Set<Tag> tags = new HashSet<>();
 
-    @ManyToOne
-    @JsonIgnoreProperties(value = { "machines", "followers" }, allowSetters = true)
-    private Offer offer;
+    @OneToMany(mappedBy = "offer")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "offer", "customer" }, allowSetters = true)
+    private Set<Order> orders = new HashSet<>();
+
+    @OneToMany(mappedBy = "offer")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "offer", "category" }, allowSetters = true)
+    private Set<Machine> machines = new HashSet<>();
 
     @ManyToOne
-    @JsonIgnoreProperties(
-        value = { "internalUser", "city", "favoriteApplicationUsers", "favoriteOffers", "followers" },
-        allowSetters = true
-    )
+    @JsonIgnoreProperties(value = { "internalUser", "offers", "badges", "orders", "city" }, allowSetters = true)
     private ApplicationUser applicationUser;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -84,34 +106,60 @@ public class ApplicationUserOffer implements Serializable {
         this.description = description;
     }
 
-    public Set<Rating> getRatings() {
-        return this.ratings;
+    public Integer getPrice() {
+        return this.price;
     }
 
-    public void setRatings(Set<Rating> ratings) {
-        if (this.ratings != null) {
-            this.ratings.forEach(i -> i.setApplicationUserOffer(null));
-        }
-        if (ratings != null) {
-            ratings.forEach(i -> i.setApplicationUserOffer(this));
-        }
-        this.ratings = ratings;
-    }
-
-    public ApplicationUserOffer ratings(Set<Rating> ratings) {
-        this.setRatings(ratings);
+    public ApplicationUserOffer price(Integer price) {
+        this.setPrice(price);
         return this;
     }
 
-    public ApplicationUserOffer addRating(Rating rating) {
-        this.ratings.add(rating);
-        rating.setApplicationUserOffer(this);
+    public void setPrice(Integer price) {
+        this.price = price;
+    }
+
+    public Boolean getActive() {
+        return this.active;
+    }
+
+    public ApplicationUserOffer active(Boolean active) {
+        this.setActive(active);
         return this;
     }
 
-    public ApplicationUserOffer removeRating(Rating rating) {
-        this.ratings.remove(rating);
-        rating.setApplicationUserOffer(null);
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public Set<Review> getReviews() {
+        return this.reviews;
+    }
+
+    public void setReviews(Set<Review> reviews) {
+        if (this.reviews != null) {
+            this.reviews.forEach(i -> i.setApplicationUserOffer(null));
+        }
+        if (reviews != null) {
+            reviews.forEach(i -> i.setApplicationUserOffer(this));
+        }
+        this.reviews = reviews;
+    }
+
+    public ApplicationUserOffer reviews(Set<Review> reviews) {
+        this.setReviews(reviews);
+        return this;
+    }
+
+    public ApplicationUserOffer addReviews(Review review) {
+        this.reviews.add(review);
+        review.setApplicationUserOffer(this);
+        return this;
+    }
+
+    public ApplicationUserOffer removeReviews(Review review) {
+        this.reviews.remove(review);
+        review.setApplicationUserOffer(null);
         return this;
     }
 
@@ -134,13 +182,13 @@ public class ApplicationUserOffer implements Serializable {
         return this;
     }
 
-    public ApplicationUserOffer addShowcase(Showcase showcase) {
+    public ApplicationUserOffer addShowcases(Showcase showcase) {
         this.showcases.add(showcase);
         showcase.setApplicationUserOffer(this);
         return this;
     }
 
-    public ApplicationUserOffer removeShowcase(Showcase showcase) {
+    public ApplicationUserOffer removeShowcases(Showcase showcase) {
         this.showcases.remove(showcase);
         showcase.setApplicationUserOffer(null);
         return this;
@@ -165,28 +213,77 @@ public class ApplicationUserOffer implements Serializable {
         return this;
     }
 
-    public ApplicationUserOffer addTag(Tag tag) {
+    public ApplicationUserOffer addTags(Tag tag) {
         this.tags.add(tag);
         tag.setApplicationUserOffer(this);
         return this;
     }
 
-    public ApplicationUserOffer removeTag(Tag tag) {
+    public ApplicationUserOffer removeTags(Tag tag) {
         this.tags.remove(tag);
         tag.setApplicationUserOffer(null);
         return this;
     }
 
-    public Offer getOffer() {
-        return this.offer;
+    public Set<Order> getOrders() {
+        return this.orders;
     }
 
-    public void setOffer(Offer offer) {
-        this.offer = offer;
+    public void setOrders(Set<Order> orders) {
+        if (this.orders != null) {
+            this.orders.forEach(i -> i.setOffer(null));
+        }
+        if (orders != null) {
+            orders.forEach(i -> i.setOffer(this));
+        }
+        this.orders = orders;
     }
 
-    public ApplicationUserOffer offer(Offer offer) {
-        this.setOffer(offer);
+    public ApplicationUserOffer orders(Set<Order> orders) {
+        this.setOrders(orders);
+        return this;
+    }
+
+    public ApplicationUserOffer addOrders(Order order) {
+        this.orders.add(order);
+        order.setOffer(this);
+        return this;
+    }
+
+    public ApplicationUserOffer removeOrders(Order order) {
+        this.orders.remove(order);
+        order.setOffer(null);
+        return this;
+    }
+
+    public Set<Machine> getMachines() {
+        return this.machines;
+    }
+
+    public void setMachines(Set<Machine> machines) {
+        if (this.machines != null) {
+            this.machines.forEach(i -> i.setOffer(null));
+        }
+        if (machines != null) {
+            machines.forEach(i -> i.setOffer(this));
+        }
+        this.machines = machines;
+    }
+
+    public ApplicationUserOffer machines(Set<Machine> machines) {
+        this.setMachines(machines);
+        return this;
+    }
+
+    public ApplicationUserOffer addMachines(Machine machine) {
+        this.machines.add(machine);
+        machine.setOffer(this);
+        return this;
+    }
+
+    public ApplicationUserOffer removeMachines(Machine machine) {
+        this.machines.remove(machine);
+        machine.setOffer(null);
         return this;
     }
 
@@ -228,6 +325,8 @@ public class ApplicationUserOffer implements Serializable {
         return "ApplicationUserOffer{" +
             "id=" + getId() +
             ", description='" + getDescription() + "'" +
+            ", price=" + getPrice() +
+            ", active='" + getActive() + "'" +
             "}";
     }
 }

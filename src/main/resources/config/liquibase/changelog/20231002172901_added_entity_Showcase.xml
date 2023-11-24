@@ -10,12 +10,12 @@
         Added the entity Showcase.
     -->
     <changeSet id="20231002172901-1" author="jhipster">
-        <createTable tableName="showcase">
+        <createTable tableName="showcase" remarks="Showcase image\nRepresents an image of a service to illustrate it">
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="image_id" type="${uuidType}">
-                <constraints nullable="false" />
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_showcase__image_id" />
             </column>
             <column name="application_user_offer_id" type="bigint">
                 <constraints nullable="true" />

@@ -10,15 +10,15 @@
         Added the entity Badge.
     -->
     <changeSet id="20231002172902-1" author="jhipster">
-        <createTable tableName="badge">
+        <createTable tableName="badge" remarks="Badge entity\nRepresents a certification (example: 100 completed orders)">
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="label" type="varchar(255)">
-                <constraints nullable="false" />
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_badge__label" />
             </column>
             <column name="picture" type="${blobType}">
-                <constraints nullable="false" />
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_badge__picture" />
             </column>
             <column name="picture_content_type" type="varchar(255)">
                 <constraints nullable="false" />

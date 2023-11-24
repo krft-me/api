@@ -7,14 +7,14 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import me.krft.api.domain.Showcase;
 import me.krft.api.repository.ShowcaseRepository;
+import me.krft.api.service.ShowcaseService;
+import me.krft.api.service.dto.ShowcaseDTO;
 import me.krft.api.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -24,7 +24,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
-@Transactional
 public class ShowcaseResource {
 
     private final Logger log = LoggerFactory.getLogger(ShowcaseResource.class);
@@ -34,26 +33,29 @@ public class ShowcaseResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final ShowcaseService showcaseService;
+
     private final ShowcaseRepository showcaseRepository;
 
-    public ShowcaseResource(ShowcaseRepository showcaseRepository) {
+    public ShowcaseResource(ShowcaseService showcaseService, ShowcaseRepository showcaseRepository) {
+        this.showcaseService = showcaseService;
         this.showcaseRepository = showcaseRepository;
     }
 
     /**
      * {@code POST  /showcases} : Create a new showcase.
      *
-     * @param showcase the showcase to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new showcase, or with status {@code 400 (Bad Request)} if the showcase has already an ID.
+     * @param showcaseDTO the showcaseDTO to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new showcaseDTO, or with status {@code 400 (Bad Request)} if the showcase has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/showcases")
-    public ResponseEntity<Showcase> createShowcase(@Valid @RequestBody Showcase showcase) throws URISyntaxException {
-        log.debug("REST request to save Showcase : {}", showcase);
-        if (showcase.getId() != null) {
+    public ResponseEntity<ShowcaseDTO> createShowcase(@Valid @RequestBody ShowcaseDTO showcaseDTO) throws URISyntaxException {
+        log.debug("REST request to save Showcase : {}", showcaseDTO);
+        if (showcaseDTO.getId() != null) {
             throw new BadRequestAlertException("A new showcase cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Showcase result = showcaseRepository.save(showcase);
+        ShowcaseDTO result = showcaseService.save(showcaseDTO);
         return ResponseEntity
             .created(new URI("/api/showcases/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -63,23 +65,23 @@ public class ShowcaseResource {
     /**
      * {@code PUT  /showcases/:id} : Updates an existing showcase.
      *
-     * @param id the id of the showcase to save.
-     * @param showcase the showcase to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated showcase,
-     * or with status {@code 400 (Bad Request)} if the showcase is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the showcase couldn't be updated.
+     * @param id the id of the showcaseDTO to save.
+     * @param showcaseDTO the showcaseDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated showcaseDTO,
+     * or with status {@code 400 (Bad Request)} if the showcaseDTO is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the showcaseDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/showcases/{id}")
-    public ResponseEntity<Showcase> updateShowcase(
+    public ResponseEntity<ShowcaseDTO> updateShowcase(
         @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody Showcase showcase
+        @Valid @RequestBody ShowcaseDTO showcaseDTO
     ) throws URISyntaxException {
-        log.debug("REST request to update Showcase : {}, {}", id, showcase);
-        if (showcase.getId() == null) {
+        log.debug("REST request to update Showcase : {}, {}", id, showcaseDTO);
+        if (showcaseDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, showcase.getId())) {
+        if (!Objects.equals(id, showcaseDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -87,34 +89,34 @@ public class ShowcaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Showcase result = showcaseRepository.save(showcase);
+        ShowcaseDTO result = showcaseService.update(showcaseDTO);
         return ResponseEntity
             .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, showcase.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, showcaseDTO.getId().toString()))
             .body(result);
     }
 
     /**
      * {@code PATCH  /showcases/:id} : Partial updates given fields of an existing showcase, field will ignore if it is null
      *
-     * @param id the id of the showcase to save.
-     * @param showcase the showcase to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated showcase,
-     * or with status {@code 400 (Bad Request)} if the showcase is not valid,
-     * or with status {@code 404 (Not Found)} if the showcase is not found,
-     * or with status {@code 500 (Internal Server Error)} if the showcase couldn't be updated.
+     * @param id the id of the showcaseDTO to save.
+     * @param showcaseDTO the showcaseDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated showcaseDTO,
+     * or with status {@code 400 (Bad Request)} if the showcaseDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the showcaseDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the showcaseDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/showcases/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<Showcase> partialUpdateShowcase(
+    public ResponseEntity<ShowcaseDTO> partialUpdateShowcase(
         @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody Showcase showcase
+        @NotNull @RequestBody ShowcaseDTO showcaseDTO
     ) throws URISyntaxException {
-        log.debug("REST request to partial update Showcase partially : {}, {}", id, showcase);
-        if (showcase.getId() == null) {
+        log.debug("REST request to partial update Showcase partially : {}, {}", id, showcaseDTO);
+        if (showcaseDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, showcase.getId())) {
+        if (!Objects.equals(id, showcaseDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -122,20 +124,11 @@ public class ShowcaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<Showcase> result = showcaseRepository
-            .findById(showcase.getId())
-            .map(existingShowcase -> {
-                if (showcase.getImageId() != null) {
-                    existingShowcase.setImageId(showcase.getImageId());
-                }
-
-                return existingShowcase;
-            })
-            .map(showcaseRepository::save);
+        Optional<ShowcaseDTO> result = showcaseService.partialUpdate(showcaseDTO);
 
         return ResponseUtil.wrapOrNotFound(
             result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, showcase.getId().toString())
+            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, showcaseDTO.getId().toString())
         );
     }
 
@@ -145,34 +138,34 @@ public class ShowcaseResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of showcases in body.
      */
     @GetMapping("/showcases")
-    public List<Showcase> getAllShowcases() {
+    public List<ShowcaseDTO> getAllShowcases() {
         log.debug("REST request to get all Showcases");
-        return showcaseRepository.findAll();
+        return showcaseService.findAll();
     }
 
     /**
      * {@code GET  /showcases/:id} : get the "id" showcase.
      *
-     * @param id the id of the showcase to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the showcase, or with status {@code 404 (Not Found)}.
+     * @param id the id of the showcaseDTO to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the showcaseDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/showcases/{id}")
-    public ResponseEntity<Showcase> getShowcase(@PathVariable Long id) {
+    public ResponseEntity<ShowcaseDTO> getShowcase(@PathVariable Long id) {
         log.debug("REST request to get Showcase : {}", id);
-        Optional<Showcase> showcase = showcaseRepository.findById(id);
-        return ResponseUtil.wrapOrNotFound(showcase);
+        Optional<ShowcaseDTO> showcaseDTO = showcaseService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(showcaseDTO);
     }
 
     /**
      * {@code DELETE  /showcases/:id} : delete the "id" showcase.
      *
-     * @param id the id of the showcase to delete.
+     * @param id the id of the showcaseDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/showcases/{id}")
     public ResponseEntity<Void> deleteShowcase(@PathVariable Long id) {
         log.debug("REST request to delete Showcase : {}", id);
-        showcaseRepository.deleteById(id);
+        showcaseService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

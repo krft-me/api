@@ -11,8 +11,11 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
+import me.krft.api.domain.Country;
 import me.krft.api.domain.Region;
 import me.krft.api.repository.RegionRepository;
+import me.krft.api.service.dto.RegionDTO;
+import me.krft.api.service.mapper.RegionMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +46,9 @@ class RegionResourceIT {
     private RegionRepository regionRepository;
 
     @Autowired
+    private RegionMapper regionMapper;
+
+    @Autowired
     private EntityManager em;
 
     @Autowired
@@ -58,6 +64,16 @@ class RegionResourceIT {
      */
     public static Region createEntity(EntityManager em) {
         Region region = new Region().name(DEFAULT_NAME);
+        // Add required entity
+        Country country;
+        if (TestUtil.findAll(em, Country.class).isEmpty()) {
+            country = CountryResourceIT.createEntity(em);
+            em.persist(country);
+            em.flush();
+        } else {
+            country = TestUtil.findAll(em, Country.class).get(0);
+        }
+        region.setCountry(country);
         return region;
     }
 
@@ -69,6 +85,16 @@ class RegionResourceIT {
      */
     public static Region createUpdatedEntity(EntityManager em) {
         Region region = new Region().name(UPDATED_NAME);
+        // Add required entity
+        Country country;
+        if (TestUtil.findAll(em, Country.class).isEmpty()) {
+            country = CountryResourceIT.createUpdatedEntity(em);
+            em.persist(country);
+            em.flush();
+        } else {
+            country = TestUtil.findAll(em, Country.class).get(0);
+        }
+        region.setCountry(country);
         return region;
     }
 
@@ -82,9 +108,13 @@ class RegionResourceIT {
     void createRegion() throws Exception {
         int databaseSizeBeforeCreate = regionRepository.findAll().size();
         // Create the Region
+        RegionDTO regionDTO = regionMapper.toDto(region);
         restRegionMockMvc
             .perform(
-                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(region))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(regionDTO))
             )
             .andExpect(status().isCreated());
 
@@ -100,13 +130,17 @@ class RegionResourceIT {
     void createRegionWithExistingId() throws Exception {
         // Create the Region with an existing ID
         region.setId(1L);
+        RegionDTO regionDTO = regionMapper.toDto(region);
 
         int databaseSizeBeforeCreate = regionRepository.findAll().size();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restRegionMockMvc
             .perform(
-                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(region))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(regionDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -123,10 +157,14 @@ class RegionResourceIT {
         region.setName(null);
 
         // Create the Region, which fails.
+        RegionDTO regionDTO = regionMapper.toDto(region);
 
         restRegionMockMvc
             .perform(
-                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(region))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(regionDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -184,13 +222,14 @@ class RegionResourceIT {
         // Disconnect from session so that the updates on updatedRegion are not directly saved in db
         em.detach(updatedRegion);
         updatedRegion.name(UPDATED_NAME);
+        RegionDTO regionDTO = regionMapper.toDto(updatedRegion);
 
         restRegionMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, updatedRegion.getId())
+                put(ENTITY_API_URL_ID, regionDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(updatedRegion))
+                    .content(TestUtil.convertObjectToJsonBytes(regionDTO))
             )
             .andExpect(status().isOk());
 
@@ -207,13 +246,16 @@ class RegionResourceIT {
         int databaseSizeBeforeUpdate = regionRepository.findAll().size();
         region.setId(count.incrementAndGet());
 
+        // Create the Region
+        RegionDTO regionDTO = regionMapper.toDto(region);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restRegionMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, region.getId())
+                put(ENTITY_API_URL_ID, regionDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(region))
+                    .content(TestUtil.convertObjectToJsonBytes(regionDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -228,13 +270,16 @@ class RegionResourceIT {
         int databaseSizeBeforeUpdate = regionRepository.findAll().size();
         region.setId(count.incrementAndGet());
 
+        // Create the Region
+        RegionDTO regionDTO = regionMapper.toDto(region);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restRegionMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(region))
+                    .content(TestUtil.convertObjectToJsonBytes(regionDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -249,10 +294,16 @@ class RegionResourceIT {
         int databaseSizeBeforeUpdate = regionRepository.findAll().size();
         region.setId(count.incrementAndGet());
 
+        // Create the Region
+        RegionDTO regionDTO = regionMapper.toDto(region);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restRegionMockMvc
             .perform(
-                put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(region))
+                put(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(regionDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -327,13 +378,16 @@ class RegionResourceIT {
         int databaseSizeBeforeUpdate = regionRepository.findAll().size();
         region.setId(count.incrementAndGet());
 
+        // Create the Region
+        RegionDTO regionDTO = regionMapper.toDto(region);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restRegionMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, region.getId())
+                patch(ENTITY_API_URL_ID, regionDTO.getId())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(region))
+                    .content(TestUtil.convertObjectToJsonBytes(regionDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -348,13 +402,16 @@ class RegionResourceIT {
         int databaseSizeBeforeUpdate = regionRepository.findAll().size();
         region.setId(count.incrementAndGet());
 
+        // Create the Region
+        RegionDTO regionDTO = regionMapper.toDto(region);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restRegionMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(region))
+                    .content(TestUtil.convertObjectToJsonBytes(regionDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -369,13 +426,16 @@ class RegionResourceIT {
         int databaseSizeBeforeUpdate = regionRepository.findAll().size();
         region.setId(count.incrementAndGet());
 
+        // Create the Region
+        RegionDTO regionDTO = regionMapper.toDto(region);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restRegionMockMvc
             .perform(
                 patch(ENTITY_API_URL)
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(region))
+                    .content(TestUtil.convertObjectToJsonBytes(regionDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 

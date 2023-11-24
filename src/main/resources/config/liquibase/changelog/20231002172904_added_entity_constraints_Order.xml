@@ -8,15 +8,15 @@
     -->
     <changeSet id="20231002172904-2" author="jhipster">
 
-        <addForeignKeyConstraint baseColumnNames="provider_id"
+        <addForeignKeyConstraint baseColumnNames="offer_id"
                                  baseTableName="krftme_order"
-                                 constraintName="fk_krftme_order__provider_id"
+                                 constraintName="fk_krftme_order__offer_id"
                                  referencedColumnNames="id"
                                  referencedTableName="application_user_offer"/>
 
-        <addForeignKeyConstraint baseColumnNames="client_id"
+        <addForeignKeyConstraint baseColumnNames="customer_id"
                                  baseTableName="krftme_order"
-                                 constraintName="fk_krftme_order__client_id"
+                                 constraintName="fk_krftme_order__customer_id"
                                  referencedColumnNames="id"
                                  referencedTableName="application_user"/>
     </changeSet>

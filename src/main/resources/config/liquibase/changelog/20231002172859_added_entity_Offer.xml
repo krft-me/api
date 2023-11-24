@@ -10,12 +10,15 @@
         Added the entity Offer.
     -->
     <changeSet id="20231002172859-1" author="jhipster">
-        <createTable tableName="offer">
+        <createTable tableName="offer" remarks="Offer entity representing a service stereotype">
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="name" type="varchar(255)">
-                <constraints nullable="false" />
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_offer__name" />
+            </column>
+            <column name="category_id" type="bigint">
+                <constraints nullable="true" />
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>

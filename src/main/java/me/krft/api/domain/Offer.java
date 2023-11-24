@@ -2,15 +2,13 @@ package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Offer.
+ * Offer entity representing a service stereotype
  */
 @Entity
 @Table(name = "offer")
@@ -27,21 +25,13 @@ public class Offer implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "name", nullable = false)
+    @Size(min = 1)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "offer")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "categories", "offer" }, allowSetters = true)
-    private Set<Machine> machines = new HashSet<>();
-
-    @ManyToMany(mappedBy = "favoriteOffers")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(
-        value = { "internalUser", "city", "favoriteApplicationUsers", "favoriteOffers", "followers" },
-        allowSetters = true
-    )
-    private Set<ApplicationUser> followers = new HashSet<>();
+    @ManyToOne
+    @JsonIgnoreProperties(value = { "offers" }, allowSetters = true)
+    private OfferCategory category;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -71,65 +61,16 @@ public class Offer implements Serializable {
         this.name = name;
     }
 
-    public Set<Machine> getMachines() {
-        return this.machines;
+    public OfferCategory getCategory() {
+        return this.category;
     }
 
-    public void setMachines(Set<Machine> machines) {
-        if (this.machines != null) {
-            this.machines.forEach(i -> i.setOffer(null));
-        }
-        if (machines != null) {
-            machines.forEach(i -> i.setOffer(this));
-        }
-        this.machines = machines;
+    public void setCategory(OfferCategory offerCategory) {
+        this.category = offerCategory;
     }
 
-    public Offer machines(Set<Machine> machines) {
-        this.setMachines(machines);
-        return this;
-    }
-
-    public Offer addMachine(Machine machine) {
-        this.machines.add(machine);
-        machine.setOffer(this);
-        return this;
-    }
-
-    public Offer removeMachine(Machine machine) {
-        this.machines.remove(machine);
-        machine.setOffer(null);
-        return this;
-    }
-
-    public Set<ApplicationUser> getFollowers() {
-        return this.followers;
-    }
-
-    public void setFollowers(Set<ApplicationUser> applicationUsers) {
-        if (this.followers != null) {
-            this.followers.forEach(i -> i.removeFavoriteOffer(this));
-        }
-        if (applicationUsers != null) {
-            applicationUsers.forEach(i -> i.addFavoriteOffer(this));
-        }
-        this.followers = applicationUsers;
-    }
-
-    public Offer followers(Set<ApplicationUser> applicationUsers) {
-        this.setFollowers(applicationUsers);
-        return this;
-    }
-
-    public Offer addFollowers(ApplicationUser applicationUser) {
-        this.followers.add(applicationUser);
-        applicationUser.getFavoriteOffers().add(this);
-        return this;
-    }
-
-    public Offer removeFollowers(ApplicationUser applicationUser) {
-        this.followers.remove(applicationUser);
-        applicationUser.getFavoriteOffers().remove(this);
+    public Offer category(OfferCategory offerCategory) {
+        this.setCategory(offerCategory);
         return this;
     }
 

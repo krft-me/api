@@ -10,20 +10,17 @@
         Added the entity ApplicationUser.
     -->
     <changeSet id="20231002172856-1" author="jhipster">
-        <createTable tableName="application_user">
+        <createTable tableName="application_user" remarks="User entity extending the inter {@code User} entity\nProvides additional information about the user">
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="first_name" type="varchar(255)">
+            <column name="first_name" type="varchar(255)" remarks="The user&apos;s first name">
                 <constraints nullable="false" />
             </column>
-            <column name="last_name" type="varchar(255)">
+            <column name="last_name" type="varchar(255)" remarks="The user&apos;s last name name">
                 <constraints nullable="false" />
             </column>
-            <column name="pseudo" type="varchar(255)">
-                <constraints nullable="false" />
-            </column>
-            <column name="average_rating" type="double">
+            <column name="username" type="varchar(255)" remarks="The user&apos;s username">
                 <constraints nullable="false" />
             </column>
             <column name="internal_user_id" type="varchar(100)">
@@ -34,31 +31,6 @@
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
-    </changeSet>
-
-    <changeSet id="20231002172856-1-relations" author="jhipster">
-
-        <createTable tableName="rel_application_user__favorite_application_user">
-            <column name="favorite_application_user_id" type="bigint">
-                <constraints nullable="false"/>
-            </column>
-            <column name="application_user_id" type="bigint">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <addPrimaryKey columnNames="application_user_id, favorite_application_user_id" tableName="rel_application_user__favorite_application_user"/>
-
-        <createTable tableName="rel_application_user__favorite_offer">
-            <column name="favorite_offer_id" type="bigint">
-                <constraints nullable="false"/>
-            </column>
-            <column name="application_user_id" type="bigint">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <addPrimaryKey columnNames="application_user_id, favorite_offer_id" tableName="rel_application_user__favorite_offer"/>
     </changeSet>
 
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
@@ -80,8 +52,7 @@
             <column name="id" type="numeric"/>
             <column name="first_name" type="string"/>
             <column name="last_name" type="string"/>
-            <column name="pseudo" type="string"/>
-            <column name="average_rating" type="numeric"/>
+            <column name="username" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

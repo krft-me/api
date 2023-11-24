@@ -2,12 +2,10 @@ package me.krft.api.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -15,17 +13,12 @@ import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.ApplicationUser;
 import me.krft.api.repository.ApplicationUserRepository;
-import me.krft.api.repository.UserRepository;
+import me.krft.api.service.dto.ApplicationUserDTO;
+import me.krft.api.service.mapper.ApplicationUserMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -35,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
  * Integration tests for the {@link ApplicationUserResource} REST controller.
  */
 @IntegrationTest
-@ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockUser
 class ApplicationUserResourceIT {
@@ -46,11 +38,8 @@ class ApplicationUserResourceIT {
     private static final String DEFAULT_LAST_NAME = "AAAAAAAAAA";
     private static final String UPDATED_LAST_NAME = "BBBBBBBBBB";
 
-    private static final String DEFAULT_PSEUDO = "AAAAAAAAAA";
-    private static final String UPDATED_PSEUDO = "BBBBBBBBBB";
-
-    private static final Double DEFAULT_AVERAGE_RATING = 1D;
-    private static final Double UPDATED_AVERAGE_RATING = 2D;
+    private static final String DEFAULT_USERNAME = "AAAAAAAAAA";
+    private static final String UPDATED_USERNAME = "BBBBBBBBBB";
 
     private static final String ENTITY_API_URL = "/api/application-users";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -62,10 +51,7 @@ class ApplicationUserResourceIT {
     private ApplicationUserRepository applicationUserRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Mock
-    private ApplicationUserRepository applicationUserRepositoryMock;
+    private ApplicationUserMapper applicationUserMapper;
 
     @Autowired
     private EntityManager em;
@@ -85,8 +71,7 @@ class ApplicationUserResourceIT {
         ApplicationUser applicationUser = new ApplicationUser()
             .firstName(DEFAULT_FIRST_NAME)
             .lastName(DEFAULT_LAST_NAME)
-            .pseudo(DEFAULT_PSEUDO)
-            .averageRating(DEFAULT_AVERAGE_RATING);
+            .username(DEFAULT_USERNAME);
         return applicationUser;
     }
 
@@ -100,8 +85,7 @@ class ApplicationUserResourceIT {
         ApplicationUser applicationUser = new ApplicationUser()
             .firstName(UPDATED_FIRST_NAME)
             .lastName(UPDATED_LAST_NAME)
-            .pseudo(UPDATED_PSEUDO)
-            .averageRating(UPDATED_AVERAGE_RATING);
+            .username(UPDATED_USERNAME);
         return applicationUser;
     }
 
@@ -115,12 +99,13 @@ class ApplicationUserResourceIT {
     void createApplicationUser() throws Exception {
         int databaseSizeBeforeCreate = applicationUserRepository.findAll().size();
         // Create the ApplicationUser
+        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
         restApplicationUserMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
             )
             .andExpect(status().isCreated());
 
@@ -130,8 +115,7 @@ class ApplicationUserResourceIT {
         ApplicationUser testApplicationUser = applicationUserList.get(applicationUserList.size() - 1);
         assertThat(testApplicationUser.getFirstName()).isEqualTo(DEFAULT_FIRST_NAME);
         assertThat(testApplicationUser.getLastName()).isEqualTo(DEFAULT_LAST_NAME);
-        assertThat(testApplicationUser.getPseudo()).isEqualTo(DEFAULT_PSEUDO);
-        assertThat(testApplicationUser.getAverageRating()).isEqualTo(DEFAULT_AVERAGE_RATING);
+        assertThat(testApplicationUser.getUsername()).isEqualTo(DEFAULT_USERNAME);
     }
 
     @Test
@@ -139,6 +123,7 @@ class ApplicationUserResourceIT {
     void createApplicationUserWithExistingId() throws Exception {
         // Create the ApplicationUser with an existing ID
         applicationUser.setId(1L);
+        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
 
         int databaseSizeBeforeCreate = applicationUserRepository.findAll().size();
 
@@ -148,7 +133,7 @@ class ApplicationUserResourceIT {
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -165,13 +150,14 @@ class ApplicationUserResourceIT {
         applicationUser.setFirstName(null);
 
         // Create the ApplicationUser, which fails.
+        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
 
         restApplicationUserMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -187,13 +173,14 @@ class ApplicationUserResourceIT {
         applicationUser.setLastName(null);
 
         // Create the ApplicationUser, which fails.
+        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
 
         restApplicationUserMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -203,41 +190,20 @@ class ApplicationUserResourceIT {
 
     @Test
     @Transactional
-    void checkPseudoIsRequired() throws Exception {
+    void checkUsernameIsRequired() throws Exception {
         int databaseSizeBeforeTest = applicationUserRepository.findAll().size();
         // set the field null
-        applicationUser.setPseudo(null);
+        applicationUser.setUsername(null);
 
         // Create the ApplicationUser, which fails.
+        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
 
         restApplicationUserMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
-            )
-            .andExpect(status().isBadRequest());
-
-        List<ApplicationUser> applicationUserList = applicationUserRepository.findAll();
-        assertThat(applicationUserList).hasSize(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
-    void checkAverageRatingIsRequired() throws Exception {
-        int databaseSizeBeforeTest = applicationUserRepository.findAll().size();
-        // set the field null
-        applicationUser.setAverageRating(null);
-
-        // Create the ApplicationUser, which fails.
-
-        restApplicationUserMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -259,25 +225,7 @@ class ApplicationUserResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(applicationUser.getId().intValue())))
             .andExpect(jsonPath("$.[*].firstName").value(hasItem(DEFAULT_FIRST_NAME)))
             .andExpect(jsonPath("$.[*].lastName").value(hasItem(DEFAULT_LAST_NAME)))
-            .andExpect(jsonPath("$.[*].pseudo").value(hasItem(DEFAULT_PSEUDO)))
-            .andExpect(jsonPath("$.[*].averageRating").value(hasItem(DEFAULT_AVERAGE_RATING.doubleValue())));
-    }
-
-    @SuppressWarnings({ "unchecked" })
-    void getAllApplicationUsersWithEagerRelationshipsIsEnabled() throws Exception {
-        when(applicationUserRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
-
-        restApplicationUserMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
-
-        verify(applicationUserRepositoryMock, times(1)).findAllWithEagerRelationships(any());
-    }
-
-    @SuppressWarnings({ "unchecked" })
-    void getAllApplicationUsersWithEagerRelationshipsIsNotEnabled() throws Exception {
-        when(applicationUserRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
-
-        restApplicationUserMockMvc.perform(get(ENTITY_API_URL + "?eagerload=false")).andExpect(status().isOk());
-        verify(applicationUserRepositoryMock, times(1)).findAll(any(Pageable.class));
+            .andExpect(jsonPath("$.[*].username").value(hasItem(DEFAULT_USERNAME)));
     }
 
     @Test
@@ -294,8 +242,7 @@ class ApplicationUserResourceIT {
             .andExpect(jsonPath("$.id").value(applicationUser.getId().intValue()))
             .andExpect(jsonPath("$.firstName").value(DEFAULT_FIRST_NAME))
             .andExpect(jsonPath("$.lastName").value(DEFAULT_LAST_NAME))
-            .andExpect(jsonPath("$.pseudo").value(DEFAULT_PSEUDO))
-            .andExpect(jsonPath("$.averageRating").value(DEFAULT_AVERAGE_RATING.doubleValue()));
+            .andExpect(jsonPath("$.username").value(DEFAULT_USERNAME));
     }
 
     @Test
@@ -317,18 +264,15 @@ class ApplicationUserResourceIT {
         ApplicationUser updatedApplicationUser = applicationUserRepository.findById(applicationUser.getId()).get();
         // Disconnect from session so that the updates on updatedApplicationUser are not directly saved in db
         em.detach(updatedApplicationUser);
-        updatedApplicationUser
-            .firstName(UPDATED_FIRST_NAME)
-            .lastName(UPDATED_LAST_NAME)
-            .pseudo(UPDATED_PSEUDO)
-            .averageRating(UPDATED_AVERAGE_RATING);
+        updatedApplicationUser.firstName(UPDATED_FIRST_NAME).lastName(UPDATED_LAST_NAME).username(UPDATED_USERNAME);
+        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(updatedApplicationUser);
 
         restApplicationUserMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, updatedApplicationUser.getId())
+                put(ENTITY_API_URL_ID, applicationUserDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(updatedApplicationUser))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
             )
             .andExpect(status().isOk());
 
@@ -338,8 +282,7 @@ class ApplicationUserResourceIT {
         ApplicationUser testApplicationUser = applicationUserList.get(applicationUserList.size() - 1);
         assertThat(testApplicationUser.getFirstName()).isEqualTo(UPDATED_FIRST_NAME);
         assertThat(testApplicationUser.getLastName()).isEqualTo(UPDATED_LAST_NAME);
-        assertThat(testApplicationUser.getPseudo()).isEqualTo(UPDATED_PSEUDO);
-        assertThat(testApplicationUser.getAverageRating()).isEqualTo(UPDATED_AVERAGE_RATING);
+        assertThat(testApplicationUser.getUsername()).isEqualTo(UPDATED_USERNAME);
     }
 
     @Test
@@ -348,13 +291,16 @@ class ApplicationUserResourceIT {
         int databaseSizeBeforeUpdate = applicationUserRepository.findAll().size();
         applicationUser.setId(count.incrementAndGet());
 
+        // Create the ApplicationUser
+        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restApplicationUserMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, applicationUser.getId())
+                put(ENTITY_API_URL_ID, applicationUserDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -369,13 +315,16 @@ class ApplicationUserResourceIT {
         int databaseSizeBeforeUpdate = applicationUserRepository.findAll().size();
         applicationUser.setId(count.incrementAndGet());
 
+        // Create the ApplicationUser
+        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -390,13 +339,16 @@ class ApplicationUserResourceIT {
         int databaseSizeBeforeUpdate = applicationUserRepository.findAll().size();
         applicationUser.setId(count.incrementAndGet());
 
+        // Create the ApplicationUser
+        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserMockMvc
             .perform(
                 put(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -417,7 +369,7 @@ class ApplicationUserResourceIT {
         ApplicationUser partialUpdatedApplicationUser = new ApplicationUser();
         partialUpdatedApplicationUser.setId(applicationUser.getId());
 
-        partialUpdatedApplicationUser.lastName(UPDATED_LAST_NAME).pseudo(UPDATED_PSEUDO);
+        partialUpdatedApplicationUser.lastName(UPDATED_LAST_NAME).username(UPDATED_USERNAME);
 
         restApplicationUserMockMvc
             .perform(
@@ -434,8 +386,7 @@ class ApplicationUserResourceIT {
         ApplicationUser testApplicationUser = applicationUserList.get(applicationUserList.size() - 1);
         assertThat(testApplicationUser.getFirstName()).isEqualTo(DEFAULT_FIRST_NAME);
         assertThat(testApplicationUser.getLastName()).isEqualTo(UPDATED_LAST_NAME);
-        assertThat(testApplicationUser.getPseudo()).isEqualTo(UPDATED_PSEUDO);
-        assertThat(testApplicationUser.getAverageRating()).isEqualTo(DEFAULT_AVERAGE_RATING);
+        assertThat(testApplicationUser.getUsername()).isEqualTo(UPDATED_USERNAME);
     }
 
     @Test
@@ -450,11 +401,7 @@ class ApplicationUserResourceIT {
         ApplicationUser partialUpdatedApplicationUser = new ApplicationUser();
         partialUpdatedApplicationUser.setId(applicationUser.getId());
 
-        partialUpdatedApplicationUser
-            .firstName(UPDATED_FIRST_NAME)
-            .lastName(UPDATED_LAST_NAME)
-            .pseudo(UPDATED_PSEUDO)
-            .averageRating(UPDATED_AVERAGE_RATING);
+        partialUpdatedApplicationUser.firstName(UPDATED_FIRST_NAME).lastName(UPDATED_LAST_NAME).username(UPDATED_USERNAME);
 
         restApplicationUserMockMvc
             .perform(
@@ -471,8 +418,7 @@ class ApplicationUserResourceIT {
         ApplicationUser testApplicationUser = applicationUserList.get(applicationUserList.size() - 1);
         assertThat(testApplicationUser.getFirstName()).isEqualTo(UPDATED_FIRST_NAME);
         assertThat(testApplicationUser.getLastName()).isEqualTo(UPDATED_LAST_NAME);
-        assertThat(testApplicationUser.getPseudo()).isEqualTo(UPDATED_PSEUDO);
-        assertThat(testApplicationUser.getAverageRating()).isEqualTo(UPDATED_AVERAGE_RATING);
+        assertThat(testApplicationUser.getUsername()).isEqualTo(UPDATED_USERNAME);
     }
 
     @Test
@@ -481,13 +427,16 @@ class ApplicationUserResourceIT {
         int databaseSizeBeforeUpdate = applicationUserRepository.findAll().size();
         applicationUser.setId(count.incrementAndGet());
 
+        // Create the ApplicationUser
+        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restApplicationUserMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, applicationUser.getId())
+                patch(ENTITY_API_URL_ID, applicationUserDTO.getId())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -502,13 +451,16 @@ class ApplicationUserResourceIT {
         int databaseSizeBeforeUpdate = applicationUserRepository.findAll().size();
         applicationUser.setId(count.incrementAndGet());
 
+        // Create the ApplicationUser
+        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -523,13 +475,16 @@ class ApplicationUserResourceIT {
         int databaseSizeBeforeUpdate = applicationUserRepository.findAll().size();
         applicationUser.setId(count.incrementAndGet());
 
+        // Create the ApplicationUser
+        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserMockMvc
             .perform(
                 patch(ENTITY_API_URL)
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 

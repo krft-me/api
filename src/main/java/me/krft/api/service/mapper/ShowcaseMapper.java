@@ -1,19 +1,21 @@
 package me.krft.api.service.mapper;
 
+import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.domain.Showcase;
+import me.krft.api.service.dto.ApplicationUserOfferDTO;
 import me.krft.api.service.dto.ShowcaseDTO;
+import org.mapstruct.*;
 
-public class ShowcaseMapper implements EntityDTOMapper<Showcase, ShowcaseDTO>{
-    @Override
-    public ShowcaseDTO toDTO(Showcase entity) {
-        return ShowcaseDTO.builder()
-                .id(entity.getId())
-                .imageId(entity.getImageId())
-                .build();
-    }
+/**
+ * Mapper for the entity {@link Showcase} and its DTO {@link ShowcaseDTO}.
+ */
+@Mapper(componentModel = "spring")
+public interface ShowcaseMapper extends EntityMapper<ShowcaseDTO, Showcase> {
+    @Mapping(target = "applicationUserOffer", source = "applicationUserOffer", qualifiedByName = "applicationUserOfferId")
+    ShowcaseDTO toDto(Showcase s);
 
-    @Override
-    public Showcase toEntity(ShowcaseDTO dto) {
-        return new Showcase().id(dto.getId()).imageId(dto.getImageId());
-    }
+    @Named("applicationUserOfferId")
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    ApplicationUserOfferDTO toDtoApplicationUserOfferId(ApplicationUserOffer applicationUserOffer);
 }

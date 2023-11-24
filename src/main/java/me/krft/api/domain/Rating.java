@@ -32,7 +32,7 @@ public class Rating implements Serializable {
     private String comment;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "ratings", "showcases", "tags", "offer", "applicationUser" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "machines", "applicationUser" }, allowSetters = true)
     private ApplicationUserOffer applicationUserOffer;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

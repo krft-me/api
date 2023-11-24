@@ -8,7 +8,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Tag.
+ * Tag entity\nRepresents a preset keyword for an offer
  */
 @Entity
 @Table(name = "tag")
@@ -25,11 +25,12 @@ public class Tag implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "label", nullable = false)
+    @Size(min = 1)
+    @Column(name = "label", nullable = false, unique = true)
     private String label;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "ratings", "showcases", "tags", "offer", "applicationUser" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "machines", "applicationUser" }, allowSetters = true)
     private ApplicationUserOffer applicationUserOffer;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

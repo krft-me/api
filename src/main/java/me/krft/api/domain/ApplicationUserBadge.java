@@ -9,7 +9,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A ApplicationUserBadge.
+ * Association entity between users and badges
  */
 @Entity
 @Table(name = "application_user_badge")
@@ -25,18 +25,20 @@ public class ApplicationUserBadge implements Serializable {
     @Column(name = "id")
     private Long id;
 
+    /**
+     * Date the user obtained the badge
+     */
     @NotNull
-    @Column(name = "obtention_date", nullable = false)
-    private Instant obtentionDate;
+    @Column(name = "obtained_date", nullable = false)
+    private Instant obtainedDate;
+
+    @ManyToOne(optional = false)
+    @NotNull
+    @JsonIgnoreProperties(value = { "internalUser", "offers", "badges", "orders", "city" }, allowSetters = true)
+    private ApplicationUser user;
 
     @ManyToOne
-    @JsonIgnoreProperties(
-        value = { "internalUser", "city", "favoriteApplicationUsers", "favoriteOffers", "followers" },
-        allowSetters = true
-    )
-    private ApplicationUser applicationUser;
-
-    @ManyToOne
+    @JsonIgnoreProperties(value = { "applicationUserBadges" }, allowSetters = true)
     private Badge badge;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -54,29 +56,29 @@ public class ApplicationUserBadge implements Serializable {
         this.id = id;
     }
 
-    public Instant getObtentionDate() {
-        return this.obtentionDate;
+    public Instant getObtainedDate() {
+        return this.obtainedDate;
     }
 
-    public ApplicationUserBadge obtentionDate(Instant obtentionDate) {
-        this.setObtentionDate(obtentionDate);
+    public ApplicationUserBadge obtainedDate(Instant obtainedDate) {
+        this.setObtainedDate(obtainedDate);
         return this;
     }
 
-    public void setObtentionDate(Instant obtentionDate) {
-        this.obtentionDate = obtentionDate;
+    public void setObtainedDate(Instant obtainedDate) {
+        this.obtainedDate = obtainedDate;
     }
 
-    public ApplicationUser getApplicationUser() {
-        return this.applicationUser;
+    public ApplicationUser getUser() {
+        return this.user;
     }
 
-    public void setApplicationUser(ApplicationUser applicationUser) {
-        this.applicationUser = applicationUser;
+    public void setUser(ApplicationUser applicationUser) {
+        this.user = applicationUser;
     }
 
-    public ApplicationUserBadge applicationUser(ApplicationUser applicationUser) {
-        this.setApplicationUser(applicationUser);
+    public ApplicationUserBadge user(ApplicationUser applicationUser) {
+        this.setUser(applicationUser);
         return this;
     }
 
@@ -117,7 +119,7 @@ public class ApplicationUserBadge implements Serializable {
     public String toString() {
         return "ApplicationUserBadge{" +
             "id=" + getId() +
-            ", obtentionDate='" + getObtentionDate() + "'" +
+            ", obtainedDate='" + getObtainedDate() + "'" +
             "}";
     }
 }

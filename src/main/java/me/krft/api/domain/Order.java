@@ -10,7 +10,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Order.
+ * Order entity\nRepresents an order placed by a customer for an offer
  */
 @Entity
 @Table(name = "krftme_order")
@@ -26,25 +26,29 @@ public class Order implements Serializable {
     @Column(name = "id")
     private Long id;
 
+    /**
+     * Date the order was placed
+     */
     @NotNull
     @Column(name = "date", nullable = false)
     private Instant date;
 
+    /**
+     * State of the order
+     */
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "state", nullable = false)
     private State state;
 
-    @ManyToOne
-    @JsonIgnoreProperties(value = { "ratings", "showcases", "tags", "offer", "applicationUser" }, allowSetters = true)
-    private ApplicationUserOffer provider;
+    @ManyToOne(optional = false)
+    @NotNull
+    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "machines", "applicationUser" }, allowSetters = true)
+    private ApplicationUserOffer offer;
 
     @ManyToOne
-    @JsonIgnoreProperties(
-        value = { "internalUser", "city", "favoriteApplicationUsers", "favoriteOffers", "followers" },
-        allowSetters = true
-    )
-    private ApplicationUser client;
+    @JsonIgnoreProperties(value = { "internalUser", "offers", "badges", "orders", "city" }, allowSetters = true)
+    private ApplicationUser customer;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -87,29 +91,29 @@ public class Order implements Serializable {
         this.state = state;
     }
 
-    public ApplicationUserOffer getProvider() {
-        return this.provider;
+    public ApplicationUserOffer getOffer() {
+        return this.offer;
     }
 
-    public void setProvider(ApplicationUserOffer applicationUserOffer) {
-        this.provider = applicationUserOffer;
+    public void setOffer(ApplicationUserOffer applicationUserOffer) {
+        this.offer = applicationUserOffer;
     }
 
-    public Order provider(ApplicationUserOffer applicationUserOffer) {
-        this.setProvider(applicationUserOffer);
+    public Order offer(ApplicationUserOffer applicationUserOffer) {
+        this.setOffer(applicationUserOffer);
         return this;
     }
 
-    public ApplicationUser getClient() {
-        return this.client;
+    public ApplicationUser getCustomer() {
+        return this.customer;
     }
 
-    public void setClient(ApplicationUser applicationUser) {
-        this.client = applicationUser;
+    public void setCustomer(ApplicationUser applicationUser) {
+        this.customer = applicationUser;
     }
 
-    public Order client(ApplicationUser applicationUser) {
-        this.setClient(applicationUser);
+    public Order customer(ApplicationUser applicationUser) {
+        this.setCustomer(applicationUser);
         return this;
     }
 

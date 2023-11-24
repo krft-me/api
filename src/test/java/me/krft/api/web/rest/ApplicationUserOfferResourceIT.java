@@ -13,6 +13,8 @@ import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.repository.ApplicationUserOfferRepository;
+import me.krft.api.service.dto.ApplicationUserOfferDTO;
+import me.krft.api.service.mapper.ApplicationUserOfferMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,12 @@ class ApplicationUserOfferResourceIT {
     private static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
     private static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
 
+    private static final Integer DEFAULT_PRICE = 0;
+    private static final Integer UPDATED_PRICE = 1;
+
+    private static final Boolean DEFAULT_ACTIVE = false;
+    private static final Boolean UPDATED_ACTIVE = true;
+
     private static final String ENTITY_API_URL = "/api/application-user-offers";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
@@ -41,6 +49,9 @@ class ApplicationUserOfferResourceIT {
 
     @Autowired
     private ApplicationUserOfferRepository applicationUserOfferRepository;
+
+    @Autowired
+    private ApplicationUserOfferMapper applicationUserOfferMapper;
 
     @Autowired
     private EntityManager em;
@@ -57,7 +68,10 @@ class ApplicationUserOfferResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ApplicationUserOffer createEntity(EntityManager em) {
-        ApplicationUserOffer applicationUserOffer = new ApplicationUserOffer().description(DEFAULT_DESCRIPTION);
+        ApplicationUserOffer applicationUserOffer = new ApplicationUserOffer()
+            .description(DEFAULT_DESCRIPTION)
+            .price(DEFAULT_PRICE)
+            .active(DEFAULT_ACTIVE);
         return applicationUserOffer;
     }
 
@@ -68,7 +82,10 @@ class ApplicationUserOfferResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ApplicationUserOffer createUpdatedEntity(EntityManager em) {
-        ApplicationUserOffer applicationUserOffer = new ApplicationUserOffer().description(UPDATED_DESCRIPTION);
+        ApplicationUserOffer applicationUserOffer = new ApplicationUserOffer()
+            .description(UPDATED_DESCRIPTION)
+            .price(UPDATED_PRICE)
+            .active(UPDATED_ACTIVE);
         return applicationUserOffer;
     }
 
@@ -82,12 +99,13 @@ class ApplicationUserOfferResourceIT {
     void createApplicationUserOffer() throws Exception {
         int databaseSizeBeforeCreate = applicationUserOfferRepository.findAll().size();
         // Create the ApplicationUserOffer
+        ApplicationUserOfferDTO applicationUserOfferDTO = applicationUserOfferMapper.toDto(applicationUserOffer);
         restApplicationUserOfferMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOffer))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOfferDTO))
             )
             .andExpect(status().isCreated());
 
@@ -96,6 +114,8 @@ class ApplicationUserOfferResourceIT {
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeCreate + 1);
         ApplicationUserOffer testApplicationUserOffer = applicationUserOfferList.get(applicationUserOfferList.size() - 1);
         assertThat(testApplicationUserOffer.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
+        assertThat(testApplicationUserOffer.getPrice()).isEqualTo(DEFAULT_PRICE);
+        assertThat(testApplicationUserOffer.getActive()).isEqualTo(DEFAULT_ACTIVE);
     }
 
     @Test
@@ -103,6 +123,7 @@ class ApplicationUserOfferResourceIT {
     void createApplicationUserOfferWithExistingId() throws Exception {
         // Create the ApplicationUserOffer with an existing ID
         applicationUserOffer.setId(1L);
+        ApplicationUserOfferDTO applicationUserOfferDTO = applicationUserOfferMapper.toDto(applicationUserOffer);
 
         int databaseSizeBeforeCreate = applicationUserOfferRepository.findAll().size();
 
@@ -112,7 +133,7 @@ class ApplicationUserOfferResourceIT {
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOffer))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOfferDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -129,13 +150,60 @@ class ApplicationUserOfferResourceIT {
         applicationUserOffer.setDescription(null);
 
         // Create the ApplicationUserOffer, which fails.
+        ApplicationUserOfferDTO applicationUserOfferDTO = applicationUserOfferMapper.toDto(applicationUserOffer);
 
         restApplicationUserOfferMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOffer))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOfferDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
+        assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkPriceIsRequired() throws Exception {
+        int databaseSizeBeforeTest = applicationUserOfferRepository.findAll().size();
+        // set the field null
+        applicationUserOffer.setPrice(null);
+
+        // Create the ApplicationUserOffer, which fails.
+        ApplicationUserOfferDTO applicationUserOfferDTO = applicationUserOfferMapper.toDto(applicationUserOffer);
+
+        restApplicationUserOfferMockMvc
+            .perform(
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOfferDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
+        assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkActiveIsRequired() throws Exception {
+        int databaseSizeBeforeTest = applicationUserOfferRepository.findAll().size();
+        // set the field null
+        applicationUserOffer.setActive(null);
+
+        // Create the ApplicationUserOffer, which fails.
+        ApplicationUserOfferDTO applicationUserOfferDTO = applicationUserOfferMapper.toDto(applicationUserOffer);
+
+        restApplicationUserOfferMockMvc
+            .perform(
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOfferDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -155,7 +223,9 @@ class ApplicationUserOfferResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(applicationUserOffer.getId().intValue())))
-            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)));
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
+            .andExpect(jsonPath("$.[*].price").value(hasItem(DEFAULT_PRICE)))
+            .andExpect(jsonPath("$.[*].active").value(hasItem(DEFAULT_ACTIVE.booleanValue())));
     }
 
     @Test
@@ -170,7 +240,9 @@ class ApplicationUserOfferResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(applicationUserOffer.getId().intValue()))
-            .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION));
+            .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
+            .andExpect(jsonPath("$.price").value(DEFAULT_PRICE))
+            .andExpect(jsonPath("$.active").value(DEFAULT_ACTIVE.booleanValue()));
     }
 
     @Test
@@ -192,14 +264,15 @@ class ApplicationUserOfferResourceIT {
         ApplicationUserOffer updatedApplicationUserOffer = applicationUserOfferRepository.findById(applicationUserOffer.getId()).get();
         // Disconnect from session so that the updates on updatedApplicationUserOffer are not directly saved in db
         em.detach(updatedApplicationUserOffer);
-        updatedApplicationUserOffer.description(UPDATED_DESCRIPTION);
+        updatedApplicationUserOffer.description(UPDATED_DESCRIPTION).price(UPDATED_PRICE).active(UPDATED_ACTIVE);
+        ApplicationUserOfferDTO applicationUserOfferDTO = applicationUserOfferMapper.toDto(updatedApplicationUserOffer);
 
         restApplicationUserOfferMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, updatedApplicationUserOffer.getId())
+                put(ENTITY_API_URL_ID, applicationUserOfferDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(updatedApplicationUserOffer))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOfferDTO))
             )
             .andExpect(status().isOk());
 
@@ -208,6 +281,8 @@ class ApplicationUserOfferResourceIT {
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeUpdate);
         ApplicationUserOffer testApplicationUserOffer = applicationUserOfferList.get(applicationUserOfferList.size() - 1);
         assertThat(testApplicationUserOffer.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+        assertThat(testApplicationUserOffer.getPrice()).isEqualTo(UPDATED_PRICE);
+        assertThat(testApplicationUserOffer.getActive()).isEqualTo(UPDATED_ACTIVE);
     }
 
     @Test
@@ -216,13 +291,16 @@ class ApplicationUserOfferResourceIT {
         int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
         applicationUserOffer.setId(count.incrementAndGet());
 
+        // Create the ApplicationUserOffer
+        ApplicationUserOfferDTO applicationUserOfferDTO = applicationUserOfferMapper.toDto(applicationUserOffer);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restApplicationUserOfferMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, applicationUserOffer.getId())
+                put(ENTITY_API_URL_ID, applicationUserOfferDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOffer))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOfferDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -237,13 +315,16 @@ class ApplicationUserOfferResourceIT {
         int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
         applicationUserOffer.setId(count.incrementAndGet());
 
+        // Create the ApplicationUserOffer
+        ApplicationUserOfferDTO applicationUserOfferDTO = applicationUserOfferMapper.toDto(applicationUserOffer);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserOfferMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOffer))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOfferDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -258,13 +339,16 @@ class ApplicationUserOfferResourceIT {
         int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
         applicationUserOffer.setId(count.incrementAndGet());
 
+        // Create the ApplicationUserOffer
+        ApplicationUserOfferDTO applicationUserOfferDTO = applicationUserOfferMapper.toDto(applicationUserOffer);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserOfferMockMvc
             .perform(
                 put(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOffer))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOfferDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -285,7 +369,7 @@ class ApplicationUserOfferResourceIT {
         ApplicationUserOffer partialUpdatedApplicationUserOffer = new ApplicationUserOffer();
         partialUpdatedApplicationUserOffer.setId(applicationUserOffer.getId());
 
-        partialUpdatedApplicationUserOffer.description(UPDATED_DESCRIPTION);
+        partialUpdatedApplicationUserOffer.description(UPDATED_DESCRIPTION).price(UPDATED_PRICE).active(UPDATED_ACTIVE);
 
         restApplicationUserOfferMockMvc
             .perform(
@@ -301,6 +385,8 @@ class ApplicationUserOfferResourceIT {
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeUpdate);
         ApplicationUserOffer testApplicationUserOffer = applicationUserOfferList.get(applicationUserOfferList.size() - 1);
         assertThat(testApplicationUserOffer.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+        assertThat(testApplicationUserOffer.getPrice()).isEqualTo(UPDATED_PRICE);
+        assertThat(testApplicationUserOffer.getActive()).isEqualTo(UPDATED_ACTIVE);
     }
 
     @Test
@@ -315,7 +401,7 @@ class ApplicationUserOfferResourceIT {
         ApplicationUserOffer partialUpdatedApplicationUserOffer = new ApplicationUserOffer();
         partialUpdatedApplicationUserOffer.setId(applicationUserOffer.getId());
 
-        partialUpdatedApplicationUserOffer.description(UPDATED_DESCRIPTION);
+        partialUpdatedApplicationUserOffer.description(UPDATED_DESCRIPTION).price(UPDATED_PRICE).active(UPDATED_ACTIVE);
 
         restApplicationUserOfferMockMvc
             .perform(
@@ -331,6 +417,8 @@ class ApplicationUserOfferResourceIT {
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeUpdate);
         ApplicationUserOffer testApplicationUserOffer = applicationUserOfferList.get(applicationUserOfferList.size() - 1);
         assertThat(testApplicationUserOffer.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+        assertThat(testApplicationUserOffer.getPrice()).isEqualTo(UPDATED_PRICE);
+        assertThat(testApplicationUserOffer.getActive()).isEqualTo(UPDATED_ACTIVE);
     }
 
     @Test
@@ -339,13 +427,16 @@ class ApplicationUserOfferResourceIT {
         int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
         applicationUserOffer.setId(count.incrementAndGet());
 
+        // Create the ApplicationUserOffer
+        ApplicationUserOfferDTO applicationUserOfferDTO = applicationUserOfferMapper.toDto(applicationUserOffer);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restApplicationUserOfferMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, applicationUserOffer.getId())
+                patch(ENTITY_API_URL_ID, applicationUserOfferDTO.getId())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOffer))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOfferDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -360,13 +451,16 @@ class ApplicationUserOfferResourceIT {
         int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
         applicationUserOffer.setId(count.incrementAndGet());
 
+        // Create the ApplicationUserOffer
+        ApplicationUserOfferDTO applicationUserOfferDTO = applicationUserOfferMapper.toDto(applicationUserOffer);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserOfferMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOffer))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOfferDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -381,13 +475,16 @@ class ApplicationUserOfferResourceIT {
         int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
         applicationUserOffer.setId(count.incrementAndGet());
 
+        // Create the ApplicationUserOffer
+        ApplicationUserOfferDTO applicationUserOfferDTO = applicationUserOfferMapper.toDto(applicationUserOffer);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserOfferMockMvc
             .perform(
                 patch(ENTITY_API_URL)
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOffer))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOfferDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 

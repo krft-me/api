@@ -3,17 +3,20 @@
   "changelogDate": "20231002172854",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
-  "dto": "no",
+  "dto": "mapstruct",
   "embedded": false,
   "entityTableName": "region",
   "fields": [
     {
       "fieldName": "name",
       "fieldType": "String",
-      "fieldValidateRules": ["required"]
+      "fieldValidateRules": ["required", "minlength"],
+      "fieldValidateRulesMinlength": "1",
+      "javadoc": "The region's name"
     }
   ],
   "fluentMethods": true,
+  "javadoc": "Region entity",
   "jpaMetamodelFiltering": false,
   "microserviceName": "krftme",
   "name": "Region",
@@ -21,10 +24,18 @@
   "readOnly": false,
   "relationships": [
     {
+      "otherEntityName": "city",
+      "otherEntityRelationshipName": "region",
+      "relationshipName": "cities",
+      "relationshipType": "one-to-many"
+    },
+    {
       "otherEntityName": "country",
+      "otherEntityRelationshipName": "regions",
       "relationshipName": "country",
-      "relationshipType": "many-to-one"
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
     }
   ],
-  "service": "no"
+  "service": "serviceImpl"
 }

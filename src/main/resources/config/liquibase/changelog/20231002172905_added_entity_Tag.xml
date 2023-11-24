@@ -10,12 +10,12 @@
         Added the entity Tag.
     -->
     <changeSet id="20231002172905-1" author="jhipster">
-        <createTable tableName="tag">
+        <createTable tableName="tag" remarks="Tag entity\nRepresents a preset keyword for an offer">
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="label" type="varchar(255)">
-                <constraints nullable="false" />
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_tag__label" />
             </column>
             <column name="application_user_offer_id" type="bigint">
                 <constraints nullable="true" />

@@ -9,7 +9,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Showcase.
+ * Showcase image\nRepresents an image of a service to illustrate it
  */
 @Entity
 @Table(name = "showcase")
@@ -26,11 +26,11 @@ public class Showcase implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "image_id", nullable = false)
+    @Column(name = "image_id", nullable = false, unique = true)
     private UUID imageId;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "ratings", "showcases", "tags", "offer", "applicationUser" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "machines", "applicationUser" }, allowSetters = true)
     private ApplicationUserOffer applicationUserOffer;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

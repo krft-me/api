@@ -2,15 +2,13 @@ package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Machine.
+ * Machine entity
  */
 @Entity
 @Table(name = "machine")
@@ -27,17 +25,18 @@ public class Machine implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "name", nullable = false)
+    @Size(min = 1)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "machine")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "machine" }, allowSetters = true)
-    private Set<Category> categories = new HashSet<>();
+    @ManyToOne(optional = false)
+    @NotNull
+    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "machines", "applicationUser" }, allowSetters = true)
+    private ApplicationUserOffer offer;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "machines", "followers" }, allowSetters = true)
-    private Offer offer;
+    @JsonIgnoreProperties(value = { "machines" }, allowSetters = true)
+    private MachineCategory category;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -67,47 +66,29 @@ public class Machine implements Serializable {
         this.name = name;
     }
 
-    public Set<Category> getCategories() {
-        return this.categories;
-    }
-
-    public void setCategories(Set<Category> categories) {
-        if (this.categories != null) {
-            this.categories.forEach(i -> i.setMachine(null));
-        }
-        if (categories != null) {
-            categories.forEach(i -> i.setMachine(this));
-        }
-        this.categories = categories;
-    }
-
-    public Machine categories(Set<Category> categories) {
-        this.setCategories(categories);
-        return this;
-    }
-
-    public Machine addCategory(Category category) {
-        this.categories.add(category);
-        category.setMachine(this);
-        return this;
-    }
-
-    public Machine removeCategory(Category category) {
-        this.categories.remove(category);
-        category.setMachine(null);
-        return this;
-    }
-
-    public Offer getOffer() {
+    public ApplicationUserOffer getOffer() {
         return this.offer;
     }
 
-    public void setOffer(Offer offer) {
-        this.offer = offer;
+    public void setOffer(ApplicationUserOffer applicationUserOffer) {
+        this.offer = applicationUserOffer;
     }
 
-    public Machine offer(Offer offer) {
-        this.setOffer(offer);
+    public Machine offer(ApplicationUserOffer applicationUserOffer) {
+        this.setOffer(applicationUserOffer);
+        return this;
+    }
+
+    public MachineCategory getCategory() {
+        return this.category;
+    }
+
+    public void setCategory(MachineCategory machineCategory) {
+        this.category = machineCategory;
+    }
+
+    public Machine category(MachineCategory machineCategory) {
+        this.setCategory(machineCategory);
         return this;
     }
 

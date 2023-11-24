@@ -3,17 +3,18 @@
   "changelogDate": "20231002172901",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
-  "dto": "no",
+  "dto": "mapstruct",
   "embedded": false,
   "entityTableName": "showcase",
   "fields": [
     {
       "fieldName": "imageId",
       "fieldType": "UUID",
-      "fieldValidateRules": ["required"]
+      "fieldValidateRules": ["required", "unique"]
     }
   ],
   "fluentMethods": true,
+  "javadoc": "Showcase image\\nRepresents an image of a service to illustrate it",
   "jpaMetamodelFiltering": false,
   "microserviceName": "krftme",
   "name": "Showcase",
@@ -22,10 +23,10 @@
   "relationships": [
     {
       "otherEntityName": "applicationUserOffer",
-      "otherEntityRelationshipName": "showcase",
+      "otherEntityRelationshipName": "showcases",
       "relationshipName": "applicationUserOffer",
       "relationshipType": "many-to-one"
     }
   ],
-  "service": "no"
+  "service": "serviceImpl"
 }

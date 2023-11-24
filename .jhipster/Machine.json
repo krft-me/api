@@ -3,17 +3,19 @@
   "changelogDate": "20231002172858",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
-  "dto": "no",
+  "dto": "mapstruct",
   "embedded": false,
   "entityTableName": "machine",
   "fields": [
     {
       "fieldName": "name",
       "fieldType": "String",
-      "fieldValidateRules": ["required"]
+      "fieldValidateRules": ["required", "minlength", "unique"],
+      "fieldValidateRulesMinlength": "1"
     }
   ],
   "fluentMethods": true,
+  "javadoc": "Machine entity",
   "jpaMetamodelFiltering": false,
   "microserviceName": "krftme",
   "name": "Machine",
@@ -21,17 +23,18 @@
   "readOnly": false,
   "relationships": [
     {
-      "otherEntityName": "category",
-      "otherEntityRelationshipName": "machine",
-      "relationshipName": "category",
-      "relationshipType": "one-to-many"
+      "otherEntityName": "applicationUserOffer",
+      "otherEntityRelationshipName": "machines",
+      "relationshipName": "offer",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
     },
     {
-      "otherEntityName": "offer",
+      "otherEntityName": "machineCategory",
       "otherEntityRelationshipName": "machine",
-      "relationshipName": "offer",
+      "relationshipName": "category",
       "relationshipType": "many-to-one"
     }
   ],
-  "service": "no"
+  "service": "serviceImpl"
 }

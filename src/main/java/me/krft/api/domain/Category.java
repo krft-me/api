@@ -29,7 +29,7 @@ public class Category implements Serializable {
     private String label;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "categories", "offer" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "offer", "category" }, allowSetters = true)
     private Machine machine;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

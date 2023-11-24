@@ -7,14 +7,14 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import me.krft.api.domain.Tag;
 import me.krft.api.repository.TagRepository;
+import me.krft.api.service.TagService;
+import me.krft.api.service.dto.TagDTO;
 import me.krft.api.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -24,7 +24,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
-@Transactional
 public class TagResource {
 
     private final Logger log = LoggerFactory.getLogger(TagResource.class);
@@ -34,26 +33,29 @@ public class TagResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final TagService tagService;
+
     private final TagRepository tagRepository;
 
-    public TagResource(TagRepository tagRepository) {
+    public TagResource(TagService tagService, TagRepository tagRepository) {
+        this.tagService = tagService;
         this.tagRepository = tagRepository;
     }
 
     /**
      * {@code POST  /tags} : Create a new tag.
      *
-     * @param tag the tag to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new tag, or with status {@code 400 (Bad Request)} if the tag has already an ID.
+     * @param tagDTO the tagDTO to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new tagDTO, or with status {@code 400 (Bad Request)} if the tag has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/tags")
-    public ResponseEntity<Tag> createTag(@Valid @RequestBody Tag tag) throws URISyntaxException {
-        log.debug("REST request to save Tag : {}", tag);
-        if (tag.getId() != null) {
+    public ResponseEntity<TagDTO> createTag(@Valid @RequestBody TagDTO tagDTO) throws URISyntaxException {
+        log.debug("REST request to save Tag : {}", tagDTO);
+        if (tagDTO.getId() != null) {
             throw new BadRequestAlertException("A new tag cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Tag result = tagRepository.save(tag);
+        TagDTO result = tagService.save(tagDTO);
         return ResponseEntity
             .created(new URI("/api/tags/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -63,21 +65,21 @@ public class TagResource {
     /**
      * {@code PUT  /tags/:id} : Updates an existing tag.
      *
-     * @param id the id of the tag to save.
-     * @param tag the tag to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated tag,
-     * or with status {@code 400 (Bad Request)} if the tag is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the tag couldn't be updated.
+     * @param id the id of the tagDTO to save.
+     * @param tagDTO the tagDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated tagDTO,
+     * or with status {@code 400 (Bad Request)} if the tagDTO is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the tagDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/tags/{id}")
-    public ResponseEntity<Tag> updateTag(@PathVariable(value = "id", required = false) final Long id, @Valid @RequestBody Tag tag)
+    public ResponseEntity<TagDTO> updateTag(@PathVariable(value = "id", required = false) final Long id, @Valid @RequestBody TagDTO tagDTO)
         throws URISyntaxException {
-        log.debug("REST request to update Tag : {}, {}", id, tag);
-        if (tag.getId() == null) {
+        log.debug("REST request to update Tag : {}, {}", id, tagDTO);
+        if (tagDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, tag.getId())) {
+        if (!Objects.equals(id, tagDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -85,32 +87,34 @@ public class TagResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Tag result = tagRepository.save(tag);
+        TagDTO result = tagService.update(tagDTO);
         return ResponseEntity
             .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, tag.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, tagDTO.getId().toString()))
             .body(result);
     }
 
     /**
      * {@code PATCH  /tags/:id} : Partial updates given fields of an existing tag, field will ignore if it is null
      *
-     * @param id the id of the tag to save.
-     * @param tag the tag to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated tag,
-     * or with status {@code 400 (Bad Request)} if the tag is not valid,
-     * or with status {@code 404 (Not Found)} if the tag is not found,
-     * or with status {@code 500 (Internal Server Error)} if the tag couldn't be updated.
+     * @param id the id of the tagDTO to save.
+     * @param tagDTO the tagDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated tagDTO,
+     * or with status {@code 400 (Bad Request)} if the tagDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the tagDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the tagDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/tags/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<Tag> partialUpdateTag(@PathVariable(value = "id", required = false) final Long id, @NotNull @RequestBody Tag tag)
-        throws URISyntaxException {
-        log.debug("REST request to partial update Tag partially : {}, {}", id, tag);
-        if (tag.getId() == null) {
+    public ResponseEntity<TagDTO> partialUpdateTag(
+        @PathVariable(value = "id", required = false) final Long id,
+        @NotNull @RequestBody TagDTO tagDTO
+    ) throws URISyntaxException {
+        log.debug("REST request to partial update Tag partially : {}, {}", id, tagDTO);
+        if (tagDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, tag.getId())) {
+        if (!Objects.equals(id, tagDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -118,20 +122,11 @@ public class TagResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<Tag> result = tagRepository
-            .findById(tag.getId())
-            .map(existingTag -> {
-                if (tag.getLabel() != null) {
-                    existingTag.setLabel(tag.getLabel());
-                }
-
-                return existingTag;
-            })
-            .map(tagRepository::save);
+        Optional<TagDTO> result = tagService.partialUpdate(tagDTO);
 
         return ResponseUtil.wrapOrNotFound(
             result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, tag.getId().toString())
+            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, tagDTO.getId().toString())
         );
     }
 
@@ -141,34 +136,34 @@ public class TagResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of tags in body.
      */
     @GetMapping("/tags")
-    public List<Tag> getAllTags() {
+    public List<TagDTO> getAllTags() {
         log.debug("REST request to get all Tags");
-        return tagRepository.findAll();
+        return tagService.findAll();
     }
 
     /**
      * {@code GET  /tags/:id} : get the "id" tag.
      *
-     * @param id the id of the tag to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the tag, or with status {@code 404 (Not Found)}.
+     * @param id the id of the tagDTO to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the tagDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/tags/{id}")
-    public ResponseEntity<Tag> getTag(@PathVariable Long id) {
+    public ResponseEntity<TagDTO> getTag(@PathVariable Long id) {
         log.debug("REST request to get Tag : {}", id);
-        Optional<Tag> tag = tagRepository.findById(id);
-        return ResponseUtil.wrapOrNotFound(tag);
+        Optional<TagDTO> tagDTO = tagService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(tagDTO);
     }
 
     /**
      * {@code DELETE  /tags/:id} : delete the "id" tag.
      *
-     * @param id the id of the tag to delete.
+     * @param id the id of the tagDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/tags/{id}")
     public ResponseEntity<Void> deleteTag(@PathVariable Long id) {
         log.debug("REST request to delete Tag : {}", id);
-        tagRepository.deleteById(id);
+        tagService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

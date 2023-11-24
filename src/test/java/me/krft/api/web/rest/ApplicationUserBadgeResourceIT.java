@@ -13,8 +13,11 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
+import me.krft.api.domain.ApplicationUser;
 import me.krft.api.domain.ApplicationUserBadge;
 import me.krft.api.repository.ApplicationUserBadgeRepository;
+import me.krft.api.service.dto.ApplicationUserBadgeDTO;
+import me.krft.api.service.mapper.ApplicationUserBadgeMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class ApplicationUserBadgeResourceIT {
 
-    private static final Instant DEFAULT_OBTENTION_DATE = Instant.ofEpochMilli(0L);
-    private static final Instant UPDATED_OBTENTION_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+    private static final Instant DEFAULT_OBTAINED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_OBTAINED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final String ENTITY_API_URL = "/api/application-user-badges";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -43,6 +46,9 @@ class ApplicationUserBadgeResourceIT {
 
     @Autowired
     private ApplicationUserBadgeRepository applicationUserBadgeRepository;
+
+    @Autowired
+    private ApplicationUserBadgeMapper applicationUserBadgeMapper;
 
     @Autowired
     private EntityManager em;
@@ -59,7 +65,17 @@ class ApplicationUserBadgeResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ApplicationUserBadge createEntity(EntityManager em) {
-        ApplicationUserBadge applicationUserBadge = new ApplicationUserBadge().obtentionDate(DEFAULT_OBTENTION_DATE);
+        ApplicationUserBadge applicationUserBadge = new ApplicationUserBadge().obtainedDate(DEFAULT_OBTAINED_DATE);
+        // Add required entity
+        ApplicationUser applicationUser;
+        if (TestUtil.findAll(em, ApplicationUser.class).isEmpty()) {
+            applicationUser = ApplicationUserResourceIT.createEntity(em);
+            em.persist(applicationUser);
+            em.flush();
+        } else {
+            applicationUser = TestUtil.findAll(em, ApplicationUser.class).get(0);
+        }
+        applicationUserBadge.setUser(applicationUser);
         return applicationUserBadge;
     }
 
@@ -70,7 +86,17 @@ class ApplicationUserBadgeResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ApplicationUserBadge createUpdatedEntity(EntityManager em) {
-        ApplicationUserBadge applicationUserBadge = new ApplicationUserBadge().obtentionDate(UPDATED_OBTENTION_DATE);
+        ApplicationUserBadge applicationUserBadge = new ApplicationUserBadge().obtainedDate(UPDATED_OBTAINED_DATE);
+        // Add required entity
+        ApplicationUser applicationUser;
+        if (TestUtil.findAll(em, ApplicationUser.class).isEmpty()) {
+            applicationUser = ApplicationUserResourceIT.createUpdatedEntity(em);
+            em.persist(applicationUser);
+            em.flush();
+        } else {
+            applicationUser = TestUtil.findAll(em, ApplicationUser.class).get(0);
+        }
+        applicationUserBadge.setUser(applicationUser);
         return applicationUserBadge;
     }
 
@@ -84,12 +110,13 @@ class ApplicationUserBadgeResourceIT {
     void createApplicationUserBadge() throws Exception {
         int databaseSizeBeforeCreate = applicationUserBadgeRepository.findAll().size();
         // Create the ApplicationUserBadge
+        ApplicationUserBadgeDTO applicationUserBadgeDTO = applicationUserBadgeMapper.toDto(applicationUserBadge);
         restApplicationUserBadgeMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadgeDTO))
             )
             .andExpect(status().isCreated());
 
@@ -97,7 +124,7 @@ class ApplicationUserBadgeResourceIT {
         List<ApplicationUserBadge> applicationUserBadgeList = applicationUserBadgeRepository.findAll();
         assertThat(applicationUserBadgeList).hasSize(databaseSizeBeforeCreate + 1);
         ApplicationUserBadge testApplicationUserBadge = applicationUserBadgeList.get(applicationUserBadgeList.size() - 1);
-        assertThat(testApplicationUserBadge.getObtentionDate()).isEqualTo(DEFAULT_OBTENTION_DATE);
+        assertThat(testApplicationUserBadge.getObtainedDate()).isEqualTo(DEFAULT_OBTAINED_DATE);
     }
 
     @Test
@@ -105,6 +132,7 @@ class ApplicationUserBadgeResourceIT {
     void createApplicationUserBadgeWithExistingId() throws Exception {
         // Create the ApplicationUserBadge with an existing ID
         applicationUserBadge.setId(1L);
+        ApplicationUserBadgeDTO applicationUserBadgeDTO = applicationUserBadgeMapper.toDto(applicationUserBadge);
 
         int databaseSizeBeforeCreate = applicationUserBadgeRepository.findAll().size();
 
@@ -114,7 +142,7 @@ class ApplicationUserBadgeResourceIT {
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadgeDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -125,19 +153,20 @@ class ApplicationUserBadgeResourceIT {
 
     @Test
     @Transactional
-    void checkObtentionDateIsRequired() throws Exception {
+    void checkObtainedDateIsRequired() throws Exception {
         int databaseSizeBeforeTest = applicationUserBadgeRepository.findAll().size();
         // set the field null
-        applicationUserBadge.setObtentionDate(null);
+        applicationUserBadge.setObtainedDate(null);
 
         // Create the ApplicationUserBadge, which fails.
+        ApplicationUserBadgeDTO applicationUserBadgeDTO = applicationUserBadgeMapper.toDto(applicationUserBadge);
 
         restApplicationUserBadgeMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadgeDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -157,7 +186,7 @@ class ApplicationUserBadgeResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(applicationUserBadge.getId().intValue())))
-            .andExpect(jsonPath("$.[*].obtentionDate").value(hasItem(DEFAULT_OBTENTION_DATE.toString())));
+            .andExpect(jsonPath("$.[*].obtainedDate").value(hasItem(DEFAULT_OBTAINED_DATE.toString())));
     }
 
     @Test
@@ -172,7 +201,7 @@ class ApplicationUserBadgeResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(applicationUserBadge.getId().intValue()))
-            .andExpect(jsonPath("$.obtentionDate").value(DEFAULT_OBTENTION_DATE.toString()));
+            .andExpect(jsonPath("$.obtainedDate").value(DEFAULT_OBTAINED_DATE.toString()));
     }
 
     @Test
@@ -194,14 +223,15 @@ class ApplicationUserBadgeResourceIT {
         ApplicationUserBadge updatedApplicationUserBadge = applicationUserBadgeRepository.findById(applicationUserBadge.getId()).get();
         // Disconnect from session so that the updates on updatedApplicationUserBadge are not directly saved in db
         em.detach(updatedApplicationUserBadge);
-        updatedApplicationUserBadge.obtentionDate(UPDATED_OBTENTION_DATE);
+        updatedApplicationUserBadge.obtainedDate(UPDATED_OBTAINED_DATE);
+        ApplicationUserBadgeDTO applicationUserBadgeDTO = applicationUserBadgeMapper.toDto(updatedApplicationUserBadge);
 
         restApplicationUserBadgeMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, updatedApplicationUserBadge.getId())
+                put(ENTITY_API_URL_ID, applicationUserBadgeDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(updatedApplicationUserBadge))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadgeDTO))
             )
             .andExpect(status().isOk());
 
@@ -209,7 +239,7 @@ class ApplicationUserBadgeResourceIT {
         List<ApplicationUserBadge> applicationUserBadgeList = applicationUserBadgeRepository.findAll();
         assertThat(applicationUserBadgeList).hasSize(databaseSizeBeforeUpdate);
         ApplicationUserBadge testApplicationUserBadge = applicationUserBadgeList.get(applicationUserBadgeList.size() - 1);
-        assertThat(testApplicationUserBadge.getObtentionDate()).isEqualTo(UPDATED_OBTENTION_DATE);
+        assertThat(testApplicationUserBadge.getObtainedDate()).isEqualTo(UPDATED_OBTAINED_DATE);
     }
 
     @Test
@@ -218,13 +248,16 @@ class ApplicationUserBadgeResourceIT {
         int databaseSizeBeforeUpdate = applicationUserBadgeRepository.findAll().size();
         applicationUserBadge.setId(count.incrementAndGet());
 
+        // Create the ApplicationUserBadge
+        ApplicationUserBadgeDTO applicationUserBadgeDTO = applicationUserBadgeMapper.toDto(applicationUserBadge);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restApplicationUserBadgeMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, applicationUserBadge.getId())
+                put(ENTITY_API_URL_ID, applicationUserBadgeDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadgeDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -239,13 +272,16 @@ class ApplicationUserBadgeResourceIT {
         int databaseSizeBeforeUpdate = applicationUserBadgeRepository.findAll().size();
         applicationUserBadge.setId(count.incrementAndGet());
 
+        // Create the ApplicationUserBadge
+        ApplicationUserBadgeDTO applicationUserBadgeDTO = applicationUserBadgeMapper.toDto(applicationUserBadge);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserBadgeMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadgeDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -260,13 +296,16 @@ class ApplicationUserBadgeResourceIT {
         int databaseSizeBeforeUpdate = applicationUserBadgeRepository.findAll().size();
         applicationUserBadge.setId(count.incrementAndGet());
 
+        // Create the ApplicationUserBadge
+        ApplicationUserBadgeDTO applicationUserBadgeDTO = applicationUserBadgeMapper.toDto(applicationUserBadge);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserBadgeMockMvc
             .perform(
                 put(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadgeDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -287,7 +326,7 @@ class ApplicationUserBadgeResourceIT {
         ApplicationUserBadge partialUpdatedApplicationUserBadge = new ApplicationUserBadge();
         partialUpdatedApplicationUserBadge.setId(applicationUserBadge.getId());
 
-        partialUpdatedApplicationUserBadge.obtentionDate(UPDATED_OBTENTION_DATE);
+        partialUpdatedApplicationUserBadge.obtainedDate(UPDATED_OBTAINED_DATE);
 
         restApplicationUserBadgeMockMvc
             .perform(
@@ -302,7 +341,7 @@ class ApplicationUserBadgeResourceIT {
         List<ApplicationUserBadge> applicationUserBadgeList = applicationUserBadgeRepository.findAll();
         assertThat(applicationUserBadgeList).hasSize(databaseSizeBeforeUpdate);
         ApplicationUserBadge testApplicationUserBadge = applicationUserBadgeList.get(applicationUserBadgeList.size() - 1);
-        assertThat(testApplicationUserBadge.getObtentionDate()).isEqualTo(UPDATED_OBTENTION_DATE);
+        assertThat(testApplicationUserBadge.getObtainedDate()).isEqualTo(UPDATED_OBTAINED_DATE);
     }
 
     @Test
@@ -317,7 +356,7 @@ class ApplicationUserBadgeResourceIT {
         ApplicationUserBadge partialUpdatedApplicationUserBadge = new ApplicationUserBadge();
         partialUpdatedApplicationUserBadge.setId(applicationUserBadge.getId());
 
-        partialUpdatedApplicationUserBadge.obtentionDate(UPDATED_OBTENTION_DATE);
+        partialUpdatedApplicationUserBadge.obtainedDate(UPDATED_OBTAINED_DATE);
 
         restApplicationUserBadgeMockMvc
             .perform(
@@ -332,7 +371,7 @@ class ApplicationUserBadgeResourceIT {
         List<ApplicationUserBadge> applicationUserBadgeList = applicationUserBadgeRepository.findAll();
         assertThat(applicationUserBadgeList).hasSize(databaseSizeBeforeUpdate);
         ApplicationUserBadge testApplicationUserBadge = applicationUserBadgeList.get(applicationUserBadgeList.size() - 1);
-        assertThat(testApplicationUserBadge.getObtentionDate()).isEqualTo(UPDATED_OBTENTION_DATE);
+        assertThat(testApplicationUserBadge.getObtainedDate()).isEqualTo(UPDATED_OBTAINED_DATE);
     }
 
     @Test
@@ -341,13 +380,16 @@ class ApplicationUserBadgeResourceIT {
         int databaseSizeBeforeUpdate = applicationUserBadgeRepository.findAll().size();
         applicationUserBadge.setId(count.incrementAndGet());
 
+        // Create the ApplicationUserBadge
+        ApplicationUserBadgeDTO applicationUserBadgeDTO = applicationUserBadgeMapper.toDto(applicationUserBadge);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restApplicationUserBadgeMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, applicationUserBadge.getId())
+                patch(ENTITY_API_URL_ID, applicationUserBadgeDTO.getId())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadgeDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -362,13 +404,16 @@ class ApplicationUserBadgeResourceIT {
         int databaseSizeBeforeUpdate = applicationUserBadgeRepository.findAll().size();
         applicationUserBadge.setId(count.incrementAndGet());
 
+        // Create the ApplicationUserBadge
+        ApplicationUserBadgeDTO applicationUserBadgeDTO = applicationUserBadgeMapper.toDto(applicationUserBadge);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserBadgeMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadgeDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -383,13 +428,16 @@ class ApplicationUserBadgeResourceIT {
         int databaseSizeBeforeUpdate = applicationUserBadgeRepository.findAll().size();
         applicationUserBadge.setId(count.incrementAndGet());
 
+        // Create the ApplicationUserBadge
+        ApplicationUserBadgeDTO applicationUserBadgeDTO = applicationUserBadgeMapper.toDto(applicationUserBadge);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserBadgeMockMvc
             .perform(
                 patch(ENTITY_API_URL)
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserBadgeDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 

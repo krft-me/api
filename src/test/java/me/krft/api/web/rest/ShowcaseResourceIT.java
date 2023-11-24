@@ -14,6 +14,8 @@ import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.Showcase;
 import me.krft.api.repository.ShowcaseRepository;
+import me.krft.api.service.dto.ShowcaseDTO;
+import me.krft.api.service.mapper.ShowcaseMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,9 @@ class ShowcaseResourceIT {
 
     @Autowired
     private ShowcaseRepository showcaseRepository;
+
+    @Autowired
+    private ShowcaseMapper showcaseMapper;
 
     @Autowired
     private EntityManager em;
@@ -83,12 +88,13 @@ class ShowcaseResourceIT {
     void createShowcase() throws Exception {
         int databaseSizeBeforeCreate = showcaseRepository.findAll().size();
         // Create the Showcase
+        ShowcaseDTO showcaseDTO = showcaseMapper.toDto(showcase);
         restShowcaseMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(showcase))
+                    .content(TestUtil.convertObjectToJsonBytes(showcaseDTO))
             )
             .andExpect(status().isCreated());
 
@@ -104,6 +110,7 @@ class ShowcaseResourceIT {
     void createShowcaseWithExistingId() throws Exception {
         // Create the Showcase with an existing ID
         showcase.setId(1L);
+        ShowcaseDTO showcaseDTO = showcaseMapper.toDto(showcase);
 
         int databaseSizeBeforeCreate = showcaseRepository.findAll().size();
 
@@ -113,7 +120,7 @@ class ShowcaseResourceIT {
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(showcase))
+                    .content(TestUtil.convertObjectToJsonBytes(showcaseDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -130,13 +137,14 @@ class ShowcaseResourceIT {
         showcase.setImageId(null);
 
         // Create the Showcase, which fails.
+        ShowcaseDTO showcaseDTO = showcaseMapper.toDto(showcase);
 
         restShowcaseMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(showcase))
+                    .content(TestUtil.convertObjectToJsonBytes(showcaseDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -194,13 +202,14 @@ class ShowcaseResourceIT {
         // Disconnect from session so that the updates on updatedShowcase are not directly saved in db
         em.detach(updatedShowcase);
         updatedShowcase.imageId(UPDATED_IMAGE_ID);
+        ShowcaseDTO showcaseDTO = showcaseMapper.toDto(updatedShowcase);
 
         restShowcaseMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, updatedShowcase.getId())
+                put(ENTITY_API_URL_ID, showcaseDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(updatedShowcase))
+                    .content(TestUtil.convertObjectToJsonBytes(showcaseDTO))
             )
             .andExpect(status().isOk());
 
@@ -217,13 +226,16 @@ class ShowcaseResourceIT {
         int databaseSizeBeforeUpdate = showcaseRepository.findAll().size();
         showcase.setId(count.incrementAndGet());
 
+        // Create the Showcase
+        ShowcaseDTO showcaseDTO = showcaseMapper.toDto(showcase);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restShowcaseMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, showcase.getId())
+                put(ENTITY_API_URL_ID, showcaseDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(showcase))
+                    .content(TestUtil.convertObjectToJsonBytes(showcaseDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -238,13 +250,16 @@ class ShowcaseResourceIT {
         int databaseSizeBeforeUpdate = showcaseRepository.findAll().size();
         showcase.setId(count.incrementAndGet());
 
+        // Create the Showcase
+        ShowcaseDTO showcaseDTO = showcaseMapper.toDto(showcase);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restShowcaseMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(showcase))
+                    .content(TestUtil.convertObjectToJsonBytes(showcaseDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -259,13 +274,16 @@ class ShowcaseResourceIT {
         int databaseSizeBeforeUpdate = showcaseRepository.findAll().size();
         showcase.setId(count.incrementAndGet());
 
+        // Create the Showcase
+        ShowcaseDTO showcaseDTO = showcaseMapper.toDto(showcase);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restShowcaseMockMvc
             .perform(
                 put(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(showcase))
+                    .content(TestUtil.convertObjectToJsonBytes(showcaseDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -340,13 +358,16 @@ class ShowcaseResourceIT {
         int databaseSizeBeforeUpdate = showcaseRepository.findAll().size();
         showcase.setId(count.incrementAndGet());
 
+        // Create the Showcase
+        ShowcaseDTO showcaseDTO = showcaseMapper.toDto(showcase);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restShowcaseMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, showcase.getId())
+                patch(ENTITY_API_URL_ID, showcaseDTO.getId())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(showcase))
+                    .content(TestUtil.convertObjectToJsonBytes(showcaseDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -361,13 +382,16 @@ class ShowcaseResourceIT {
         int databaseSizeBeforeUpdate = showcaseRepository.findAll().size();
         showcase.setId(count.incrementAndGet());
 
+        // Create the Showcase
+        ShowcaseDTO showcaseDTO = showcaseMapper.toDto(showcase);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restShowcaseMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(showcase))
+                    .content(TestUtil.convertObjectToJsonBytes(showcaseDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -382,13 +406,16 @@ class ShowcaseResourceIT {
         int databaseSizeBeforeUpdate = showcaseRepository.findAll().size();
         showcase.setId(count.incrementAndGet());
 
+        // Create the Showcase
+        ShowcaseDTO showcaseDTO = showcaseMapper.toDto(showcase);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restShowcaseMockMvc
             .perform(
                 patch(ENTITY_API_URL)
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(showcase))
+                    .content(TestUtil.convertObjectToJsonBytes(showcaseDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
