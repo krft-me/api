@@ -83,6 +83,7 @@
         <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
         <properties-maven-plugin.version>1.1.0</properties-maven-plugin.version>
         <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
+        <lombok.version>1.18.30</lombok.version>
 
         <!-- jhipster-needle-maven-property -->
     </properties>
@@ -101,6 +102,12 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>tech.jhipster</groupId>
             <artifactId>jhipster-framework</artifactId>
@@ -425,6 +432,11 @@
                         <source>${java.version}</source>
                         <target>${java.version}</target>
                         <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </path>
                             <path>
                                 <groupId>org.springframework.boot</groupId>
                                 <artifactId>spring-boot-configuration-processor</artifactId>
