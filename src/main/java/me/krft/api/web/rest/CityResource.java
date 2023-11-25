@@ -1,12 +1,12 @@
 package me.krft.api.web.rest;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import me.krft.api.domain.City;
 import me.krft.api.repository.CityRepository;
 import me.krft.api.service.CityService;
