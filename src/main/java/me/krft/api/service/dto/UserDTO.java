@@ -1,11 +1,13 @@
 package me.krft.api.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 import me.krft.api.domain.User;
 
 /**
  * A DTO representing a user, with only the public attributes.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
