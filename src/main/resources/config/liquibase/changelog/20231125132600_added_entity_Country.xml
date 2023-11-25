@@ -15,10 +15,10 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="name" type="varchar(255)" remarks="The country&apos;s name in english">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
-            <column name="iso_code" type="varchar(3)" remarks="ISO 3166-1 alpha-2\n@see https:">
-                <constraints nullable="false" unique="true" uniqueConstraintName="ux_country__iso_code" />
+            <column name="iso_code" type="varchar(3)" remarks="ISO 3166-1 alpha-2">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_country__iso_code"/>
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
