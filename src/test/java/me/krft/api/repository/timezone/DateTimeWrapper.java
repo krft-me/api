@@ -1,9 +1,9 @@
 package me.krft.api.repository.timezone;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.*;
 import java.util.Objects;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "krftme_date_time_wrapper")

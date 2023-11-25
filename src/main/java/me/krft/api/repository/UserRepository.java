@@ -1,5 +1,6 @@
 package me.krft.api.repository;
 
+import java.util.List;
 import java.util.Optional;
 import me.krft.api.domain.User;
 import org.springframework.cache.annotation.Cacheable;

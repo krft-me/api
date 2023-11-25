@@ -20,42 +20,52 @@ logging:
     me.krft.api: INFO
 
 management:
-  prometheus:
     metrics:
-      export:
-        enabled: false
-  zipkin: # Use the "zipkin" Maven profile to have the Spring Cloud Zipkin dependencies
-    tracing:
-      endpoint: http://localhost:9411/api/v2/spans
-  tracing:
-    sampling:
-      probability: 1.0 # report 100% of traces
+        export:
+            prometheus:
+                enabled: false
 
 spring:
-  devtools:
+    devtools:
     restart:
-      enabled: false
+        enabled: false
     livereload:
-      enabled: false
-  cloud:
-    consul:
-      discovery:
-        prefer-ip-address: true
-      host: localhost
-      port: 8500
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/krftme
-    username: krftme
-    password:
-    hikari:
-      poolName: Hikari
-      auto-commit: false
-  # Replace by 'prod, faker' to add the faker context and have sample data loaded in production
-  liquibase:
-    contexts: prod
-  thymeleaf:
-    cache: true
+        enabled: false
+    cloud:
+        consul:
+            discovery:
+            prefer-ip-address: true
+            host: localhost
+            port: 8500
+        datasource:
+            type: com.zaxxer.hikari.HikariDataSource
+            url: jdbc:postgresql://localhost:5432/krftme
+            username: krftme
+            password:
+            hikari:
+                poolName: Hikari
+                auto-commit: false
+        jpa:
+            database-platform: tech.jhipster.domain.util.FixedPostgreSQL10Dialect
+        # Replace by 'prod, faker' to add the faker context and have sample data loaded in production
+        liquibase:
+            contexts: prod
+        thymeleaf:
+            cache: true
+        sleuth:
+            # https://github.com/spring-projects/spring-framework/issues/27844#issuescomment-1002866885
+            # https://github.com/spring-cloud/spring-cloud-sleuth/issues/2094
+            async:
+                enabled: false
+            enabled: false
+            sampler:
+                probability: 1 # report 100% of traces
+        zipkin: # Use the "zipkin" Maven profile to have the Spring Cloud Zipkin dependencies
+            base-url: http://localhost:9411
+            enabled: false
+            locator:
+                discovery:
+                    enabled: true
 
 # ===================================================================
 # To enable TLS in production, generate a certificate using:
@@ -104,7 +114,7 @@ jhipster:
       enabled: false
       host: localhost
       port: 5000
-      ring-buffer-size: 512
+      queue-size: 512
 # ===================================================================
 # Application specific properties
 # Add your own application properties here, see the ApplicationProperties class

@@ -1,10 +1,11 @@
 package me.krft.api.service.dto;
 
-import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.validation.constraints.*;
+
 import me.krft.api.config.Constants;
 import me.krft.api.domain.Authority;
 import me.krft.api.domain.User;

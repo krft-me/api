@@ -1,4 +1,4 @@
 /**
- * Data transfer objects for rest mapping.
+ * Data Transfer Objects.
  */
 package me.krft.api.service.dto;
