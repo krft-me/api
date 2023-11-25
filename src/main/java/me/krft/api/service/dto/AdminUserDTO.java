@@ -1,5 +1,6 @@
 package me.krft.api.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
@@ -12,6 +13,7 @@ import me.krft.api.domain.User;
 /**
  * A DTO representing a user, with his authorities.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AdminUserDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
