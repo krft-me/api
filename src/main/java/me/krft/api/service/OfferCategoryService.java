@@ -2,42 +2,42 @@ package me.krft.api.service;
 
 import java.util.List;
 import java.util.Optional;
-import me.krft.api.service.dto.OfferCategoryDTO;
+import me.krft.api.domain.OfferCategory;
 
 /**
- * Service Interface for managing {@link me.krft.api.domain.OfferCategory}.
+ * Service Interface for managing {@link OfferCategory}.
  */
 public interface OfferCategoryService {
     /**
      * Save a offerCategory.
      *
-     * @param offerCategoryDTO the entity to save.
+     * @param offerCategory the entity to save.
      * @return the persisted entity.
      */
-    OfferCategoryDTO save(OfferCategoryDTO offerCategoryDTO);
+    OfferCategory save(OfferCategory offerCategory);
 
     /**
      * Updates a offerCategory.
      *
-     * @param offerCategoryDTO the entity to update.
+     * @param offerCategory the entity to update.
      * @return the persisted entity.
      */
-    OfferCategoryDTO update(OfferCategoryDTO offerCategoryDTO);
+    OfferCategory update(OfferCategory offerCategory);
 
     /**
      * Partially updates a offerCategory.
      *
-     * @param offerCategoryDTO the entity to update partially.
+     * @param offerCategory the entity to update partially.
      * @return the persisted entity.
      */
-    Optional<OfferCategoryDTO> partialUpdate(OfferCategoryDTO offerCategoryDTO);
+    Optional<OfferCategory> partialUpdate(OfferCategory offerCategory);
 
     /**
      * Get all the offerCategories.
      *
      * @return the list of entities.
      */
-    List<OfferCategoryDTO> findAll();
+    List<OfferCategory> findAll();
 
     /**
      * Get the "id" offerCategory.
@@ -45,7 +45,7 @@ public interface OfferCategoryService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<OfferCategoryDTO> findOne(Long id);
+    Optional<OfferCategory> findOne(Long id);
 
     /**
      * Delete the "id" offerCategory.

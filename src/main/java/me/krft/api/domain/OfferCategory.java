@@ -1,6 +1,7 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,6 +13,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 /**
  * OfferCategory entity\nRepresents a preset offer type
  */
+@Schema(description = "OfferCategory entity\nRepresents a preset offer type")
 @Entity
 @Table(name = "offer_category")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -33,7 +35,7 @@ public class OfferCategory implements Serializable {
 
     @OneToMany(mappedBy = "category")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "category" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "userOffers", "machine", "category" }, allowSetters = true)
     private Set<Offer> offers = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

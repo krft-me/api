@@ -1,7 +1,10 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
@@ -10,6 +13,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 /**
  * Offer entity representing a service stereotype
  */
+@Schema(description = "Offer entity representing a service stereotype")
 @Entity
 @Table(name = "offer")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -28,6 +32,15 @@ public class Offer implements Serializable {
     @Size(min = 1)
     @Column(name = "name", nullable = false, unique = true)
     private String name;
+
+    @OneToMany(mappedBy = "offer")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "applicationUser", "offer" }, allowSetters = true)
+    private Set<ApplicationUserOffer> userOffers = new HashSet<>();
+
+    @ManyToOne
+    @JsonIgnoreProperties(value = { "offers", "machineCategory" }, allowSetters = true)
+    private Machine machine;
 
     @ManyToOne
     @JsonIgnoreProperties(value = { "offers" }, allowSetters = true)
@@ -59,6 +72,50 @@ public class Offer implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Set<ApplicationUserOffer> getUserOffers() {
+        return this.userOffers;
+    }
+
+    public void setUserOffers(Set<ApplicationUserOffer> applicationUserOffers) {
+        if (this.userOffers != null) {
+            this.userOffers.forEach(i -> i.setOffer(null));
+        }
+        if (applicationUserOffers != null) {
+            applicationUserOffers.forEach(i -> i.setOffer(this));
+        }
+        this.userOffers = applicationUserOffers;
+    }
+
+    public Offer userOffers(Set<ApplicationUserOffer> applicationUserOffers) {
+        this.setUserOffers(applicationUserOffers);
+        return this;
+    }
+
+    public Offer addUserOffers(ApplicationUserOffer applicationUserOffer) {
+        this.userOffers.add(applicationUserOffer);
+        applicationUserOffer.setOffer(this);
+        return this;
+    }
+
+    public Offer removeUserOffers(ApplicationUserOffer applicationUserOffer) {
+        this.userOffers.remove(applicationUserOffer);
+        applicationUserOffer.setOffer(null);
+        return this;
+    }
+
+    public Machine getMachine() {
+        return this.machine;
+    }
+
+    public void setMachine(Machine machine) {
+        this.machine = machine;
+    }
+
+    public Offer machine(Machine machine) {
+        this.setMachine(machine);
+        return this;
     }
 
     public OfferCategory getCategory() {

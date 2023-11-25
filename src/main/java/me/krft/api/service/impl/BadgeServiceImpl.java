@@ -1,14 +1,10 @@
 package me.krft.api.service.impl;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import me.krft.api.domain.Badge;
 import me.krft.api.repository.BadgeRepository;
 import me.krft.api.service.BadgeService;
-import me.krft.api.service.dto.BadgeDTO;
-import me.krft.api.service.mapper.BadgeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,56 +21,53 @@ public class BadgeServiceImpl implements BadgeService {
 
     private final BadgeRepository badgeRepository;
 
-    private final BadgeMapper badgeMapper;
-
-    public BadgeServiceImpl(BadgeRepository badgeRepository, BadgeMapper badgeMapper) {
+    public BadgeServiceImpl(BadgeRepository badgeRepository) {
         this.badgeRepository = badgeRepository;
-        this.badgeMapper = badgeMapper;
     }
 
     @Override
-    public BadgeDTO save(BadgeDTO badgeDTO) {
-        log.debug("Request to save Badge : {}", badgeDTO);
-        Badge badge = badgeMapper.toEntity(badgeDTO);
-        badge = badgeRepository.save(badge);
-        return badgeMapper.toDto(badge);
+    public Badge save(Badge badge) {
+        log.debug("Request to save Badge : {}", badge);
+        return badgeRepository.save(badge);
     }
 
     @Override
-    public BadgeDTO update(BadgeDTO badgeDTO) {
-        log.debug("Request to update Badge : {}", badgeDTO);
-        Badge badge = badgeMapper.toEntity(badgeDTO);
-        badge = badgeRepository.save(badge);
-        return badgeMapper.toDto(badge);
+    public Badge update(Badge badge) {
+        log.debug("Request to update Badge : {}", badge);
+        return badgeRepository.save(badge);
     }
 
     @Override
-    public Optional<BadgeDTO> partialUpdate(BadgeDTO badgeDTO) {
-        log.debug("Request to partially update Badge : {}", badgeDTO);
+    public Optional<Badge> partialUpdate(Badge badge) {
+        log.debug("Request to partially update Badge : {}", badge);
 
         return badgeRepository
-            .findById(badgeDTO.getId())
+            .findById(badge.getId())
             .map(existingBadge -> {
-                badgeMapper.partialUpdate(existingBadge, badgeDTO);
+                if (badge.getLabel() != null) {
+                    existingBadge.setLabel(badge.getLabel());
+                }
+                if (badge.getPicture() != null) {
+                    existingBadge.setPicture(badge.getPicture());
+                }
 
                 return existingBadge;
             })
-            .map(badgeRepository::save)
-            .map(badgeMapper::toDto);
+            .map(badgeRepository::save);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<BadgeDTO> findAll() {
+    public List<Badge> findAll() {
         log.debug("Request to get all Badges");
-        return badgeRepository.findAll().stream().map(badgeMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return badgeRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<BadgeDTO> findOne(Long id) {
+    public Optional<Badge> findOne(Long id) {
         log.debug("Request to get Badge : {}", id);
-        return badgeRepository.findById(id).map(badgeMapper::toDto);
+        return badgeRepository.findById(id);
     }
 
     @Override

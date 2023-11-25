@@ -1,14 +1,10 @@
 package me.krft.api.service.impl;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import me.krft.api.domain.OfferCategory;
 import me.krft.api.repository.OfferCategoryRepository;
 import me.krft.api.service.OfferCategoryService;
-import me.krft.api.service.dto.OfferCategoryDTO;
-import me.krft.api.service.mapper.OfferCategoryMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,56 +21,50 @@ public class OfferCategoryServiceImpl implements OfferCategoryService {
 
     private final OfferCategoryRepository offerCategoryRepository;
 
-    private final OfferCategoryMapper offerCategoryMapper;
-
-    public OfferCategoryServiceImpl(OfferCategoryRepository offerCategoryRepository, OfferCategoryMapper offerCategoryMapper) {
+    public OfferCategoryServiceImpl(OfferCategoryRepository offerCategoryRepository) {
         this.offerCategoryRepository = offerCategoryRepository;
-        this.offerCategoryMapper = offerCategoryMapper;
     }
 
     @Override
-    public OfferCategoryDTO save(OfferCategoryDTO offerCategoryDTO) {
-        log.debug("Request to save OfferCategory : {}", offerCategoryDTO);
-        OfferCategory offerCategory = offerCategoryMapper.toEntity(offerCategoryDTO);
-        offerCategory = offerCategoryRepository.save(offerCategory);
-        return offerCategoryMapper.toDto(offerCategory);
+    public OfferCategory save(OfferCategory offerCategory) {
+        log.debug("Request to save OfferCategory : {}", offerCategory);
+        return offerCategoryRepository.save(offerCategory);
     }
 
     @Override
-    public OfferCategoryDTO update(OfferCategoryDTO offerCategoryDTO) {
-        log.debug("Request to update OfferCategory : {}", offerCategoryDTO);
-        OfferCategory offerCategory = offerCategoryMapper.toEntity(offerCategoryDTO);
-        offerCategory = offerCategoryRepository.save(offerCategory);
-        return offerCategoryMapper.toDto(offerCategory);
+    public OfferCategory update(OfferCategory offerCategory) {
+        log.debug("Request to update OfferCategory : {}", offerCategory);
+        return offerCategoryRepository.save(offerCategory);
     }
 
     @Override
-    public Optional<OfferCategoryDTO> partialUpdate(OfferCategoryDTO offerCategoryDTO) {
-        log.debug("Request to partially update OfferCategory : {}", offerCategoryDTO);
+    public Optional<OfferCategory> partialUpdate(OfferCategory offerCategory) {
+        log.debug("Request to partially update OfferCategory : {}", offerCategory);
 
         return offerCategoryRepository
-            .findById(offerCategoryDTO.getId())
+            .findById(offerCategory.getId())
             .map(existingOfferCategory -> {
-                offerCategoryMapper.partialUpdate(existingOfferCategory, offerCategoryDTO);
+                if (offerCategory.getLabel() != null) {
+                    existingOfferCategory.setLabel(offerCategory.getLabel());
+                }
 
                 return existingOfferCategory;
             })
-            .map(offerCategoryRepository::save)
-            .map(offerCategoryMapper::toDto);
+            .map(offerCategoryRepository::save);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<OfferCategoryDTO> findAll() {
+    public List<OfferCategory> findAll() {
         log.debug("Request to get all OfferCategories");
-        return offerCategoryRepository.findAll().stream().map(offerCategoryMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return offerCategoryRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<OfferCategoryDTO> findOne(Long id) {
+    public Optional<OfferCategory> findOne(Long id) {
         log.debug("Request to get OfferCategory : {}", id);
-        return offerCategoryRepository.findById(id).map(offerCategoryMapper::toDto);
+        return offerCategoryRepository.findById(id);
     }
 
     @Override

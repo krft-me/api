@@ -1,6 +1,7 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,6 +13,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 /**
  * City entity
  */
+@Schema(description = "City entity")
 @Entity
 @Table(name = "city")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -29,6 +31,7 @@ public class City implements Serializable {
     /**
      * The city's name
      */
+    @Schema(description = "The city's name", required = true)
     @NotNull
     @Size(min = 1)
     @Column(name = "name", nullable = false)
@@ -37,6 +40,7 @@ public class City implements Serializable {
     /**
      * The city's zipcode
      */
+    @Schema(description = "The city's zipcode", required = true)
     @NotNull
     @Column(name = "zip_code", nullable = false)
     private String zipCode;

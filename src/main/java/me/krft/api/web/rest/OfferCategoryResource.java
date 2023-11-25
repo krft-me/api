@@ -7,9 +7,9 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import me.krft.api.domain.OfferCategory;
 import me.krft.api.repository.OfferCategoryRepository;
 import me.krft.api.service.OfferCategoryService;
-import me.krft.api.service.dto.OfferCategoryDTO;
 import me.krft.api.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,18 +45,17 @@ public class OfferCategoryResource {
     /**
      * {@code POST  /offer-categories} : Create a new offerCategory.
      *
-     * @param offerCategoryDTO the offerCategoryDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new offerCategoryDTO, or with status {@code 400 (Bad Request)} if the offerCategory has already an ID.
+     * @param offerCategory the offerCategory to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new offerCategory, or with status {@code 400 (Bad Request)} if the offerCategory has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/offer-categories")
-    public ResponseEntity<OfferCategoryDTO> createOfferCategory(@Valid @RequestBody OfferCategoryDTO offerCategoryDTO)
-        throws URISyntaxException {
-        log.debug("REST request to save OfferCategory : {}", offerCategoryDTO);
-        if (offerCategoryDTO.getId() != null) {
+    public ResponseEntity<OfferCategory> createOfferCategory(@Valid @RequestBody OfferCategory offerCategory) throws URISyntaxException {
+        log.debug("REST request to save OfferCategory : {}", offerCategory);
+        if (offerCategory.getId() != null) {
             throw new BadRequestAlertException("A new offerCategory cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        OfferCategoryDTO result = offerCategoryService.save(offerCategoryDTO);
+        OfferCategory result = offerCategoryService.save(offerCategory);
         return ResponseEntity
             .created(new URI("/api/offer-categories/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -66,23 +65,23 @@ public class OfferCategoryResource {
     /**
      * {@code PUT  /offer-categories/:id} : Updates an existing offerCategory.
      *
-     * @param id the id of the offerCategoryDTO to save.
-     * @param offerCategoryDTO the offerCategoryDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated offerCategoryDTO,
-     * or with status {@code 400 (Bad Request)} if the offerCategoryDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the offerCategoryDTO couldn't be updated.
+     * @param id the id of the offerCategory to save.
+     * @param offerCategory the offerCategory to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated offerCategory,
+     * or with status {@code 400 (Bad Request)} if the offerCategory is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the offerCategory couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/offer-categories/{id}")
-    public ResponseEntity<OfferCategoryDTO> updateOfferCategory(
+    public ResponseEntity<OfferCategory> updateOfferCategory(
         @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody OfferCategoryDTO offerCategoryDTO
+        @Valid @RequestBody OfferCategory offerCategory
     ) throws URISyntaxException {
-        log.debug("REST request to update OfferCategory : {}, {}", id, offerCategoryDTO);
-        if (offerCategoryDTO.getId() == null) {
+        log.debug("REST request to update OfferCategory : {}, {}", id, offerCategory);
+        if (offerCategory.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, offerCategoryDTO.getId())) {
+        if (!Objects.equals(id, offerCategory.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -90,34 +89,34 @@ public class OfferCategoryResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        OfferCategoryDTO result = offerCategoryService.update(offerCategoryDTO);
+        OfferCategory result = offerCategoryService.update(offerCategory);
         return ResponseEntity
             .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, offerCategoryDTO.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, offerCategory.getId().toString()))
             .body(result);
     }
 
     /**
      * {@code PATCH  /offer-categories/:id} : Partial updates given fields of an existing offerCategory, field will ignore if it is null
      *
-     * @param id the id of the offerCategoryDTO to save.
-     * @param offerCategoryDTO the offerCategoryDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated offerCategoryDTO,
-     * or with status {@code 400 (Bad Request)} if the offerCategoryDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the offerCategoryDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the offerCategoryDTO couldn't be updated.
+     * @param id the id of the offerCategory to save.
+     * @param offerCategory the offerCategory to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated offerCategory,
+     * or with status {@code 400 (Bad Request)} if the offerCategory is not valid,
+     * or with status {@code 404 (Not Found)} if the offerCategory is not found,
+     * or with status {@code 500 (Internal Server Error)} if the offerCategory couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/offer-categories/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<OfferCategoryDTO> partialUpdateOfferCategory(
+    public ResponseEntity<OfferCategory> partialUpdateOfferCategory(
         @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody OfferCategoryDTO offerCategoryDTO
+        @NotNull @RequestBody OfferCategory offerCategory
     ) throws URISyntaxException {
-        log.debug("REST request to partial update OfferCategory partially : {}, {}", id, offerCategoryDTO);
-        if (offerCategoryDTO.getId() == null) {
+        log.debug("REST request to partial update OfferCategory partially : {}, {}", id, offerCategory);
+        if (offerCategory.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, offerCategoryDTO.getId())) {
+        if (!Objects.equals(id, offerCategory.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -125,11 +124,11 @@ public class OfferCategoryResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<OfferCategoryDTO> result = offerCategoryService.partialUpdate(offerCategoryDTO);
+        Optional<OfferCategory> result = offerCategoryService.partialUpdate(offerCategory);
 
         return ResponseUtil.wrapOrNotFound(
             result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, offerCategoryDTO.getId().toString())
+            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, offerCategory.getId().toString())
         );
     }
 
@@ -139,7 +138,7 @@ public class OfferCategoryResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of offerCategories in body.
      */
     @GetMapping("/offer-categories")
-    public List<OfferCategoryDTO> getAllOfferCategories() {
+    public List<OfferCategory> getAllOfferCategories() {
         log.debug("REST request to get all OfferCategories");
         return offerCategoryService.findAll();
     }
@@ -147,20 +146,20 @@ public class OfferCategoryResource {
     /**
      * {@code GET  /offer-categories/:id} : get the "id" offerCategory.
      *
-     * @param id the id of the offerCategoryDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the offerCategoryDTO, or with status {@code 404 (Not Found)}.
+     * @param id the id of the offerCategory to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the offerCategory, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/offer-categories/{id}")
-    public ResponseEntity<OfferCategoryDTO> getOfferCategory(@PathVariable Long id) {
+    public ResponseEntity<OfferCategory> getOfferCategory(@PathVariable Long id) {
         log.debug("REST request to get OfferCategory : {}", id);
-        Optional<OfferCategoryDTO> offerCategoryDTO = offerCategoryService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(offerCategoryDTO);
+        Optional<OfferCategory> offerCategory = offerCategoryService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(offerCategory);
     }
 
     /**
      * {@code DELETE  /offer-categories/:id} : delete the "id" offerCategory.
      *
-     * @param id the id of the offerCategoryDTO to delete.
+     * @param id the id of the offerCategory to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/offer-categories/{id}")

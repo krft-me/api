@@ -1,14 +1,10 @@
 package me.krft.api.service.impl;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import me.krft.api.domain.Showcase;
 import me.krft.api.repository.ShowcaseRepository;
 import me.krft.api.service.ShowcaseService;
-import me.krft.api.service.dto.ShowcaseDTO;
-import me.krft.api.service.mapper.ShowcaseMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,56 +21,50 @@ public class ShowcaseServiceImpl implements ShowcaseService {
 
     private final ShowcaseRepository showcaseRepository;
 
-    private final ShowcaseMapper showcaseMapper;
-
-    public ShowcaseServiceImpl(ShowcaseRepository showcaseRepository, ShowcaseMapper showcaseMapper) {
+    public ShowcaseServiceImpl(ShowcaseRepository showcaseRepository) {
         this.showcaseRepository = showcaseRepository;
-        this.showcaseMapper = showcaseMapper;
     }
 
     @Override
-    public ShowcaseDTO save(ShowcaseDTO showcaseDTO) {
-        log.debug("Request to save Showcase : {}", showcaseDTO);
-        Showcase showcase = showcaseMapper.toEntity(showcaseDTO);
-        showcase = showcaseRepository.save(showcase);
-        return showcaseMapper.toDto(showcase);
+    public Showcase save(Showcase showcase) {
+        log.debug("Request to save Showcase : {}", showcase);
+        return showcaseRepository.save(showcase);
     }
 
     @Override
-    public ShowcaseDTO update(ShowcaseDTO showcaseDTO) {
-        log.debug("Request to update Showcase : {}", showcaseDTO);
-        Showcase showcase = showcaseMapper.toEntity(showcaseDTO);
-        showcase = showcaseRepository.save(showcase);
-        return showcaseMapper.toDto(showcase);
+    public Showcase update(Showcase showcase) {
+        log.debug("Request to update Showcase : {}", showcase);
+        return showcaseRepository.save(showcase);
     }
 
     @Override
-    public Optional<ShowcaseDTO> partialUpdate(ShowcaseDTO showcaseDTO) {
-        log.debug("Request to partially update Showcase : {}", showcaseDTO);
+    public Optional<Showcase> partialUpdate(Showcase showcase) {
+        log.debug("Request to partially update Showcase : {}", showcase);
 
         return showcaseRepository
-            .findById(showcaseDTO.getId())
+            .findById(showcase.getId())
             .map(existingShowcase -> {
-                showcaseMapper.partialUpdate(existingShowcase, showcaseDTO);
+                if (showcase.getImageId() != null) {
+                    existingShowcase.setImageId(showcase.getImageId());
+                }
 
                 return existingShowcase;
             })
-            .map(showcaseRepository::save)
-            .map(showcaseMapper::toDto);
+            .map(showcaseRepository::save);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ShowcaseDTO> findAll() {
+    public List<Showcase> findAll() {
         log.debug("Request to get all Showcases");
-        return showcaseRepository.findAll().stream().map(showcaseMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return showcaseRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<ShowcaseDTO> findOne(Long id) {
+    public Optional<Showcase> findOne(Long id) {
         log.debug("Request to get Showcase : {}", id);
-        return showcaseRepository.findById(id).map(showcaseMapper::toDto);
+        return showcaseRepository.findById(id);
     }
 
     @Override

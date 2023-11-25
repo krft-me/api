@@ -1,11 +1,11 @@
-id;description;price;active
-1;action-items;9962;true
-2;Poitou-Charentes;94823;false
-3;b Automotive;31378;false
-4;des;64567;true
-5;Zadkine quantify des;7798;false
-6;functionalities PNG;88194;true
-7;Bedfordshire Turkménistan magnetic;59521;true
-8;Handmade;38433;true
-9;Buckinghamshire navigate;68639;false
-10;platforms;95034;true
+id;description;price;active;offer_id
+1;action-items;9962;true;1
+2;Poitou-Charentes;94823;false;2
+3;b Automotive;31378;false;3
+4;des;64567;true;4
+5;Zadkine quantify des;7798;false;5
+6;functionalities PNG;88194;true;6
+7;Bedfordshire Turkménistan magnetic;59521;true;7
+8;Handmade;38433;true;8
+9;Buckinghamshire navigate;68639;false;9
+10;platforms;95034;true;10

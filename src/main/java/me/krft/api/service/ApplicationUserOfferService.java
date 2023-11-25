@@ -2,42 +2,42 @@ package me.krft.api.service;
 
 import java.util.List;
 import java.util.Optional;
-import me.krft.api.service.dto.ApplicationUserOfferDTO;
+import me.krft.api.domain.ApplicationUserOffer;
 
 /**
- * Service Interface for managing {@link me.krft.api.domain.ApplicationUserOffer}.
+ * Service Interface for managing {@link ApplicationUserOffer}.
  */
 public interface ApplicationUserOfferService {
     /**
      * Save a applicationUserOffer.
      *
-     * @param applicationUserOfferDTO the entity to save.
+     * @param applicationUserOffer the entity to save.
      * @return the persisted entity.
      */
-    ApplicationUserOfferDTO save(ApplicationUserOfferDTO applicationUserOfferDTO);
+    ApplicationUserOffer save(ApplicationUserOffer applicationUserOffer);
 
     /**
      * Updates a applicationUserOffer.
      *
-     * @param applicationUserOfferDTO the entity to update.
+     * @param applicationUserOffer the entity to update.
      * @return the persisted entity.
      */
-    ApplicationUserOfferDTO update(ApplicationUserOfferDTO applicationUserOfferDTO);
+    ApplicationUserOffer update(ApplicationUserOffer applicationUserOffer);
 
     /**
      * Partially updates a applicationUserOffer.
      *
-     * @param applicationUserOfferDTO the entity to update partially.
+     * @param applicationUserOffer the entity to update partially.
      * @return the persisted entity.
      */
-    Optional<ApplicationUserOfferDTO> partialUpdate(ApplicationUserOfferDTO applicationUserOfferDTO);
+    Optional<ApplicationUserOffer> partialUpdate(ApplicationUserOffer applicationUserOffer);
 
     /**
      * Get all the applicationUserOffers.
      *
      * @return the list of entities.
      */
-    List<ApplicationUserOfferDTO> findAll();
+    List<ApplicationUserOffer> findAll();
 
     /**
      * Get the "id" applicationUserOffer.
@@ -45,7 +45,7 @@ public interface ApplicationUserOfferService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<ApplicationUserOfferDTO> findOne(Long id);
+    Optional<ApplicationUserOffer> findOne(Long id);
 
     /**
      * Delete the "id" applicationUserOffer.

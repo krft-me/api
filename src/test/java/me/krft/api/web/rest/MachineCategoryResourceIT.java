@@ -13,8 +13,6 @@ import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.MachineCategory;
 import me.krft.api.repository.MachineCategoryRepository;
-import me.krft.api.service.dto.MachineCategoryDTO;
-import me.krft.api.service.mapper.MachineCategoryMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +41,6 @@ class MachineCategoryResourceIT {
 
     @Autowired
     private MachineCategoryRepository machineCategoryRepository;
-
-    @Autowired
-    private MachineCategoryMapper machineCategoryMapper;
 
     @Autowired
     private EntityManager em;
@@ -87,13 +82,12 @@ class MachineCategoryResourceIT {
     void createMachineCategory() throws Exception {
         int databaseSizeBeforeCreate = machineCategoryRepository.findAll().size();
         // Create the MachineCategory
-        MachineCategoryDTO machineCategoryDTO = machineCategoryMapper.toDto(machineCategory);
         restMachineCategoryMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(machineCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(machineCategory))
             )
             .andExpect(status().isCreated());
 
@@ -109,7 +103,6 @@ class MachineCategoryResourceIT {
     void createMachineCategoryWithExistingId() throws Exception {
         // Create the MachineCategory with an existing ID
         machineCategory.setId(1L);
-        MachineCategoryDTO machineCategoryDTO = machineCategoryMapper.toDto(machineCategory);
 
         int databaseSizeBeforeCreate = machineCategoryRepository.findAll().size();
 
@@ -119,7 +112,7 @@ class MachineCategoryResourceIT {
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(machineCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(machineCategory))
             )
             .andExpect(status().isBadRequest());
 
@@ -136,14 +129,13 @@ class MachineCategoryResourceIT {
         machineCategory.setLabel(null);
 
         // Create the MachineCategory, which fails.
-        MachineCategoryDTO machineCategoryDTO = machineCategoryMapper.toDto(machineCategory);
 
         restMachineCategoryMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(machineCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(machineCategory))
             )
             .andExpect(status().isBadRequest());
 
@@ -201,14 +193,13 @@ class MachineCategoryResourceIT {
         // Disconnect from session so that the updates on updatedMachineCategory are not directly saved in db
         em.detach(updatedMachineCategory);
         updatedMachineCategory.label(UPDATED_LABEL);
-        MachineCategoryDTO machineCategoryDTO = machineCategoryMapper.toDto(updatedMachineCategory);
 
         restMachineCategoryMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, machineCategoryDTO.getId())
+                put(ENTITY_API_URL_ID, updatedMachineCategory.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(machineCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(updatedMachineCategory))
             )
             .andExpect(status().isOk());
 
@@ -225,16 +216,13 @@ class MachineCategoryResourceIT {
         int databaseSizeBeforeUpdate = machineCategoryRepository.findAll().size();
         machineCategory.setId(count.incrementAndGet());
 
-        // Create the MachineCategory
-        MachineCategoryDTO machineCategoryDTO = machineCategoryMapper.toDto(machineCategory);
-
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restMachineCategoryMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, machineCategoryDTO.getId())
+                put(ENTITY_API_URL_ID, machineCategory.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(machineCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(machineCategory))
             )
             .andExpect(status().isBadRequest());
 
@@ -249,16 +237,13 @@ class MachineCategoryResourceIT {
         int databaseSizeBeforeUpdate = machineCategoryRepository.findAll().size();
         machineCategory.setId(count.incrementAndGet());
 
-        // Create the MachineCategory
-        MachineCategoryDTO machineCategoryDTO = machineCategoryMapper.toDto(machineCategory);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restMachineCategoryMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(machineCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(machineCategory))
             )
             .andExpect(status().isBadRequest());
 
@@ -273,16 +258,13 @@ class MachineCategoryResourceIT {
         int databaseSizeBeforeUpdate = machineCategoryRepository.findAll().size();
         machineCategory.setId(count.incrementAndGet());
 
-        // Create the MachineCategory
-        MachineCategoryDTO machineCategoryDTO = machineCategoryMapper.toDto(machineCategory);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restMachineCategoryMockMvc
             .perform(
                 put(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(machineCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(machineCategory))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -357,16 +339,13 @@ class MachineCategoryResourceIT {
         int databaseSizeBeforeUpdate = machineCategoryRepository.findAll().size();
         machineCategory.setId(count.incrementAndGet());
 
-        // Create the MachineCategory
-        MachineCategoryDTO machineCategoryDTO = machineCategoryMapper.toDto(machineCategory);
-
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restMachineCategoryMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, machineCategoryDTO.getId())
+                patch(ENTITY_API_URL_ID, machineCategory.getId())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(machineCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(machineCategory))
             )
             .andExpect(status().isBadRequest());
 
@@ -381,16 +360,13 @@ class MachineCategoryResourceIT {
         int databaseSizeBeforeUpdate = machineCategoryRepository.findAll().size();
         machineCategory.setId(count.incrementAndGet());
 
-        // Create the MachineCategory
-        MachineCategoryDTO machineCategoryDTO = machineCategoryMapper.toDto(machineCategory);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restMachineCategoryMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(machineCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(machineCategory))
             )
             .andExpect(status().isBadRequest());
 
@@ -405,16 +381,13 @@ class MachineCategoryResourceIT {
         int databaseSizeBeforeUpdate = machineCategoryRepository.findAll().size();
         machineCategory.setId(count.incrementAndGet());
 
-        // Create the MachineCategory
-        MachineCategoryDTO machineCategoryDTO = machineCategoryMapper.toDto(machineCategory);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restMachineCategoryMockMvc
             .perform(
                 patch(ENTITY_API_URL)
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(machineCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(machineCategory))
             )
             .andExpect(status().isMethodNotAllowed());
 

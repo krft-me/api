@@ -2,42 +2,42 @@ package me.krft.api.service;
 
 import java.util.List;
 import java.util.Optional;
-import me.krft.api.service.dto.MachineCategoryDTO;
+import me.krft.api.domain.MachineCategory;
 
 /**
- * Service Interface for managing {@link me.krft.api.domain.MachineCategory}.
+ * Service Interface for managing {@link MachineCategory}.
  */
 public interface MachineCategoryService {
     /**
      * Save a machineCategory.
      *
-     * @param machineCategoryDTO the entity to save.
+     * @param machineCategory the entity to save.
      * @return the persisted entity.
      */
-    MachineCategoryDTO save(MachineCategoryDTO machineCategoryDTO);
+    MachineCategory save(MachineCategory machineCategory);
 
     /**
      * Updates a machineCategory.
      *
-     * @param machineCategoryDTO the entity to update.
+     * @param machineCategory the entity to update.
      * @return the persisted entity.
      */
-    MachineCategoryDTO update(MachineCategoryDTO machineCategoryDTO);
+    MachineCategory update(MachineCategory machineCategory);
 
     /**
      * Partially updates a machineCategory.
      *
-     * @param machineCategoryDTO the entity to update partially.
+     * @param machineCategory the entity to update partially.
      * @return the persisted entity.
      */
-    Optional<MachineCategoryDTO> partialUpdate(MachineCategoryDTO machineCategoryDTO);
+    Optional<MachineCategory> partialUpdate(MachineCategory machineCategory);
 
     /**
      * Get all the machineCategories.
      *
      * @return the list of entities.
      */
-    List<MachineCategoryDTO> findAll();
+    List<MachineCategory> findAll();
 
     /**
      * Get the "id" machineCategory.
@@ -45,7 +45,7 @@ public interface MachineCategoryService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<MachineCategoryDTO> findOne(Long id);
+    Optional<MachineCategory> findOne(Long id);
 
     /**
      * Delete the "id" machineCategory.

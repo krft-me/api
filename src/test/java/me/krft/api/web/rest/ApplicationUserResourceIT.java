@@ -13,8 +13,7 @@ import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.ApplicationUser;
 import me.krft.api.repository.ApplicationUserRepository;
-import me.krft.api.service.dto.ApplicationUserDTO;
-import me.krft.api.service.mapper.ApplicationUserMapper;
+import me.krft.api.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +50,7 @@ class ApplicationUserResourceIT {
     private ApplicationUserRepository applicationUserRepository;
 
     @Autowired
-    private ApplicationUserMapper applicationUserMapper;
+    private UserRepository userRepository;
 
     @Autowired
     private EntityManager em;
@@ -99,13 +98,12 @@ class ApplicationUserResourceIT {
     void createApplicationUser() throws Exception {
         int databaseSizeBeforeCreate = applicationUserRepository.findAll().size();
         // Create the ApplicationUser
-        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
         restApplicationUserMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
             .andExpect(status().isCreated());
 
@@ -123,7 +121,6 @@ class ApplicationUserResourceIT {
     void createApplicationUserWithExistingId() throws Exception {
         // Create the ApplicationUser with an existing ID
         applicationUser.setId(1L);
-        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
 
         int databaseSizeBeforeCreate = applicationUserRepository.findAll().size();
 
@@ -133,7 +130,7 @@ class ApplicationUserResourceIT {
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
             .andExpect(status().isBadRequest());
 
@@ -150,14 +147,13 @@ class ApplicationUserResourceIT {
         applicationUser.setFirstName(null);
 
         // Create the ApplicationUser, which fails.
-        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
 
         restApplicationUserMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
             .andExpect(status().isBadRequest());
 
@@ -173,14 +169,13 @@ class ApplicationUserResourceIT {
         applicationUser.setLastName(null);
 
         // Create the ApplicationUser, which fails.
-        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
 
         restApplicationUserMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
             .andExpect(status().isBadRequest());
 
@@ -196,14 +191,13 @@ class ApplicationUserResourceIT {
         applicationUser.setUsername(null);
 
         // Create the ApplicationUser, which fails.
-        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
 
         restApplicationUserMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
             .andExpect(status().isBadRequest());
 
@@ -265,14 +259,13 @@ class ApplicationUserResourceIT {
         // Disconnect from session so that the updates on updatedApplicationUser are not directly saved in db
         em.detach(updatedApplicationUser);
         updatedApplicationUser.firstName(UPDATED_FIRST_NAME).lastName(UPDATED_LAST_NAME).username(UPDATED_USERNAME);
-        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(updatedApplicationUser);
 
         restApplicationUserMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, applicationUserDTO.getId())
+                put(ENTITY_API_URL_ID, updatedApplicationUser.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(updatedApplicationUser))
             )
             .andExpect(status().isOk());
 
@@ -291,16 +284,13 @@ class ApplicationUserResourceIT {
         int databaseSizeBeforeUpdate = applicationUserRepository.findAll().size();
         applicationUser.setId(count.incrementAndGet());
 
-        // Create the ApplicationUser
-        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
-
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restApplicationUserMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, applicationUserDTO.getId())
+                put(ENTITY_API_URL_ID, applicationUser.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
             .andExpect(status().isBadRequest());
 
@@ -315,16 +305,13 @@ class ApplicationUserResourceIT {
         int databaseSizeBeforeUpdate = applicationUserRepository.findAll().size();
         applicationUser.setId(count.incrementAndGet());
 
-        // Create the ApplicationUser
-        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
             .andExpect(status().isBadRequest());
 
@@ -339,16 +326,13 @@ class ApplicationUserResourceIT {
         int databaseSizeBeforeUpdate = applicationUserRepository.findAll().size();
         applicationUser.setId(count.incrementAndGet());
 
-        // Create the ApplicationUser
-        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserMockMvc
             .perform(
                 put(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -427,16 +411,13 @@ class ApplicationUserResourceIT {
         int databaseSizeBeforeUpdate = applicationUserRepository.findAll().size();
         applicationUser.setId(count.incrementAndGet());
 
-        // Create the ApplicationUser
-        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
-
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restApplicationUserMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, applicationUserDTO.getId())
+                patch(ENTITY_API_URL_ID, applicationUser.getId())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
             .andExpect(status().isBadRequest());
 
@@ -451,16 +432,13 @@ class ApplicationUserResourceIT {
         int databaseSizeBeforeUpdate = applicationUserRepository.findAll().size();
         applicationUser.setId(count.incrementAndGet());
 
-        // Create the ApplicationUser
-        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
             .andExpect(status().isBadRequest());
 
@@ -475,16 +453,13 @@ class ApplicationUserResourceIT {
         int databaseSizeBeforeUpdate = applicationUserRepository.findAll().size();
         applicationUser.setId(count.incrementAndGet());
 
-        // Create the ApplicationUser
-        ApplicationUserDTO applicationUserDTO = applicationUserMapper.toDto(applicationUser);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserMockMvc
             .perform(
                 patch(ENTITY_API_URL)
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(applicationUserDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUser))
             )
             .andExpect(status().isMethodNotAllowed());
 

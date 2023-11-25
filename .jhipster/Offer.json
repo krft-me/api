@@ -1,9 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231002172859",
+  "changelogDate": "20231125124420",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
-  "dto": "mapstruct",
+  "dto": "no",
   "embedded": false,
   "entityTableName": "offer",
   "fields": [
@@ -22,6 +22,18 @@
   "pagination": "no",
   "readOnly": false,
   "relationships": [
+    {
+      "otherEntityName": "applicationUserOffer",
+      "otherEntityRelationshipName": "offer",
+      "relationshipName": "userOffers",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "machine",
+      "otherEntityRelationshipName": "offers",
+      "relationshipName": "machine",
+      "relationshipType": "many-to-one"
+    },
     {
       "otherEntityName": "offerCategory",
       "otherEntityRelationshipName": "offer",

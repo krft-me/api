@@ -1,9 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231002172904",
+  "changelogDate": "20231125124425",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
-  "dto": "mapstruct",
+  "dto": "no",
   "embedded": false,
   "entityTableName": "krftme_order",
   "fields": [
@@ -41,7 +41,8 @@
       "otherEntityName": "applicationUser",
       "otherEntityRelationshipName": "orders",
       "relationshipName": "customer",
-      "relationshipType": "many-to-one"
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
     }
   ],
   "service": "serviceImpl"

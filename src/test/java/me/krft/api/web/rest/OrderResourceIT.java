@@ -13,12 +13,11 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
+import me.krft.api.domain.ApplicationUser;
 import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.domain.Order;
 import me.krft.api.domain.enumeration.State;
 import me.krft.api.repository.OrderRepository;
-import me.krft.api.service.dto.OrderDTO;
-import me.krft.api.service.mapper.OrderMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,9 +51,6 @@ class OrderResourceIT {
     private OrderRepository orderRepository;
 
     @Autowired
-    private OrderMapper orderMapper;
-
-    @Autowired
     private EntityManager em;
 
     @Autowired
@@ -80,6 +76,16 @@ class OrderResourceIT {
             applicationUserOffer = TestUtil.findAll(em, ApplicationUserOffer.class).get(0);
         }
         order.setOffer(applicationUserOffer);
+        // Add required entity
+        ApplicationUser applicationUser;
+        if (TestUtil.findAll(em, ApplicationUser.class).isEmpty()) {
+            applicationUser = ApplicationUserResourceIT.createEntity(em);
+            em.persist(applicationUser);
+            em.flush();
+        } else {
+            applicationUser = TestUtil.findAll(em, ApplicationUser.class).get(0);
+        }
+        order.setCustomer(applicationUser);
         return order;
     }
 
@@ -101,6 +107,16 @@ class OrderResourceIT {
             applicationUserOffer = TestUtil.findAll(em, ApplicationUserOffer.class).get(0);
         }
         order.setOffer(applicationUserOffer);
+        // Add required entity
+        ApplicationUser applicationUser;
+        if (TestUtil.findAll(em, ApplicationUser.class).isEmpty()) {
+            applicationUser = ApplicationUserResourceIT.createUpdatedEntity(em);
+            em.persist(applicationUser);
+            em.flush();
+        } else {
+            applicationUser = TestUtil.findAll(em, ApplicationUser.class).get(0);
+        }
+        order.setCustomer(applicationUser);
         return order;
     }
 
@@ -114,13 +130,9 @@ class OrderResourceIT {
     void createOrder() throws Exception {
         int databaseSizeBeforeCreate = orderRepository.findAll().size();
         // Create the Order
-        OrderDTO orderDTO = orderMapper.toDto(order);
         restOrderMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(orderDTO))
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(order))
             )
             .andExpect(status().isCreated());
 
@@ -137,17 +149,13 @@ class OrderResourceIT {
     void createOrderWithExistingId() throws Exception {
         // Create the Order with an existing ID
         order.setId(1L);
-        OrderDTO orderDTO = orderMapper.toDto(order);
 
         int databaseSizeBeforeCreate = orderRepository.findAll().size();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restOrderMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(orderDTO))
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(order))
             )
             .andExpect(status().isBadRequest());
 
@@ -164,14 +172,10 @@ class OrderResourceIT {
         order.setDate(null);
 
         // Create the Order, which fails.
-        OrderDTO orderDTO = orderMapper.toDto(order);
 
         restOrderMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(orderDTO))
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(order))
             )
             .andExpect(status().isBadRequest());
 
@@ -187,14 +191,10 @@ class OrderResourceIT {
         order.setState(null);
 
         // Create the Order, which fails.
-        OrderDTO orderDTO = orderMapper.toDto(order);
 
         restOrderMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(orderDTO))
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(order))
             )
             .andExpect(status().isBadRequest());
 
@@ -254,14 +254,13 @@ class OrderResourceIT {
         // Disconnect from session so that the updates on updatedOrder are not directly saved in db
         em.detach(updatedOrder);
         updatedOrder.date(UPDATED_DATE).state(UPDATED_STATE);
-        OrderDTO orderDTO = orderMapper.toDto(updatedOrder);
 
         restOrderMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, orderDTO.getId())
+                put(ENTITY_API_URL_ID, updatedOrder.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(orderDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(updatedOrder))
             )
             .andExpect(status().isOk());
 
@@ -279,16 +278,13 @@ class OrderResourceIT {
         int databaseSizeBeforeUpdate = orderRepository.findAll().size();
         order.setId(count.incrementAndGet());
 
-        // Create the Order
-        OrderDTO orderDTO = orderMapper.toDto(order);
-
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restOrderMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, orderDTO.getId())
+                put(ENTITY_API_URL_ID, order.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(orderDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(order))
             )
             .andExpect(status().isBadRequest());
 
@@ -303,16 +299,13 @@ class OrderResourceIT {
         int databaseSizeBeforeUpdate = orderRepository.findAll().size();
         order.setId(count.incrementAndGet());
 
-        // Create the Order
-        OrderDTO orderDTO = orderMapper.toDto(order);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOrderMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(orderDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(order))
             )
             .andExpect(status().isBadRequest());
 
@@ -327,16 +320,10 @@ class OrderResourceIT {
         int databaseSizeBeforeUpdate = orderRepository.findAll().size();
         order.setId(count.incrementAndGet());
 
-        // Create the Order
-        OrderDTO orderDTO = orderMapper.toDto(order);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOrderMockMvc
             .perform(
-                put(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(orderDTO))
+                put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(order))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -413,16 +400,13 @@ class OrderResourceIT {
         int databaseSizeBeforeUpdate = orderRepository.findAll().size();
         order.setId(count.incrementAndGet());
 
-        // Create the Order
-        OrderDTO orderDTO = orderMapper.toDto(order);
-
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restOrderMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, orderDTO.getId())
+                patch(ENTITY_API_URL_ID, order.getId())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(orderDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(order))
             )
             .andExpect(status().isBadRequest());
 
@@ -437,16 +421,13 @@ class OrderResourceIT {
         int databaseSizeBeforeUpdate = orderRepository.findAll().size();
         order.setId(count.incrementAndGet());
 
-        // Create the Order
-        OrderDTO orderDTO = orderMapper.toDto(order);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOrderMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(orderDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(order))
             )
             .andExpect(status().isBadRequest());
 
@@ -461,16 +442,13 @@ class OrderResourceIT {
         int databaseSizeBeforeUpdate = orderRepository.findAll().size();
         order.setId(count.incrementAndGet());
 
-        // Create the Order
-        OrderDTO orderDTO = orderMapper.toDto(order);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOrderMockMvc
             .perform(
                 patch(ENTITY_API_URL)
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(orderDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(order))
             )
             .andExpect(status().isMethodNotAllowed());
 

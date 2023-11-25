@@ -1,14 +1,10 @@
 package me.krft.api.service.impl;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import me.krft.api.domain.Machine;
 import me.krft.api.repository.MachineRepository;
 import me.krft.api.service.MachineService;
-import me.krft.api.service.dto.MachineDTO;
-import me.krft.api.service.mapper.MachineMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,56 +21,50 @@ public class MachineServiceImpl implements MachineService {
 
     private final MachineRepository machineRepository;
 
-    private final MachineMapper machineMapper;
-
-    public MachineServiceImpl(MachineRepository machineRepository, MachineMapper machineMapper) {
+    public MachineServiceImpl(MachineRepository machineRepository) {
         this.machineRepository = machineRepository;
-        this.machineMapper = machineMapper;
     }
 
     @Override
-    public MachineDTO save(MachineDTO machineDTO) {
-        log.debug("Request to save Machine : {}", machineDTO);
-        Machine machine = machineMapper.toEntity(machineDTO);
-        machine = machineRepository.save(machine);
-        return machineMapper.toDto(machine);
+    public Machine save(Machine machine) {
+        log.debug("Request to save Machine : {}", machine);
+        return machineRepository.save(machine);
     }
 
     @Override
-    public MachineDTO update(MachineDTO machineDTO) {
-        log.debug("Request to update Machine : {}", machineDTO);
-        Machine machine = machineMapper.toEntity(machineDTO);
-        machine = machineRepository.save(machine);
-        return machineMapper.toDto(machine);
+    public Machine update(Machine machine) {
+        log.debug("Request to update Machine : {}", machine);
+        return machineRepository.save(machine);
     }
 
     @Override
-    public Optional<MachineDTO> partialUpdate(MachineDTO machineDTO) {
-        log.debug("Request to partially update Machine : {}", machineDTO);
+    public Optional<Machine> partialUpdate(Machine machine) {
+        log.debug("Request to partially update Machine : {}", machine);
 
         return machineRepository
-            .findById(machineDTO.getId())
+            .findById(machine.getId())
             .map(existingMachine -> {
-                machineMapper.partialUpdate(existingMachine, machineDTO);
+                if (machine.getName() != null) {
+                    existingMachine.setName(machine.getName());
+                }
 
                 return existingMachine;
             })
-            .map(machineRepository::save)
-            .map(machineMapper::toDto);
+            .map(machineRepository::save);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<MachineDTO> findAll() {
+    public List<Machine> findAll() {
         log.debug("Request to get all Machines");
-        return machineRepository.findAll().stream().map(machineMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return machineRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<MachineDTO> findOne(Long id) {
+    public Optional<Machine> findOne(Long id) {
         log.debug("Request to get Machine : {}", id);
-        return machineRepository.findById(id).map(machineMapper::toDto);
+        return machineRepository.findById(id);
     }
 
     @Override

@@ -13,8 +13,6 @@ import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.Offer;
 import me.krft.api.repository.OfferRepository;
-import me.krft.api.service.dto.OfferDTO;
-import me.krft.api.service.mapper.OfferMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +41,6 @@ class OfferResourceIT {
 
     @Autowired
     private OfferRepository offerRepository;
-
-    @Autowired
-    private OfferMapper offerMapper;
 
     @Autowired
     private EntityManager em;
@@ -87,13 +82,9 @@ class OfferResourceIT {
     void createOffer() throws Exception {
         int databaseSizeBeforeCreate = offerRepository.findAll().size();
         // Create the Offer
-        OfferDTO offerDTO = offerMapper.toDto(offer);
         restOfferMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(offerDTO))
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(offer))
             )
             .andExpect(status().isCreated());
 
@@ -109,17 +100,13 @@ class OfferResourceIT {
     void createOfferWithExistingId() throws Exception {
         // Create the Offer with an existing ID
         offer.setId(1L);
-        OfferDTO offerDTO = offerMapper.toDto(offer);
 
         int databaseSizeBeforeCreate = offerRepository.findAll().size();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restOfferMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(offerDTO))
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(offer))
             )
             .andExpect(status().isBadRequest());
 
@@ -136,14 +123,10 @@ class OfferResourceIT {
         offer.setName(null);
 
         // Create the Offer, which fails.
-        OfferDTO offerDTO = offerMapper.toDto(offer);
 
         restOfferMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(offerDTO))
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(offer))
             )
             .andExpect(status().isBadRequest());
 
@@ -201,14 +184,13 @@ class OfferResourceIT {
         // Disconnect from session so that the updates on updatedOffer are not directly saved in db
         em.detach(updatedOffer);
         updatedOffer.name(UPDATED_NAME);
-        OfferDTO offerDTO = offerMapper.toDto(updatedOffer);
 
         restOfferMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, offerDTO.getId())
+                put(ENTITY_API_URL_ID, updatedOffer.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(offerDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(updatedOffer))
             )
             .andExpect(status().isOk());
 
@@ -225,16 +207,13 @@ class OfferResourceIT {
         int databaseSizeBeforeUpdate = offerRepository.findAll().size();
         offer.setId(count.incrementAndGet());
 
-        // Create the Offer
-        OfferDTO offerDTO = offerMapper.toDto(offer);
-
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restOfferMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, offerDTO.getId())
+                put(ENTITY_API_URL_ID, offer.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(offerDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(offer))
             )
             .andExpect(status().isBadRequest());
 
@@ -249,16 +228,13 @@ class OfferResourceIT {
         int databaseSizeBeforeUpdate = offerRepository.findAll().size();
         offer.setId(count.incrementAndGet());
 
-        // Create the Offer
-        OfferDTO offerDTO = offerMapper.toDto(offer);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOfferMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(offerDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(offer))
             )
             .andExpect(status().isBadRequest());
 
@@ -273,16 +249,10 @@ class OfferResourceIT {
         int databaseSizeBeforeUpdate = offerRepository.findAll().size();
         offer.setId(count.incrementAndGet());
 
-        // Create the Offer
-        OfferDTO offerDTO = offerMapper.toDto(offer);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOfferMockMvc
             .perform(
-                put(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(offerDTO))
+                put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(offer))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -355,16 +325,13 @@ class OfferResourceIT {
         int databaseSizeBeforeUpdate = offerRepository.findAll().size();
         offer.setId(count.incrementAndGet());
 
-        // Create the Offer
-        OfferDTO offerDTO = offerMapper.toDto(offer);
-
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restOfferMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, offerDTO.getId())
+                patch(ENTITY_API_URL_ID, offer.getId())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(offerDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(offer))
             )
             .andExpect(status().isBadRequest());
 
@@ -379,16 +346,13 @@ class OfferResourceIT {
         int databaseSizeBeforeUpdate = offerRepository.findAll().size();
         offer.setId(count.incrementAndGet());
 
-        // Create the Offer
-        OfferDTO offerDTO = offerMapper.toDto(offer);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOfferMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(offerDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(offer))
             )
             .andExpect(status().isBadRequest());
 
@@ -403,16 +367,13 @@ class OfferResourceIT {
         int databaseSizeBeforeUpdate = offerRepository.findAll().size();
         offer.setId(count.incrementAndGet());
 
-        // Create the Offer
-        OfferDTO offerDTO = offerMapper.toDto(offer);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOfferMockMvc
             .perform(
                 patch(ENTITY_API_URL)
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(offerDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(offer))
             )
             .andExpect(status().isMethodNotAllowed());
 

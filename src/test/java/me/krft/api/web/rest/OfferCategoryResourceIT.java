@@ -13,8 +13,6 @@ import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.OfferCategory;
 import me.krft.api.repository.OfferCategoryRepository;
-import me.krft.api.service.dto.OfferCategoryDTO;
-import me.krft.api.service.mapper.OfferCategoryMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +41,6 @@ class OfferCategoryResourceIT {
 
     @Autowired
     private OfferCategoryRepository offerCategoryRepository;
-
-    @Autowired
-    private OfferCategoryMapper offerCategoryMapper;
 
     @Autowired
     private EntityManager em;
@@ -87,13 +82,12 @@ class OfferCategoryResourceIT {
     void createOfferCategory() throws Exception {
         int databaseSizeBeforeCreate = offerCategoryRepository.findAll().size();
         // Create the OfferCategory
-        OfferCategoryDTO offerCategoryDTO = offerCategoryMapper.toDto(offerCategory);
         restOfferCategoryMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(offerCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(offerCategory))
             )
             .andExpect(status().isCreated());
 
@@ -109,7 +103,6 @@ class OfferCategoryResourceIT {
     void createOfferCategoryWithExistingId() throws Exception {
         // Create the OfferCategory with an existing ID
         offerCategory.setId(1L);
-        OfferCategoryDTO offerCategoryDTO = offerCategoryMapper.toDto(offerCategory);
 
         int databaseSizeBeforeCreate = offerCategoryRepository.findAll().size();
 
@@ -119,7 +112,7 @@ class OfferCategoryResourceIT {
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(offerCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(offerCategory))
             )
             .andExpect(status().isBadRequest());
 
@@ -136,14 +129,13 @@ class OfferCategoryResourceIT {
         offerCategory.setLabel(null);
 
         // Create the OfferCategory, which fails.
-        OfferCategoryDTO offerCategoryDTO = offerCategoryMapper.toDto(offerCategory);
 
         restOfferCategoryMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(offerCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(offerCategory))
             )
             .andExpect(status().isBadRequest());
 
@@ -201,14 +193,13 @@ class OfferCategoryResourceIT {
         // Disconnect from session so that the updates on updatedOfferCategory are not directly saved in db
         em.detach(updatedOfferCategory);
         updatedOfferCategory.label(UPDATED_LABEL);
-        OfferCategoryDTO offerCategoryDTO = offerCategoryMapper.toDto(updatedOfferCategory);
 
         restOfferCategoryMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, offerCategoryDTO.getId())
+                put(ENTITY_API_URL_ID, updatedOfferCategory.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(offerCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(updatedOfferCategory))
             )
             .andExpect(status().isOk());
 
@@ -225,16 +216,13 @@ class OfferCategoryResourceIT {
         int databaseSizeBeforeUpdate = offerCategoryRepository.findAll().size();
         offerCategory.setId(count.incrementAndGet());
 
-        // Create the OfferCategory
-        OfferCategoryDTO offerCategoryDTO = offerCategoryMapper.toDto(offerCategory);
-
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restOfferCategoryMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, offerCategoryDTO.getId())
+                put(ENTITY_API_URL_ID, offerCategory.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(offerCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(offerCategory))
             )
             .andExpect(status().isBadRequest());
 
@@ -249,16 +237,13 @@ class OfferCategoryResourceIT {
         int databaseSizeBeforeUpdate = offerCategoryRepository.findAll().size();
         offerCategory.setId(count.incrementAndGet());
 
-        // Create the OfferCategory
-        OfferCategoryDTO offerCategoryDTO = offerCategoryMapper.toDto(offerCategory);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOfferCategoryMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(offerCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(offerCategory))
             )
             .andExpect(status().isBadRequest());
 
@@ -273,16 +258,13 @@ class OfferCategoryResourceIT {
         int databaseSizeBeforeUpdate = offerCategoryRepository.findAll().size();
         offerCategory.setId(count.incrementAndGet());
 
-        // Create the OfferCategory
-        OfferCategoryDTO offerCategoryDTO = offerCategoryMapper.toDto(offerCategory);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOfferCategoryMockMvc
             .perform(
                 put(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(offerCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(offerCategory))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -357,16 +339,13 @@ class OfferCategoryResourceIT {
         int databaseSizeBeforeUpdate = offerCategoryRepository.findAll().size();
         offerCategory.setId(count.incrementAndGet());
 
-        // Create the OfferCategory
-        OfferCategoryDTO offerCategoryDTO = offerCategoryMapper.toDto(offerCategory);
-
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restOfferCategoryMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, offerCategoryDTO.getId())
+                patch(ENTITY_API_URL_ID, offerCategory.getId())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(offerCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(offerCategory))
             )
             .andExpect(status().isBadRequest());
 
@@ -381,16 +360,13 @@ class OfferCategoryResourceIT {
         int databaseSizeBeforeUpdate = offerCategoryRepository.findAll().size();
         offerCategory.setId(count.incrementAndGet());
 
-        // Create the OfferCategory
-        OfferCategoryDTO offerCategoryDTO = offerCategoryMapper.toDto(offerCategory);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOfferCategoryMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(offerCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(offerCategory))
             )
             .andExpect(status().isBadRequest());
 
@@ -405,16 +381,13 @@ class OfferCategoryResourceIT {
         int databaseSizeBeforeUpdate = offerCategoryRepository.findAll().size();
         offerCategory.setId(count.incrementAndGet());
 
-        // Create the OfferCategory
-        OfferCategoryDTO offerCategoryDTO = offerCategoryMapper.toDto(offerCategory);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOfferCategoryMockMvc
             .perform(
                 patch(ENTITY_API_URL)
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(offerCategoryDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(offerCategory))
             )
             .andExpect(status().isMethodNotAllowed());
 

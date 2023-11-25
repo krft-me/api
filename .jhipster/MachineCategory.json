@@ -1,9 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231124203708",
+  "changelogDate": "20231125124428",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
-  "dto": "mapstruct",
+  "dto": "no",
   "embedded": false,
   "entityTableName": "machine_category",
   "fields": [
@@ -24,8 +24,8 @@
   "relationships": [
     {
       "otherEntityName": "machine",
-      "otherEntityRelationshipName": "category",
-      "relationshipName": "machine",
+      "otherEntityRelationshipName": "machineCategory",
+      "relationshipName": "machines",
       "relationshipType": "one-to-many"
     }
   ],

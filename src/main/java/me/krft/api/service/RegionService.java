@@ -2,42 +2,42 @@ package me.krft.api.service;
 
 import java.util.List;
 import java.util.Optional;
-import me.krft.api.service.dto.RegionDTO;
+import me.krft.api.domain.Region;
 
 /**
- * Service Interface for managing {@link me.krft.api.domain.Region}.
+ * Service Interface for managing {@link Region}.
  */
 public interface RegionService {
     /**
      * Save a region.
      *
-     * @param regionDTO the entity to save.
+     * @param region the entity to save.
      * @return the persisted entity.
      */
-    RegionDTO save(RegionDTO regionDTO);
+    Region save(Region region);
 
     /**
      * Updates a region.
      *
-     * @param regionDTO the entity to update.
+     * @param region the entity to update.
      * @return the persisted entity.
      */
-    RegionDTO update(RegionDTO regionDTO);
+    Region update(Region region);
 
     /**
      * Partially updates a region.
      *
-     * @param regionDTO the entity to update partially.
+     * @param region the entity to update partially.
      * @return the persisted entity.
      */
-    Optional<RegionDTO> partialUpdate(RegionDTO regionDTO);
+    Optional<Region> partialUpdate(Region region);
 
     /**
      * Get all the regions.
      *
      * @return the list of entities.
      */
-    List<RegionDTO> findAll();
+    List<Region> findAll();
 
     /**
      * Get the "id" region.
@@ -45,7 +45,7 @@ public interface RegionService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<RegionDTO> findOne(Long id);
+    Optional<Region> findOne(Long id);
 
     /**
      * Delete the "id" region.

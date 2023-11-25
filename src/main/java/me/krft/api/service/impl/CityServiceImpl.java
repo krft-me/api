@@ -1,14 +1,10 @@
 package me.krft.api.service.impl;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import me.krft.api.domain.City;
 import me.krft.api.repository.CityRepository;
 import me.krft.api.service.CityService;
-import me.krft.api.service.dto.CityDTO;
-import me.krft.api.service.mapper.CityMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,56 +21,53 @@ public class CityServiceImpl implements CityService {
 
     private final CityRepository cityRepository;
 
-    private final CityMapper cityMapper;
-
-    public CityServiceImpl(CityRepository cityRepository, CityMapper cityMapper) {
+    public CityServiceImpl(CityRepository cityRepository) {
         this.cityRepository = cityRepository;
-        this.cityMapper = cityMapper;
     }
 
     @Override
-    public CityDTO save(CityDTO cityDTO) {
-        log.debug("Request to save City : {}", cityDTO);
-        City city = cityMapper.toEntity(cityDTO);
-        city = cityRepository.save(city);
-        return cityMapper.toDto(city);
+    public City save(City city) {
+        log.debug("Request to save City : {}", city);
+        return cityRepository.save(city);
     }
 
     @Override
-    public CityDTO update(CityDTO cityDTO) {
-        log.debug("Request to update City : {}", cityDTO);
-        City city = cityMapper.toEntity(cityDTO);
-        city = cityRepository.save(city);
-        return cityMapper.toDto(city);
+    public City update(City city) {
+        log.debug("Request to update City : {}", city);
+        return cityRepository.save(city);
     }
 
     @Override
-    public Optional<CityDTO> partialUpdate(CityDTO cityDTO) {
-        log.debug("Request to partially update City : {}", cityDTO);
+    public Optional<City> partialUpdate(City city) {
+        log.debug("Request to partially update City : {}", city);
 
         return cityRepository
-            .findById(cityDTO.getId())
+            .findById(city.getId())
             .map(existingCity -> {
-                cityMapper.partialUpdate(existingCity, cityDTO);
+                if (city.getName() != null) {
+                    existingCity.setName(city.getName());
+                }
+                if (city.getZipCode() != null) {
+                    existingCity.setZipCode(city.getZipCode());
+                }
 
                 return existingCity;
             })
-            .map(cityRepository::save)
-            .map(cityMapper::toDto);
+            .map(cityRepository::save);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CityDTO> findAll() {
+    public List<City> findAll() {
         log.debug("Request to get all Cities");
-        return cityRepository.findAll().stream().map(cityMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return cityRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<CityDTO> findOne(Long id) {
+    public Optional<City> findOne(Long id) {
         log.debug("Request to get City : {}", id);
-        return cityRepository.findById(id).map(cityMapper::toDto);
+        return cityRepository.findById(id);
     }
 
     @Override

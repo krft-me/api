@@ -1,6 +1,7 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.time.Instant;
 import javax.persistence.*;
@@ -11,6 +12,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 /**
  * Association entity between users and badges
  */
+@Schema(description = "Association entity between users and badges")
 @Entity
 @Table(name = "application_user_badge")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -28,6 +30,7 @@ public class ApplicationUserBadge implements Serializable {
     /**
      * Date the user obtained the badge
      */
+    @Schema(description = "Date the user obtained the badge", required = true)
     @NotNull
     @Column(name = "obtained_date", nullable = false)
     private Instant obtainedDate;
@@ -37,7 +40,8 @@ public class ApplicationUserBadge implements Serializable {
     @JsonIgnoreProperties(value = { "internalUser", "offers", "badges", "orders", "city" }, allowSetters = true)
     private ApplicationUser user;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @NotNull
     @JsonIgnoreProperties(value = { "applicationUserBadges" }, allowSetters = true)
     private Badge badge;
 

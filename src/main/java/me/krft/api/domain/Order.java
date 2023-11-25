@@ -1,6 +1,7 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.time.Instant;
 import javax.persistence.*;
@@ -12,6 +13,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 /**
  * Order entity\nRepresents an order placed by a customer for an offer
  */
+@Schema(description = "Order entity\nRepresents an order placed by a customer for an offer")
 @Entity
 @Table(name = "krftme_order")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -29,6 +31,7 @@ public class Order implements Serializable {
     /**
      * Date the order was placed
      */
+    @Schema(description = "Date the order was placed", required = true)
     @NotNull
     @Column(name = "date", nullable = false)
     private Instant date;
@@ -36,6 +39,7 @@ public class Order implements Serializable {
     /**
      * State of the order
      */
+    @Schema(description = "State of the order", required = true)
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "state", nullable = false)
@@ -43,10 +47,11 @@ public class Order implements Serializable {
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "machines", "applicationUser" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "applicationUser", "offer" }, allowSetters = true)
     private ApplicationUserOffer offer;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @NotNull
     @JsonIgnoreProperties(value = { "internalUser", "offers", "badges", "orders", "city" }, allowSetters = true)
     private ApplicationUser customer;
 

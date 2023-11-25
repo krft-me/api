@@ -1,6 +1,7 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -10,6 +11,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 /**
  * Tag entity\nRepresents a preset keyword for an offer
  */
+@Schema(description = "Tag entity\nRepresents a preset keyword for an offer")
 @Entity
 @Table(name = "tag")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -30,7 +32,7 @@ public class Tag implements Serializable {
     private String label;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "machines", "applicationUser" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "applicationUser", "offer" }, allowSetters = true)
     private ApplicationUserOffer applicationUserOffer;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

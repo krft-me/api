@@ -50,7 +50,6 @@
     "packaging": "jar"
   },
   "devDependencies": {
-    "generator-jhipster": "7.9.4",
     "husky": "7.0.4",
     "lint-staged": "13.0.3",
     "prettier": "2.7.1",
@@ -62,5 +61,8 @@
   },
   "cacheDirectories": [
     "node_modules"
-  ]
+  ],
+  "dependencies": {
+    "generator-jhipster": "^7.9.4"
+  }
 }

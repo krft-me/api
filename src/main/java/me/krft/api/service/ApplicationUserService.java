@@ -2,42 +2,42 @@ package me.krft.api.service;
 
 import java.util.List;
 import java.util.Optional;
-import me.krft.api.service.dto.ApplicationUserDTO;
+import me.krft.api.domain.ApplicationUser;
 
 /**
- * Service Interface for managing {@link me.krft.api.domain.ApplicationUser}.
+ * Service Interface for managing {@link ApplicationUser}.
  */
 public interface ApplicationUserService {
     /**
      * Save a applicationUser.
      *
-     * @param applicationUserDTO the entity to save.
+     * @param applicationUser the entity to save.
      * @return the persisted entity.
      */
-    ApplicationUserDTO save(ApplicationUserDTO applicationUserDTO);
+    ApplicationUser save(ApplicationUser applicationUser);
 
     /**
      * Updates a applicationUser.
      *
-     * @param applicationUserDTO the entity to update.
+     * @param applicationUser the entity to update.
      * @return the persisted entity.
      */
-    ApplicationUserDTO update(ApplicationUserDTO applicationUserDTO);
+    ApplicationUser update(ApplicationUser applicationUser);
 
     /**
      * Partially updates a applicationUser.
      *
-     * @param applicationUserDTO the entity to update partially.
+     * @param applicationUser the entity to update partially.
      * @return the persisted entity.
      */
-    Optional<ApplicationUserDTO> partialUpdate(ApplicationUserDTO applicationUserDTO);
+    Optional<ApplicationUser> partialUpdate(ApplicationUser applicationUser);
 
     /**
      * Get all the applicationUsers.
      *
      * @return the list of entities.
      */
-    List<ApplicationUserDTO> findAll();
+    List<ApplicationUser> findAll();
 
     /**
      * Get the "id" applicationUser.
@@ -45,7 +45,7 @@ public interface ApplicationUserService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<ApplicationUserDTO> findOne(Long id);
+    Optional<ApplicationUser> findOne(Long id);
 
     /**
      * Delete the "id" applicationUser.

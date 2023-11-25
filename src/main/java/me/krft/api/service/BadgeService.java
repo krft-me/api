@@ -2,42 +2,42 @@ package me.krft.api.service;
 
 import java.util.List;
 import java.util.Optional;
-import me.krft.api.service.dto.BadgeDTO;
+import me.krft.api.domain.Badge;
 
 /**
- * Service Interface for managing {@link me.krft.api.domain.Badge}.
+ * Service Interface for managing {@link Badge}.
  */
 public interface BadgeService {
     /**
      * Save a badge.
      *
-     * @param badgeDTO the entity to save.
+     * @param badge the entity to save.
      * @return the persisted entity.
      */
-    BadgeDTO save(BadgeDTO badgeDTO);
+    Badge save(Badge badge);
 
     /**
      * Updates a badge.
      *
-     * @param badgeDTO the entity to update.
+     * @param badge the entity to update.
      * @return the persisted entity.
      */
-    BadgeDTO update(BadgeDTO badgeDTO);
+    Badge update(Badge badge);
 
     /**
      * Partially updates a badge.
      *
-     * @param badgeDTO the entity to update partially.
+     * @param badge the entity to update partially.
      * @return the persisted entity.
      */
-    Optional<BadgeDTO> partialUpdate(BadgeDTO badgeDTO);
+    Optional<Badge> partialUpdate(Badge badge);
 
     /**
      * Get all the badges.
      *
      * @return the list of entities.
      */
-    List<BadgeDTO> findAll();
+    List<Badge> findAll();
 
     /**
      * Get the "id" badge.
@@ -45,7 +45,7 @@ public interface BadgeService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<BadgeDTO> findOne(Long id);
+    Optional<Badge> findOne(Long id);
 
     /**
      * Delete the "id" badge.

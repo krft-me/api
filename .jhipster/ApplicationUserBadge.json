@@ -1,9 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231002172903",
+  "changelogDate": "20231125124424",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
-  "dto": "mapstruct",
+  "dto": "no",
   "embedded": false,
   "entityTableName": "application_user_badge",
   "fields": [
@@ -33,7 +33,8 @@
       "otherEntityName": "badge",
       "otherEntityRelationshipName": "applicationUserBadge",
       "relationshipName": "badge",
-      "relationshipType": "many-to-one"
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
     }
   ],
   "service": "serviceImpl"

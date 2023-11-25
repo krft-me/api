@@ -7,9 +7,9 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.repository.ApplicationUserOfferRepository;
 import me.krft.api.service.ApplicationUserOfferService;
-import me.krft.api.service.dto.ApplicationUserOfferDTO;
 import me.krft.api.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,19 +48,18 @@ public class ApplicationUserOfferResource {
     /**
      * {@code POST  /application-user-offers} : Create a new applicationUserOffer.
      *
-     * @param applicationUserOfferDTO the applicationUserOfferDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new applicationUserOfferDTO, or with status {@code 400 (Bad Request)} if the applicationUserOffer has already an ID.
+     * @param applicationUserOffer the applicationUserOffer to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new applicationUserOffer, or with status {@code 400 (Bad Request)} if the applicationUserOffer has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/application-user-offers")
-    public ResponseEntity<ApplicationUserOfferDTO> createApplicationUserOffer(
-        @Valid @RequestBody ApplicationUserOfferDTO applicationUserOfferDTO
-    ) throws URISyntaxException {
-        log.debug("REST request to save ApplicationUserOffer : {}", applicationUserOfferDTO);
-        if (applicationUserOfferDTO.getId() != null) {
+    public ResponseEntity<ApplicationUserOffer> createApplicationUserOffer(@Valid @RequestBody ApplicationUserOffer applicationUserOffer)
+        throws URISyntaxException {
+        log.debug("REST request to save ApplicationUserOffer : {}", applicationUserOffer);
+        if (applicationUserOffer.getId() != null) {
             throw new BadRequestAlertException("A new applicationUserOffer cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        ApplicationUserOfferDTO result = applicationUserOfferService.save(applicationUserOfferDTO);
+        ApplicationUserOffer result = applicationUserOfferService.save(applicationUserOffer);
         return ResponseEntity
             .created(new URI("/api/application-user-offers/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -70,23 +69,23 @@ public class ApplicationUserOfferResource {
     /**
      * {@code PUT  /application-user-offers/:id} : Updates an existing applicationUserOffer.
      *
-     * @param id the id of the applicationUserOfferDTO to save.
-     * @param applicationUserOfferDTO the applicationUserOfferDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated applicationUserOfferDTO,
-     * or with status {@code 400 (Bad Request)} if the applicationUserOfferDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the applicationUserOfferDTO couldn't be updated.
+     * @param id the id of the applicationUserOffer to save.
+     * @param applicationUserOffer the applicationUserOffer to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated applicationUserOffer,
+     * or with status {@code 400 (Bad Request)} if the applicationUserOffer is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the applicationUserOffer couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/application-user-offers/{id}")
-    public ResponseEntity<ApplicationUserOfferDTO> updateApplicationUserOffer(
+    public ResponseEntity<ApplicationUserOffer> updateApplicationUserOffer(
         @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody ApplicationUserOfferDTO applicationUserOfferDTO
+        @Valid @RequestBody ApplicationUserOffer applicationUserOffer
     ) throws URISyntaxException {
-        log.debug("REST request to update ApplicationUserOffer : {}, {}", id, applicationUserOfferDTO);
-        if (applicationUserOfferDTO.getId() == null) {
+        log.debug("REST request to update ApplicationUserOffer : {}, {}", id, applicationUserOffer);
+        if (applicationUserOffer.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, applicationUserOfferDTO.getId())) {
+        if (!Objects.equals(id, applicationUserOffer.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -94,34 +93,34 @@ public class ApplicationUserOfferResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        ApplicationUserOfferDTO result = applicationUserOfferService.update(applicationUserOfferDTO);
+        ApplicationUserOffer result = applicationUserOfferService.update(applicationUserOffer);
         return ResponseEntity
             .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, applicationUserOfferDTO.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, applicationUserOffer.getId().toString()))
             .body(result);
     }
 
     /**
      * {@code PATCH  /application-user-offers/:id} : Partial updates given fields of an existing applicationUserOffer, field will ignore if it is null
      *
-     * @param id the id of the applicationUserOfferDTO to save.
-     * @param applicationUserOfferDTO the applicationUserOfferDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated applicationUserOfferDTO,
-     * or with status {@code 400 (Bad Request)} if the applicationUserOfferDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the applicationUserOfferDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the applicationUserOfferDTO couldn't be updated.
+     * @param id the id of the applicationUserOffer to save.
+     * @param applicationUserOffer the applicationUserOffer to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated applicationUserOffer,
+     * or with status {@code 400 (Bad Request)} if the applicationUserOffer is not valid,
+     * or with status {@code 404 (Not Found)} if the applicationUserOffer is not found,
+     * or with status {@code 500 (Internal Server Error)} if the applicationUserOffer couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/application-user-offers/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<ApplicationUserOfferDTO> partialUpdateApplicationUserOffer(
+    public ResponseEntity<ApplicationUserOffer> partialUpdateApplicationUserOffer(
         @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody ApplicationUserOfferDTO applicationUserOfferDTO
+        @NotNull @RequestBody ApplicationUserOffer applicationUserOffer
     ) throws URISyntaxException {
-        log.debug("REST request to partial update ApplicationUserOffer partially : {}, {}", id, applicationUserOfferDTO);
-        if (applicationUserOfferDTO.getId() == null) {
+        log.debug("REST request to partial update ApplicationUserOffer partially : {}, {}", id, applicationUserOffer);
+        if (applicationUserOffer.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, applicationUserOfferDTO.getId())) {
+        if (!Objects.equals(id, applicationUserOffer.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -129,11 +128,11 @@ public class ApplicationUserOfferResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<ApplicationUserOfferDTO> result = applicationUserOfferService.partialUpdate(applicationUserOfferDTO);
+        Optional<ApplicationUserOffer> result = applicationUserOfferService.partialUpdate(applicationUserOffer);
 
         return ResponseUtil.wrapOrNotFound(
             result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, applicationUserOfferDTO.getId().toString())
+            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, applicationUserOffer.getId().toString())
         );
     }
 
@@ -143,7 +142,7 @@ public class ApplicationUserOfferResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of applicationUserOffers in body.
      */
     @GetMapping("/application-user-offers")
-    public List<ApplicationUserOfferDTO> getAllApplicationUserOffers() {
+    public List<ApplicationUserOffer> getAllApplicationUserOffers() {
         log.debug("REST request to get all ApplicationUserOffers");
         return applicationUserOfferService.findAll();
     }
@@ -151,20 +150,20 @@ public class ApplicationUserOfferResource {
     /**
      * {@code GET  /application-user-offers/:id} : get the "id" applicationUserOffer.
      *
-     * @param id the id of the applicationUserOfferDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the applicationUserOfferDTO, or with status {@code 404 (Not Found)}.
+     * @param id the id of the applicationUserOffer to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the applicationUserOffer, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/application-user-offers/{id}")
-    public ResponseEntity<ApplicationUserOfferDTO> getApplicationUserOffer(@PathVariable Long id) {
+    public ResponseEntity<ApplicationUserOffer> getApplicationUserOffer(@PathVariable Long id) {
         log.debug("REST request to get ApplicationUserOffer : {}", id);
-        Optional<ApplicationUserOfferDTO> applicationUserOfferDTO = applicationUserOfferService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(applicationUserOfferDTO);
+        Optional<ApplicationUserOffer> applicationUserOffer = applicationUserOfferService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(applicationUserOffer);
     }
 
     /**
      * {@code DELETE  /application-user-offers/:id} : delete the "id" applicationUserOffer.
      *
-     * @param id the id of the applicationUserOfferDTO to delete.
+     * @param id the id of the applicationUserOffer to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/application-user-offers/{id}")

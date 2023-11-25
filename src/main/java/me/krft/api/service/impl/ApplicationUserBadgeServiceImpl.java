@@ -1,14 +1,10 @@
 package me.krft.api.service.impl;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import me.krft.api.domain.ApplicationUserBadge;
 import me.krft.api.repository.ApplicationUserBadgeRepository;
 import me.krft.api.service.ApplicationUserBadgeService;
-import me.krft.api.service.dto.ApplicationUserBadgeDTO;
-import me.krft.api.service.mapper.ApplicationUserBadgeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,63 +21,50 @@ public class ApplicationUserBadgeServiceImpl implements ApplicationUserBadgeServ
 
     private final ApplicationUserBadgeRepository applicationUserBadgeRepository;
 
-    private final ApplicationUserBadgeMapper applicationUserBadgeMapper;
-
-    public ApplicationUserBadgeServiceImpl(
-        ApplicationUserBadgeRepository applicationUserBadgeRepository,
-        ApplicationUserBadgeMapper applicationUserBadgeMapper
-    ) {
+    public ApplicationUserBadgeServiceImpl(ApplicationUserBadgeRepository applicationUserBadgeRepository) {
         this.applicationUserBadgeRepository = applicationUserBadgeRepository;
-        this.applicationUserBadgeMapper = applicationUserBadgeMapper;
     }
 
     @Override
-    public ApplicationUserBadgeDTO save(ApplicationUserBadgeDTO applicationUserBadgeDTO) {
-        log.debug("Request to save ApplicationUserBadge : {}", applicationUserBadgeDTO);
-        ApplicationUserBadge applicationUserBadge = applicationUserBadgeMapper.toEntity(applicationUserBadgeDTO);
-        applicationUserBadge = applicationUserBadgeRepository.save(applicationUserBadge);
-        return applicationUserBadgeMapper.toDto(applicationUserBadge);
+    public ApplicationUserBadge save(ApplicationUserBadge applicationUserBadge) {
+        log.debug("Request to save ApplicationUserBadge : {}", applicationUserBadge);
+        return applicationUserBadgeRepository.save(applicationUserBadge);
     }
 
     @Override
-    public ApplicationUserBadgeDTO update(ApplicationUserBadgeDTO applicationUserBadgeDTO) {
-        log.debug("Request to update ApplicationUserBadge : {}", applicationUserBadgeDTO);
-        ApplicationUserBadge applicationUserBadge = applicationUserBadgeMapper.toEntity(applicationUserBadgeDTO);
-        applicationUserBadge = applicationUserBadgeRepository.save(applicationUserBadge);
-        return applicationUserBadgeMapper.toDto(applicationUserBadge);
+    public ApplicationUserBadge update(ApplicationUserBadge applicationUserBadge) {
+        log.debug("Request to update ApplicationUserBadge : {}", applicationUserBadge);
+        return applicationUserBadgeRepository.save(applicationUserBadge);
     }
 
     @Override
-    public Optional<ApplicationUserBadgeDTO> partialUpdate(ApplicationUserBadgeDTO applicationUserBadgeDTO) {
-        log.debug("Request to partially update ApplicationUserBadge : {}", applicationUserBadgeDTO);
+    public Optional<ApplicationUserBadge> partialUpdate(ApplicationUserBadge applicationUserBadge) {
+        log.debug("Request to partially update ApplicationUserBadge : {}", applicationUserBadge);
 
         return applicationUserBadgeRepository
-            .findById(applicationUserBadgeDTO.getId())
+            .findById(applicationUserBadge.getId())
             .map(existingApplicationUserBadge -> {
-                applicationUserBadgeMapper.partialUpdate(existingApplicationUserBadge, applicationUserBadgeDTO);
+                if (applicationUserBadge.getObtainedDate() != null) {
+                    existingApplicationUserBadge.setObtainedDate(applicationUserBadge.getObtainedDate());
+                }
 
                 return existingApplicationUserBadge;
             })
-            .map(applicationUserBadgeRepository::save)
-            .map(applicationUserBadgeMapper::toDto);
+            .map(applicationUserBadgeRepository::save);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ApplicationUserBadgeDTO> findAll() {
+    public List<ApplicationUserBadge> findAll() {
         log.debug("Request to get all ApplicationUserBadges");
-        return applicationUserBadgeRepository
-            .findAll()
-            .stream()
-            .map(applicationUserBadgeMapper::toDto)
-            .collect(Collectors.toCollection(LinkedList::new));
+        return applicationUserBadgeRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<ApplicationUserBadgeDTO> findOne(Long id) {
+    public Optional<ApplicationUserBadge> findOne(Long id) {
         log.debug("Request to get ApplicationUserBadge : {}", id);
-        return applicationUserBadgeRepository.findById(id).map(applicationUserBadgeMapper::toDto);
+        return applicationUserBadgeRepository.findById(id);
     }
 
     @Override

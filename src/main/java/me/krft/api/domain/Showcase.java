@@ -1,6 +1,7 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.UUID;
 import javax.persistence.*;
@@ -11,6 +12,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 /**
  * Showcase image\nRepresents an image of a service to illustrate it
  */
+@Schema(description = "Showcase image\nRepresents an image of a service to illustrate it")
 @Entity
 @Table(name = "showcase")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -30,7 +32,7 @@ public class Showcase implements Serializable {
     private UUID imageId;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "machines", "applicationUser" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "applicationUser", "offer" }, allowSetters = true)
     private ApplicationUserOffer applicationUserOffer;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

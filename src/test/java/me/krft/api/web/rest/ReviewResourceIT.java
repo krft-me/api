@@ -13,8 +13,6 @@ import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.Review;
 import me.krft.api.repository.ReviewRepository;
-import me.krft.api.service.dto.ReviewDTO;
-import me.krft.api.service.mapper.ReviewMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,9 +44,6 @@ class ReviewResourceIT {
 
     @Autowired
     private ReviewRepository reviewRepository;
-
-    @Autowired
-    private ReviewMapper reviewMapper;
 
     @Autowired
     private EntityManager em;
@@ -90,13 +85,9 @@ class ReviewResourceIT {
     void createReview() throws Exception {
         int databaseSizeBeforeCreate = reviewRepository.findAll().size();
         // Create the Review
-        ReviewDTO reviewDTO = reviewMapper.toDto(review);
         restReviewMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(reviewDTO))
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(review))
             )
             .andExpect(status().isCreated());
 
@@ -113,17 +104,13 @@ class ReviewResourceIT {
     void createReviewWithExistingId() throws Exception {
         // Create the Review with an existing ID
         review.setId(1L);
-        ReviewDTO reviewDTO = reviewMapper.toDto(review);
 
         int databaseSizeBeforeCreate = reviewRepository.findAll().size();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restReviewMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(reviewDTO))
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(review))
             )
             .andExpect(status().isBadRequest());
 
@@ -140,14 +127,10 @@ class ReviewResourceIT {
         review.setRating(null);
 
         // Create the Review, which fails.
-        ReviewDTO reviewDTO = reviewMapper.toDto(review);
 
         restReviewMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(reviewDTO))
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(review))
             )
             .andExpect(status().isBadRequest());
 
@@ -207,14 +190,13 @@ class ReviewResourceIT {
         // Disconnect from session so that the updates on updatedReview are not directly saved in db
         em.detach(updatedReview);
         updatedReview.rating(UPDATED_RATING).comment(UPDATED_COMMENT);
-        ReviewDTO reviewDTO = reviewMapper.toDto(updatedReview);
 
         restReviewMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, reviewDTO.getId())
+                put(ENTITY_API_URL_ID, updatedReview.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(reviewDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(updatedReview))
             )
             .andExpect(status().isOk());
 
@@ -232,16 +214,13 @@ class ReviewResourceIT {
         int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
         review.setId(count.incrementAndGet());
 
-        // Create the Review
-        ReviewDTO reviewDTO = reviewMapper.toDto(review);
-
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restReviewMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, reviewDTO.getId())
+                put(ENTITY_API_URL_ID, review.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(reviewDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(review))
             )
             .andExpect(status().isBadRequest());
 
@@ -256,16 +235,13 @@ class ReviewResourceIT {
         int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
         review.setId(count.incrementAndGet());
 
-        // Create the Review
-        ReviewDTO reviewDTO = reviewMapper.toDto(review);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restReviewMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(reviewDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(review))
             )
             .andExpect(status().isBadRequest());
 
@@ -280,16 +256,10 @@ class ReviewResourceIT {
         int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
         review.setId(count.incrementAndGet());
 
-        // Create the Review
-        ReviewDTO reviewDTO = reviewMapper.toDto(review);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restReviewMockMvc
             .perform(
-                put(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(reviewDTO))
+                put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(review))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -364,16 +334,13 @@ class ReviewResourceIT {
         int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
         review.setId(count.incrementAndGet());
 
-        // Create the Review
-        ReviewDTO reviewDTO = reviewMapper.toDto(review);
-
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restReviewMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, reviewDTO.getId())
+                patch(ENTITY_API_URL_ID, review.getId())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(reviewDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(review))
             )
             .andExpect(status().isBadRequest());
 
@@ -388,16 +355,13 @@ class ReviewResourceIT {
         int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
         review.setId(count.incrementAndGet());
 
-        // Create the Review
-        ReviewDTO reviewDTO = reviewMapper.toDto(review);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restReviewMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(reviewDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(review))
             )
             .andExpect(status().isBadRequest());
 
@@ -412,16 +376,13 @@ class ReviewResourceIT {
         int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
         review.setId(count.incrementAndGet());
 
-        // Create the Review
-        ReviewDTO reviewDTO = reviewMapper.toDto(review);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restReviewMockMvc
             .perform(
                 patch(ENTITY_API_URL)
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(reviewDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(review))
             )
             .andExpect(status().isMethodNotAllowed());
 

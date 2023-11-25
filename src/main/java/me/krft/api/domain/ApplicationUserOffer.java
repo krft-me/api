@@ -1,6 +1,7 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,6 +13,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 /**
  * Association entity between user, offer and machine
  */
+@Schema(description = "Association entity between user, offer and machine")
 @Entity
 @Table(name = "application_user_offer")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -29,6 +31,7 @@ public class ApplicationUserOffer implements Serializable {
     /**
      * Description of the service provided, written by the user providing it
      */
+    @Schema(description = "Description of the service provided, written by the user providing it", required = true)
     @NotNull
     @Size(min = 1, max = 512)
     @Column(name = "description", length = 512, nullable = false)
@@ -37,6 +40,7 @@ public class ApplicationUserOffer implements Serializable {
     /**
      * The price of the service, set by the user providing it
      */
+    @Schema(description = "The price of the service, set by the user providing it", required = true)
     @NotNull
     @Min(value = 0)
     @Column(name = "price", nullable = false)
@@ -45,6 +49,7 @@ public class ApplicationUserOffer implements Serializable {
     /**
      * Active means the offer is visible to the users, we shouldn't delete it
      */
+    @Schema(description = "Active means the offer is visible to the users, we shouldn't delete it", required = true)
     @NotNull
     @Column(name = "active", nullable = false)
     private Boolean active;
@@ -69,14 +74,14 @@ public class ApplicationUserOffer implements Serializable {
     @JsonIgnoreProperties(value = { "offer", "customer" }, allowSetters = true)
     private Set<Order> orders = new HashSet<>();
 
-    @OneToMany(mappedBy = "offer")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "offer", "category" }, allowSetters = true)
-    private Set<Machine> machines = new HashSet<>();
-
     @ManyToOne
     @JsonIgnoreProperties(value = { "internalUser", "offers", "badges", "orders", "city" }, allowSetters = true)
     private ApplicationUser applicationUser;
+
+    @ManyToOne(optional = false)
+    @NotNull
+    @JsonIgnoreProperties(value = { "userOffers", "machine", "category" }, allowSetters = true)
+    private Offer offer;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -256,37 +261,6 @@ public class ApplicationUserOffer implements Serializable {
         return this;
     }
 
-    public Set<Machine> getMachines() {
-        return this.machines;
-    }
-
-    public void setMachines(Set<Machine> machines) {
-        if (this.machines != null) {
-            this.machines.forEach(i -> i.setOffer(null));
-        }
-        if (machines != null) {
-            machines.forEach(i -> i.setOffer(this));
-        }
-        this.machines = machines;
-    }
-
-    public ApplicationUserOffer machines(Set<Machine> machines) {
-        this.setMachines(machines);
-        return this;
-    }
-
-    public ApplicationUserOffer addMachines(Machine machine) {
-        this.machines.add(machine);
-        machine.setOffer(this);
-        return this;
-    }
-
-    public ApplicationUserOffer removeMachines(Machine machine) {
-        this.machines.remove(machine);
-        machine.setOffer(null);
-        return this;
-    }
-
     public ApplicationUser getApplicationUser() {
         return this.applicationUser;
     }
@@ -297,6 +271,19 @@ public class ApplicationUserOffer implements Serializable {
 
     public ApplicationUserOffer applicationUser(ApplicationUser applicationUser) {
         this.setApplicationUser(applicationUser);
+        return this;
+    }
+
+    public Offer getOffer() {
+        return this.offer;
+    }
+
+    public void setOffer(Offer offer) {
+        this.offer = offer;
+    }
+
+    public ApplicationUserOffer offer(Offer offer) {
+        this.setOffer(offer);
         return this;
     }
 

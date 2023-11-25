@@ -1,6 +1,7 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,6 +13,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 /**
  * Region entity
  */
+@Schema(description = "Region entity")
 @Entity
 @Table(name = "region")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -29,6 +31,7 @@ public class Region implements Serializable {
     /**
      * The region's name
      */
+    @Schema(description = "The region's name", required = true)
     @NotNull
     @Size(min = 1)
     @Column(name = "name", nullable = false)

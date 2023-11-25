@@ -1,8 +1,7 @@
 /**
  * City entity
  */
-    @service(serviceImpl)
-    @dto(mapstruct)
+@service(serviceImpl)
 entity City {
     /**
      * The city's name
@@ -17,8 +16,7 @@ entity City {
 /**
  * Region entity
  */
-    @service(serviceImpl)
-    @dto(mapstruct)
+@service(serviceImpl)
 entity Region {
     /**
      * The region's name
@@ -29,8 +27,7 @@ entity Region {
 /**
  * Country entity
  */
-    @service(serviceImpl)
-    @dto(mapstruct)
+@service(serviceImpl)
 entity Country {
     /**
      * The country's name in english
@@ -47,8 +44,7 @@ entity Country {
  * User entity extending the inter {@code User} entity
  * Provides additional information about the user
  */
-    @service(serviceImpl)
-    @dto(mapstruct)
+@service(serviceImpl)
 entity ApplicationUser {
     /**
      * The user's first name
@@ -68,8 +64,7 @@ entity ApplicationUser {
  * Review entity
  * Represents a user's opinion of a service they have purchased
  */
-    @service(serviceImpl)
-    @dto(mapstruct)
+@service(serviceImpl)
 entity Review {
     /**
      * The rating of the service from 0.0 to 5.0
@@ -84,8 +79,7 @@ entity Review {
 /**
  * Machine entity
  */
-    @service(serviceImpl)
-    @dto(mapstruct)
+@service(serviceImpl)
 entity Machine {
     name String required minlength(1) unique
 }
@@ -93,8 +87,7 @@ entity Machine {
 /**
  * Offer entity representing a service stereotype
  */
-    @service(serviceImpl)
-    @dto(mapstruct)
+@service(serviceImpl)
 entity Offer {
     name String required minlength(1) unique
 }
@@ -102,8 +95,7 @@ entity Offer {
 /**
  * Association entity between user, offer and machine
  */
-    @service(serviceImpl)
-    @dto(mapstruct)
+@service(serviceImpl)
 entity ApplicationUserOffer {
     /**
      * Description of the service provided, written by the user providing it
@@ -123,8 +115,7 @@ entity ApplicationUserOffer {
  * Showcase image
  * Represents an image of a service to illustrate it
  */
-    @service(serviceImpl)
-    @dto(mapstruct)
+@service(serviceImpl)
 entity Showcase {
     /**
      *
@@ -136,18 +127,19 @@ entity Showcase {
  * Badge entity
  * Represents a certification (example: 100 completed orders)
  */
-    @service(serviceImpl)
-    @dto(mapstruct)
+@service(serviceImpl)
 entity Badge {
     label String required minlength(1) unique
-    picture ImageBlob required unique
+    /**
+     * The badge's icon, should be a blob later
+     */
+    picture String required unique
 }
 
 /**
  * Association entity between users and badges
  */
-    @service(serviceImpl)
-    @dto(mapstruct)
+@service(serviceImpl)
 entity ApplicationUserBadge {
     /**
      * Date the user obtained the badge
@@ -159,8 +151,7 @@ entity ApplicationUserBadge {
  * Order entity
  * Represents an order placed by a customer for an offer
  */
-    @service(serviceImpl)
-    @dto(mapstruct)
+@service(serviceImpl)
 entity Order (krftme_order) {
     /**
      * Date the order was placed
@@ -176,9 +167,17 @@ entity Order (krftme_order) {
  * Tag entity
  * Represents a preset keyword for an offer
  */
-    @service(serviceImpl)
-    @dto(mapstruct)
+@service(serviceImpl)
 entity Tag {
+    label String required unique minlength(1)
+}
+
+/**
+ * Tag entity
+ * Represents a preset keyword for an offer
+ */
+@service(serviceImpl)
+entity ApplicationUserOfferTag {
     label String required unique minlength(1)
 }
 
@@ -186,8 +185,7 @@ entity Tag {
  * MachineCategory entity
  * Represents a preset machine type
  */
-    @service(serviceImpl)
-    @dto(mapstruct)
+@service(serviceImpl)
 entity MachineCategory {
     label String required unique minlength(1)
 }
@@ -196,8 +194,7 @@ entity MachineCategory {
  * OfferCategory entity
  * Represents a preset offer type
  */
-    @service(serviceImpl)
-    @dto(mapstruct)
+@service(serviceImpl)
 entity OfferCategory {
     label String required unique minlength(1)
 }
@@ -216,7 +213,7 @@ enum State {
 }
 
 relationship OneToOne {
-    ApplicationUser{internalUser} to User with builtInEntity
+    ApplicationUser{internalUser} to User
 }
 
 relationship OneToMany {
@@ -227,11 +224,12 @@ relationship OneToMany {
     Region{cities} to City{region required}
     ApplicationUser{offers} to ApplicationUserOffer
     ApplicationUser{badges} to ApplicationUserBadge{user required}
+    Badge to ApplicationUserBadge{badge required}
     ApplicationUserOffer{orders} to Order{offer required}
-    ApplicationUserOffer{machines} to Machine{offer required}
-    ApplicationUser{orders} to Order{customer}
+    Offer{userOffers} to ApplicationUserOffer{offer required}
+    Machine{offers} to Offer
+    ApplicationUser{orders} to Order{customer required}
     City to ApplicationUser{city}
     OfferCategory to Offer{category}
-    MachineCategory to Machine{category}
-    Badge to ApplicationUserBadge{badge}
+    MachineCategory{machines} to Machine
 }

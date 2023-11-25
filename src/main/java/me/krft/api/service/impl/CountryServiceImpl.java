@@ -1,14 +1,10 @@
 package me.krft.api.service.impl;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import me.krft.api.domain.Country;
 import me.krft.api.repository.CountryRepository;
 import me.krft.api.service.CountryService;
-import me.krft.api.service.dto.CountryDTO;
-import me.krft.api.service.mapper.CountryMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,56 +21,53 @@ public class CountryServiceImpl implements CountryService {
 
     private final CountryRepository countryRepository;
 
-    private final CountryMapper countryMapper;
-
-    public CountryServiceImpl(CountryRepository countryRepository, CountryMapper countryMapper) {
+    public CountryServiceImpl(CountryRepository countryRepository) {
         this.countryRepository = countryRepository;
-        this.countryMapper = countryMapper;
     }
 
     @Override
-    public CountryDTO save(CountryDTO countryDTO) {
-        log.debug("Request to save Country : {}", countryDTO);
-        Country country = countryMapper.toEntity(countryDTO);
-        country = countryRepository.save(country);
-        return countryMapper.toDto(country);
+    public Country save(Country country) {
+        log.debug("Request to save Country : {}", country);
+        return countryRepository.save(country);
     }
 
     @Override
-    public CountryDTO update(CountryDTO countryDTO) {
-        log.debug("Request to update Country : {}", countryDTO);
-        Country country = countryMapper.toEntity(countryDTO);
-        country = countryRepository.save(country);
-        return countryMapper.toDto(country);
+    public Country update(Country country) {
+        log.debug("Request to update Country : {}", country);
+        return countryRepository.save(country);
     }
 
     @Override
-    public Optional<CountryDTO> partialUpdate(CountryDTO countryDTO) {
-        log.debug("Request to partially update Country : {}", countryDTO);
+    public Optional<Country> partialUpdate(Country country) {
+        log.debug("Request to partially update Country : {}", country);
 
         return countryRepository
-            .findById(countryDTO.getId())
+            .findById(country.getId())
             .map(existingCountry -> {
-                countryMapper.partialUpdate(existingCountry, countryDTO);
+                if (country.getName() != null) {
+                    existingCountry.setName(country.getName());
+                }
+                if (country.getIsoCode() != null) {
+                    existingCountry.setIsoCode(country.getIsoCode());
+                }
 
                 return existingCountry;
             })
-            .map(countryRepository::save)
-            .map(countryMapper::toDto);
+            .map(countryRepository::save);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CountryDTO> findAll() {
+    public List<Country> findAll() {
         log.debug("Request to get all Countries");
-        return countryRepository.findAll().stream().map(countryMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return countryRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<CountryDTO> findOne(Long id) {
+    public Optional<Country> findOne(Long id) {
         log.debug("Request to get Country : {}", id);
-        return countryRepository.findById(id).map(countryMapper::toDto);
+        return countryRepository.findById(id);
     }
 
     @Override

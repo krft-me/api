@@ -1,6 +1,7 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -10,6 +11,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 /**
  * Review entity\nRepresents a user's opinion of a service they have purchased
  */
+@Schema(description = "Review entity\nRepresents a user's opinion of a service they have purchased")
 @Entity
 @Table(name = "review")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -27,6 +29,7 @@ public class Review implements Serializable {
     /**
      * The rating of the service from 0.0 to 5.0
      */
+    @Schema(description = "The rating of the service from 0.0 to 5.0", required = true)
     @NotNull
     @Min(value = 0)
     @Max(value = 50)
@@ -36,11 +39,12 @@ public class Review implements Serializable {
     /**
      * Optional comment about the service or the service provider
      */
+    @Schema(description = "Optional comment about the service or the service provider")
     @Column(name = "comment")
     private String comment;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "machines", "applicationUser" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "applicationUser", "offer" }, allowSetters = true)
     private ApplicationUserOffer applicationUserOffer;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

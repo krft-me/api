@@ -2,42 +2,42 @@ package me.krft.api.service;
 
 import java.util.List;
 import java.util.Optional;
-import me.krft.api.service.dto.TagDTO;
+import me.krft.api.domain.Tag;
 
 /**
- * Service Interface for managing {@link me.krft.api.domain.Tag}.
+ * Service Interface for managing {@link Tag}.
  */
 public interface TagService {
     /**
      * Save a tag.
      *
-     * @param tagDTO the entity to save.
+     * @param tag the entity to save.
      * @return the persisted entity.
      */
-    TagDTO save(TagDTO tagDTO);
+    Tag save(Tag tag);
 
     /**
      * Updates a tag.
      *
-     * @param tagDTO the entity to update.
+     * @param tag the entity to update.
      * @return the persisted entity.
      */
-    TagDTO update(TagDTO tagDTO);
+    Tag update(Tag tag);
 
     /**
      * Partially updates a tag.
      *
-     * @param tagDTO the entity to update partially.
+     * @param tag the entity to update partially.
      * @return the persisted entity.
      */
-    Optional<TagDTO> partialUpdate(TagDTO tagDTO);
+    Optional<Tag> partialUpdate(Tag tag);
 
     /**
      * Get all the tags.
      *
      * @return the list of entities.
      */
-    List<TagDTO> findAll();
+    List<Tag> findAll();
 
     /**
      * Get the "id" tag.
@@ -45,7 +45,7 @@ public interface TagService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<TagDTO> findOne(Long id);
+    Optional<Tag> findOne(Long id);
 
     /**
      * Delete the "id" tag.

@@ -1,6 +1,7 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,6 +13,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 /**
  * Badge entity\nRepresents a certification (example: 100 completed orders)
  */
+@Schema(description = "Badge entity\nRepresents a certification (example: 100 completed orders)")
 @Entity
 @Table(name = "badge")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -31,13 +33,13 @@ public class Badge implements Serializable {
     @Column(name = "label", nullable = false, unique = true)
     private String label;
 
-    @Lob
-    @Column(name = "picture", nullable = false, unique = true)
-    private byte[] picture;
-
+    /**
+     * The badge's icon, should be a blob later
+     */
+    @Schema(description = "The badge's icon, should be a blob later", required = true)
     @NotNull
-    @Column(name = "picture_content_type", nullable = false)
-    private String pictureContentType;
+    @Column(name = "picture", nullable = false, unique = true)
+    private String picture;
 
     @OneToMany(mappedBy = "badge")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -72,30 +74,17 @@ public class Badge implements Serializable {
         this.label = label;
     }
 
-    public byte[] getPicture() {
+    public String getPicture() {
         return this.picture;
     }
 
-    public Badge picture(byte[] picture) {
+    public Badge picture(String picture) {
         this.setPicture(picture);
         return this;
     }
 
-    public void setPicture(byte[] picture) {
+    public void setPicture(String picture) {
         this.picture = picture;
-    }
-
-    public String getPictureContentType() {
-        return this.pictureContentType;
-    }
-
-    public Badge pictureContentType(String pictureContentType) {
-        this.pictureContentType = pictureContentType;
-        return this;
-    }
-
-    public void setPictureContentType(String pictureContentType) {
-        this.pictureContentType = pictureContentType;
     }
 
     public Set<ApplicationUserBadge> getApplicationUserBadges() {
@@ -155,7 +144,6 @@ public class Badge implements Serializable {
             "id=" + getId() +
             ", label='" + getLabel() + "'" +
             ", picture='" + getPicture() + "'" +
-            ", pictureContentType='" + getPictureContentType() + "'" +
             "}";
     }
 }

@@ -2,42 +2,42 @@ package me.krft.api.service;
 
 import java.util.List;
 import java.util.Optional;
-import me.krft.api.service.dto.ApplicationUserBadgeDTO;
+import me.krft.api.domain.ApplicationUserBadge;
 
 /**
- * Service Interface for managing {@link me.krft.api.domain.ApplicationUserBadge}.
+ * Service Interface for managing {@link ApplicationUserBadge}.
  */
 public interface ApplicationUserBadgeService {
     /**
      * Save a applicationUserBadge.
      *
-     * @param applicationUserBadgeDTO the entity to save.
+     * @param applicationUserBadge the entity to save.
      * @return the persisted entity.
      */
-    ApplicationUserBadgeDTO save(ApplicationUserBadgeDTO applicationUserBadgeDTO);
+    ApplicationUserBadge save(ApplicationUserBadge applicationUserBadge);
 
     /**
      * Updates a applicationUserBadge.
      *
-     * @param applicationUserBadgeDTO the entity to update.
+     * @param applicationUserBadge the entity to update.
      * @return the persisted entity.
      */
-    ApplicationUserBadgeDTO update(ApplicationUserBadgeDTO applicationUserBadgeDTO);
+    ApplicationUserBadge update(ApplicationUserBadge applicationUserBadge);
 
     /**
      * Partially updates a applicationUserBadge.
      *
-     * @param applicationUserBadgeDTO the entity to update partially.
+     * @param applicationUserBadge the entity to update partially.
      * @return the persisted entity.
      */
-    Optional<ApplicationUserBadgeDTO> partialUpdate(ApplicationUserBadgeDTO applicationUserBadgeDTO);
+    Optional<ApplicationUserBadge> partialUpdate(ApplicationUserBadge applicationUserBadge);
 
     /**
      * Get all the applicationUserBadges.
      *
      * @return the list of entities.
      */
-    List<ApplicationUserBadgeDTO> findAll();
+    List<ApplicationUserBadge> findAll();
 
     /**
      * Get the "id" applicationUserBadge.
@@ -45,7 +45,7 @@ public interface ApplicationUserBadgeService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<ApplicationUserBadgeDTO> findOne(Long id);
+    Optional<ApplicationUserBadge> findOne(Long id);
 
     /**
      * Delete the "id" applicationUserBadge.

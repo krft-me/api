@@ -1,6 +1,7 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,6 +13,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 /**
  * Country entity
  */
+@Schema(description = "Country entity")
 @Entity
 @Table(name = "country")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -29,12 +31,14 @@ public class Country implements Serializable {
     /**
      * The country's name in english
      */
+    @Schema(description = "The country's name in english")
     @Column(name = "name")
     private String name;
 
     /**
      * ISO 3166-1 alpha-2\n@see https:
      */
+    @Schema(description = "ISO 3166-1 alpha-2\n@see https:", required = true)
     @NotNull
     @Size(max = 3)
     @Column(name = "iso_code", length = 3, nullable = false, unique = true)

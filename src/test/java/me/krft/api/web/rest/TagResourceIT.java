@@ -13,8 +13,6 @@ import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.Tag;
 import me.krft.api.repository.TagRepository;
-import me.krft.api.service.dto.TagDTO;
-import me.krft.api.service.mapper.TagMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +41,6 @@ class TagResourceIT {
 
     @Autowired
     private TagRepository tagRepository;
-
-    @Autowired
-    private TagMapper tagMapper;
 
     @Autowired
     private EntityManager em;
@@ -87,10 +82,9 @@ class TagResourceIT {
     void createTag() throws Exception {
         int databaseSizeBeforeCreate = tagRepository.findAll().size();
         // Create the Tag
-        TagDTO tagDTO = tagMapper.toDto(tag);
         restTagMockMvc
             .perform(
-                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(tagDTO))
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(tag))
             )
             .andExpect(status().isCreated());
 
@@ -106,14 +100,13 @@ class TagResourceIT {
     void createTagWithExistingId() throws Exception {
         // Create the Tag with an existing ID
         tag.setId(1L);
-        TagDTO tagDTO = tagMapper.toDto(tag);
 
         int databaseSizeBeforeCreate = tagRepository.findAll().size();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restTagMockMvc
             .perform(
-                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(tagDTO))
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(tag))
             )
             .andExpect(status().isBadRequest());
 
@@ -130,11 +123,10 @@ class TagResourceIT {
         tag.setLabel(null);
 
         // Create the Tag, which fails.
-        TagDTO tagDTO = tagMapper.toDto(tag);
 
         restTagMockMvc
             .perform(
-                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(tagDTO))
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(tag))
             )
             .andExpect(status().isBadRequest());
 
@@ -192,14 +184,13 @@ class TagResourceIT {
         // Disconnect from session so that the updates on updatedTag are not directly saved in db
         em.detach(updatedTag);
         updatedTag.label(UPDATED_LABEL);
-        TagDTO tagDTO = tagMapper.toDto(updatedTag);
 
         restTagMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, tagDTO.getId())
+                put(ENTITY_API_URL_ID, updatedTag.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(tagDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(updatedTag))
             )
             .andExpect(status().isOk());
 
@@ -216,16 +207,13 @@ class TagResourceIT {
         int databaseSizeBeforeUpdate = tagRepository.findAll().size();
         tag.setId(count.incrementAndGet());
 
-        // Create the Tag
-        TagDTO tagDTO = tagMapper.toDto(tag);
-
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restTagMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, tagDTO.getId())
+                put(ENTITY_API_URL_ID, tag.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(tagDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(tag))
             )
             .andExpect(status().isBadRequest());
 
@@ -240,16 +228,13 @@ class TagResourceIT {
         int databaseSizeBeforeUpdate = tagRepository.findAll().size();
         tag.setId(count.incrementAndGet());
 
-        // Create the Tag
-        TagDTO tagDTO = tagMapper.toDto(tag);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTagMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(tagDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(tag))
             )
             .andExpect(status().isBadRequest());
 
@@ -264,13 +249,10 @@ class TagResourceIT {
         int databaseSizeBeforeUpdate = tagRepository.findAll().size();
         tag.setId(count.incrementAndGet());
 
-        // Create the Tag
-        TagDTO tagDTO = tagMapper.toDto(tag);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTagMockMvc
             .perform(
-                put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(tagDTO))
+                put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(tag))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -345,16 +327,13 @@ class TagResourceIT {
         int databaseSizeBeforeUpdate = tagRepository.findAll().size();
         tag.setId(count.incrementAndGet());
 
-        // Create the Tag
-        TagDTO tagDTO = tagMapper.toDto(tag);
-
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restTagMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, tagDTO.getId())
+                patch(ENTITY_API_URL_ID, tag.getId())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(tagDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(tag))
             )
             .andExpect(status().isBadRequest());
 
@@ -369,16 +348,13 @@ class TagResourceIT {
         int databaseSizeBeforeUpdate = tagRepository.findAll().size();
         tag.setId(count.incrementAndGet());
 
-        // Create the Tag
-        TagDTO tagDTO = tagMapper.toDto(tag);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTagMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(tagDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(tag))
             )
             .andExpect(status().isBadRequest());
 
@@ -393,16 +369,13 @@ class TagResourceIT {
         int databaseSizeBeforeUpdate = tagRepository.findAll().size();
         tag.setId(count.incrementAndGet());
 
-        // Create the Tag
-        TagDTO tagDTO = tagMapper.toDto(tag);
-
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTagMockMvc
             .perform(
                 patch(ENTITY_API_URL)
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(tagDTO))
+                    .content(TestUtil.convertObjectToJsonBytes(tag))
             )
             .andExpect(status().isMethodNotAllowed());
 

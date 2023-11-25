@@ -2,42 +2,42 @@ package me.krft.api.service;
 
 import java.util.List;
 import java.util.Optional;
-import me.krft.api.service.dto.CountryDTO;
+import me.krft.api.domain.Country;
 
 /**
- * Service Interface for managing {@link me.krft.api.domain.Country}.
+ * Service Interface for managing {@link Country}.
  */
 public interface CountryService {
     /**
      * Save a country.
      *
-     * @param countryDTO the entity to save.
+     * @param country the entity to save.
      * @return the persisted entity.
      */
-    CountryDTO save(CountryDTO countryDTO);
+    Country save(Country country);
 
     /**
      * Updates a country.
      *
-     * @param countryDTO the entity to update.
+     * @param country the entity to update.
      * @return the persisted entity.
      */
-    CountryDTO update(CountryDTO countryDTO);
+    Country update(Country country);
 
     /**
      * Partially updates a country.
      *
-     * @param countryDTO the entity to update partially.
+     * @param country the entity to update partially.
      * @return the persisted entity.
      */
-    Optional<CountryDTO> partialUpdate(CountryDTO countryDTO);
+    Optional<Country> partialUpdate(Country country);
 
     /**
      * Get all the countries.
      *
      * @return the list of entities.
      */
-    List<CountryDTO> findAll();
+    List<Country> findAll();
 
     /**
      * Get the "id" country.
@@ -45,7 +45,7 @@ public interface CountryService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<CountryDTO> findOne(Long id);
+    Optional<Country> findOne(Long id);
 
     /**
      * Delete the "id" country.

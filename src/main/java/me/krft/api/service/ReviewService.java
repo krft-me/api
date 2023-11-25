@@ -2,42 +2,42 @@ package me.krft.api.service;
 
 import java.util.List;
 import java.util.Optional;
-import me.krft.api.service.dto.ReviewDTO;
+import me.krft.api.domain.Review;
 
 /**
- * Service Interface for managing {@link me.krft.api.domain.Review}.
+ * Service Interface for managing {@link Review}.
  */
 public interface ReviewService {
     /**
      * Save a review.
      *
-     * @param reviewDTO the entity to save.
+     * @param review the entity to save.
      * @return the persisted entity.
      */
-    ReviewDTO save(ReviewDTO reviewDTO);
+    Review save(Review review);
 
     /**
      * Updates a review.
      *
-     * @param reviewDTO the entity to update.
+     * @param review the entity to update.
      * @return the persisted entity.
      */
-    ReviewDTO update(ReviewDTO reviewDTO);
+    Review update(Review review);
 
     /**
      * Partially updates a review.
      *
-     * @param reviewDTO the entity to update partially.
+     * @param review the entity to update partially.
      * @return the persisted entity.
      */
-    Optional<ReviewDTO> partialUpdate(ReviewDTO reviewDTO);
+    Optional<Review> partialUpdate(Review review);
 
     /**
      * Get all the reviews.
      *
      * @return the list of entities.
      */
-    List<ReviewDTO> findAll();
+    List<Review> findAll();
 
     /**
      * Get the "id" review.
@@ -45,7 +45,7 @@ public interface ReviewService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<ReviewDTO> findOne(Long id);
+    Optional<Review> findOne(Long id);
 
     /**
      * Delete the "id" review.

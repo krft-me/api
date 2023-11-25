@@ -1,9 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231002172901",
+  "changelogDate": "20231125124422",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
-  "dto": "mapstruct",
+  "dto": "no",
   "embedded": false,
   "entityTableName": "showcase",
   "fields": [

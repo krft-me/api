@@ -1,6 +1,7 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,6 +13,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 /**
  * User entity extending the inter {@code User} entity\nProvides additional information about the user
  */
+@Schema(description = "User entity extending the inter {@code User} entity\nProvides additional information about the user")
 @Entity
 @Table(name = "application_user")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -29,6 +31,7 @@ public class ApplicationUser implements Serializable {
     /**
      * The user's first name
      */
+    @Schema(description = "The user's first name", required = true)
     @NotNull
     @Size(min = 1)
     @Column(name = "first_name", nullable = false)
@@ -37,6 +40,7 @@ public class ApplicationUser implements Serializable {
     /**
      * The user's last name name
      */
+    @Schema(description = "The user's last name name", required = true)
     @NotNull
     @Size(min = 1)
     @Column(name = "last_name", nullable = false)
@@ -45,6 +49,7 @@ public class ApplicationUser implements Serializable {
     /**
      * The user's username
      */
+    @Schema(description = "The user's username", required = true)
     @NotNull
     @Size(min = 1)
     @Column(name = "username", nullable = false)
@@ -56,7 +61,7 @@ public class ApplicationUser implements Serializable {
 
     @OneToMany(mappedBy = "applicationUser")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "machines", "applicationUser" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "applicationUser", "offer" }, allowSetters = true)
     private Set<ApplicationUserOffer> offers = new HashSet<>();
 
     @OneToMany(mappedBy = "user")

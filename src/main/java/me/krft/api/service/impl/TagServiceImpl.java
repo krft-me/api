@@ -1,14 +1,10 @@
 package me.krft.api.service.impl;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import me.krft.api.domain.Tag;
 import me.krft.api.repository.TagRepository;
 import me.krft.api.service.TagService;
-import me.krft.api.service.dto.TagDTO;
-import me.krft.api.service.mapper.TagMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,56 +21,50 @@ public class TagServiceImpl implements TagService {
 
     private final TagRepository tagRepository;
 
-    private final TagMapper tagMapper;
-
-    public TagServiceImpl(TagRepository tagRepository, TagMapper tagMapper) {
+    public TagServiceImpl(TagRepository tagRepository) {
         this.tagRepository = tagRepository;
-        this.tagMapper = tagMapper;
     }
 
     @Override
-    public TagDTO save(TagDTO tagDTO) {
-        log.debug("Request to save Tag : {}", tagDTO);
-        Tag tag = tagMapper.toEntity(tagDTO);
-        tag = tagRepository.save(tag);
-        return tagMapper.toDto(tag);
+    public Tag save(Tag tag) {
+        log.debug("Request to save Tag : {}", tag);
+        return tagRepository.save(tag);
     }
 
     @Override
-    public TagDTO update(TagDTO tagDTO) {
-        log.debug("Request to update Tag : {}", tagDTO);
-        Tag tag = tagMapper.toEntity(tagDTO);
-        tag = tagRepository.save(tag);
-        return tagMapper.toDto(tag);
+    public Tag update(Tag tag) {
+        log.debug("Request to update Tag : {}", tag);
+        return tagRepository.save(tag);
     }
 
     @Override
-    public Optional<TagDTO> partialUpdate(TagDTO tagDTO) {
-        log.debug("Request to partially update Tag : {}", tagDTO);
+    public Optional<Tag> partialUpdate(Tag tag) {
+        log.debug("Request to partially update Tag : {}", tag);
 
         return tagRepository
-            .findById(tagDTO.getId())
+            .findById(tag.getId())
             .map(existingTag -> {
-                tagMapper.partialUpdate(existingTag, tagDTO);
+                if (tag.getLabel() != null) {
+                    existingTag.setLabel(tag.getLabel());
+                }
 
                 return existingTag;
             })
-            .map(tagRepository::save)
-            .map(tagMapper::toDto);
+            .map(tagRepository::save);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<TagDTO> findAll() {
+    public List<Tag> findAll() {
         log.debug("Request to get all Tags");
-        return tagRepository.findAll().stream().map(tagMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return tagRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<TagDTO> findOne(Long id) {
+    public Optional<Tag> findOne(Long id) {
         log.debug("Request to get Tag : {}", id);
-        return tagRepository.findById(id).map(tagMapper::toDto);
+        return tagRepository.findById(id);
     }
 
     @Override

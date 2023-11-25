@@ -1,14 +1,10 @@
 package me.krft.api.service.impl;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import me.krft.api.domain.ApplicationUser;
 import me.krft.api.repository.ApplicationUserRepository;
 import me.krft.api.service.ApplicationUserService;
-import me.krft.api.service.dto.ApplicationUserDTO;
-import me.krft.api.service.mapper.ApplicationUserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,60 +21,56 @@ public class ApplicationUserServiceImpl implements ApplicationUserService {
 
     private final ApplicationUserRepository applicationUserRepository;
 
-    private final ApplicationUserMapper applicationUserMapper;
-
-    public ApplicationUserServiceImpl(ApplicationUserRepository applicationUserRepository, ApplicationUserMapper applicationUserMapper) {
+    public ApplicationUserServiceImpl(ApplicationUserRepository applicationUserRepository) {
         this.applicationUserRepository = applicationUserRepository;
-        this.applicationUserMapper = applicationUserMapper;
     }
 
     @Override
-    public ApplicationUserDTO save(ApplicationUserDTO applicationUserDTO) {
-        log.debug("Request to save ApplicationUser : {}", applicationUserDTO);
-        ApplicationUser applicationUser = applicationUserMapper.toEntity(applicationUserDTO);
-        applicationUser = applicationUserRepository.save(applicationUser);
-        return applicationUserMapper.toDto(applicationUser);
+    public ApplicationUser save(ApplicationUser applicationUser) {
+        log.debug("Request to save ApplicationUser : {}", applicationUser);
+        return applicationUserRepository.save(applicationUser);
     }
 
     @Override
-    public ApplicationUserDTO update(ApplicationUserDTO applicationUserDTO) {
-        log.debug("Request to update ApplicationUser : {}", applicationUserDTO);
-        ApplicationUser applicationUser = applicationUserMapper.toEntity(applicationUserDTO);
-        applicationUser = applicationUserRepository.save(applicationUser);
-        return applicationUserMapper.toDto(applicationUser);
+    public ApplicationUser update(ApplicationUser applicationUser) {
+        log.debug("Request to update ApplicationUser : {}", applicationUser);
+        return applicationUserRepository.save(applicationUser);
     }
 
     @Override
-    public Optional<ApplicationUserDTO> partialUpdate(ApplicationUserDTO applicationUserDTO) {
-        log.debug("Request to partially update ApplicationUser : {}", applicationUserDTO);
+    public Optional<ApplicationUser> partialUpdate(ApplicationUser applicationUser) {
+        log.debug("Request to partially update ApplicationUser : {}", applicationUser);
 
         return applicationUserRepository
-            .findById(applicationUserDTO.getId())
+            .findById(applicationUser.getId())
             .map(existingApplicationUser -> {
-                applicationUserMapper.partialUpdate(existingApplicationUser, applicationUserDTO);
+                if (applicationUser.getFirstName() != null) {
+                    existingApplicationUser.setFirstName(applicationUser.getFirstName());
+                }
+                if (applicationUser.getLastName() != null) {
+                    existingApplicationUser.setLastName(applicationUser.getLastName());
+                }
+                if (applicationUser.getUsername() != null) {
+                    existingApplicationUser.setUsername(applicationUser.getUsername());
+                }
 
                 return existingApplicationUser;
             })
-            .map(applicationUserRepository::save)
-            .map(applicationUserMapper::toDto);
+            .map(applicationUserRepository::save);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ApplicationUserDTO> findAll() {
+    public List<ApplicationUser> findAll() {
         log.debug("Request to get all ApplicationUsers");
-        return applicationUserRepository
-            .findAll()
-            .stream()
-            .map(applicationUserMapper::toDto)
-            .collect(Collectors.toCollection(LinkedList::new));
+        return applicationUserRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<ApplicationUserDTO> findOne(Long id) {
+    public Optional<ApplicationUser> findOne(Long id) {
         log.debug("Request to get ApplicationUser : {}", id);
-        return applicationUserRepository.findById(id).map(applicationUserMapper::toDto);
+        return applicationUserRepository.findById(id);
     }
 
     @Override

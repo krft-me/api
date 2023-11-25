@@ -1,6 +1,7 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,6 +13,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 /**
  * MachineCategory entity\nRepresents a preset machine type
  */
+@Schema(description = "MachineCategory entity\nRepresents a preset machine type")
 @Entity
 @Table(name = "machine_category")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -31,9 +33,9 @@ public class MachineCategory implements Serializable {
     @Column(name = "label", nullable = false, unique = true)
     private String label;
 
-    @OneToMany(mappedBy = "category")
+    @OneToMany(mappedBy = "machineCategory")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "offer", "category" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "offers", "machineCategory" }, allowSetters = true)
     private Set<Machine> machines = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -70,10 +72,10 @@ public class MachineCategory implements Serializable {
 
     public void setMachines(Set<Machine> machines) {
         if (this.machines != null) {
-            this.machines.forEach(i -> i.setCategory(null));
+            this.machines.forEach(i -> i.setMachineCategory(null));
         }
         if (machines != null) {
-            machines.forEach(i -> i.setCategory(this));
+            machines.forEach(i -> i.setMachineCategory(this));
         }
         this.machines = machines;
     }
@@ -83,15 +85,15 @@ public class MachineCategory implements Serializable {
         return this;
     }
 
-    public MachineCategory addMachine(Machine machine) {
+    public MachineCategory addMachines(Machine machine) {
         this.machines.add(machine);
-        machine.setCategory(this);
+        machine.setMachineCategory(this);
         return this;
     }
 
-    public MachineCategory removeMachine(Machine machine) {
+    public MachineCategory removeMachines(Machine machine) {
         this.machines.remove(machine);
-        machine.setCategory(null);
+        machine.setMachineCategory(null);
         return this;
     }
 
