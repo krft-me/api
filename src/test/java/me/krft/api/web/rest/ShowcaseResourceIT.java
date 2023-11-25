@@ -6,11 +6,11 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
+import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.domain.Showcase;
@@ -38,8 +38,8 @@ class ShowcaseResourceIT {
     private static final String ENTITY_API_URL = "/api/showcases";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
 
     @Autowired
     private ShowcaseRepository showcaseRepository;

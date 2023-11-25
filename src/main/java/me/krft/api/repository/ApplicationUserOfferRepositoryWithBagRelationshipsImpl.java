@@ -1,12 +1,12 @@
 package me.krft.api.repository;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import me.krft.api.domain.ApplicationUserOffer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
