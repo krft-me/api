@@ -14,7 +14,7 @@
       "fieldType": "String"
     },
     {
-      "documentation": "ISO 3166-1 alpha-2\\n@see https:",
+      "documentation": "ISO 3166-1 alpha-2",
       "fieldName": "isoCode",
       "fieldType": "String",
       "fieldValidateRules": ["required", "unique", "maxlength"],

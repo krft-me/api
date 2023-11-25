@@ -3,7 +3,8 @@ package me.krft.api.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,9 +38,8 @@ public class Country implements Serializable {
 
     /**
      * ISO 3166-1 alpha-2
-     * @see https:
      */
-    @Schema(description = "ISO 3166-1 alpha-2\n@see https:", required = true)
+    @Schema(description = "ISO 3166-1 alpha-2", required = true)
     @NotNull
     @Size(max = 3)
     @Column(name = "iso_code", length = 3, nullable = false, unique = true)
