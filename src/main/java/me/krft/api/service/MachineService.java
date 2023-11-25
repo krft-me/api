@@ -5,7 +5,7 @@ import java.util.Optional;
 import me.krft.api.domain.Machine;
 
 /**
- * Service Interface for managing {@link Machine}.
+ * Service Interface for managing {@link me.krft.api.domain.Machine}.
  */
 public interface MachineService {
     /**

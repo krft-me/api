@@ -1,12 +1,12 @@
 package me.krft.api.web.rest;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import me.krft.api.domain.Machine;
 import me.krft.api.repository.MachineRepository;
 import me.krft.api.service.MachineService;
@@ -23,7 +23,7 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link me.krft.api.domain.Machine}.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/machines")
 public class MachineResource {
 
     private final Logger log = LoggerFactory.getLogger(MachineResource.class);
@@ -49,7 +49,7 @@ public class MachineResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new machine, or with status {@code 400 (Bad Request)} if the machine has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/machines")
+    @PostMapping("")
     public ResponseEntity<Machine> createMachine(@Valid @RequestBody Machine machine) throws URISyntaxException {
         log.debug("REST request to save Machine : {}", machine);
         if (machine.getId() != null) {
@@ -72,7 +72,7 @@ public class MachineResource {
      * or with status {@code 500 (Internal Server Error)} if the machine couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/machines/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Machine> updateMachine(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody Machine machine
@@ -107,7 +107,7 @@ public class MachineResource {
      * or with status {@code 500 (Internal Server Error)} if the machine couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/machines/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<Machine> partialUpdateMachine(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody Machine machine
@@ -137,7 +137,7 @@ public class MachineResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of machines in body.
      */
-    @GetMapping("/machines")
+    @GetMapping("")
     public List<Machine> getAllMachines() {
         log.debug("REST request to get all Machines");
         return machineService.findAll();
@@ -149,7 +149,7 @@ public class MachineResource {
      * @param id the id of the machine to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the machine, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/machines/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Machine> getMachine(@PathVariable Long id) {
         log.debug("REST request to get Machine : {}", id);
         Optional<Machine> machine = machineService.findOne(id);
@@ -162,7 +162,7 @@ public class MachineResource {
      * @param id the id of the machine to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/machines/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMachine(@PathVariable Long id) {
         log.debug("REST request to delete Machine : {}", id);
         machineService.delete(id);

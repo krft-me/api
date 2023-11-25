@@ -93,7 +93,7 @@ entity Offer {
 }
 
 /**
- * Association entity between user, offer and machine
+ * Relationship entity between user, offer and machine
  */
 @service(serviceImpl)
 entity ApplicationUserOffer {
@@ -137,7 +137,7 @@ entity Badge {
 }
 
 /**
- * Association entity between users and badges
+ * Relationship entity between users and badges
  */
 @service(serviceImpl)
 entity ApplicationUserBadge {
@@ -169,15 +169,6 @@ entity Order (krftme_order) {
  */
 @service(serviceImpl)
 entity Tag {
-    label String required unique minlength(1)
-}
-
-/**
- * Tag entity
- * Represents a preset keyword for an offer
- */
-@service(serviceImpl)
-entity ApplicationUserOfferTag {
     label String required unique minlength(1)
 }
 
@@ -216,20 +207,26 @@ relationship OneToOne {
     ApplicationUser{internalUser} to User
 }
 
+// FIRST CONTAINS MANY SECOND, AND SECOND CONTAINS ONE FIRST
 relationship OneToMany {
-    ApplicationUserOffer{reviews} to Review
-    ApplicationUserOffer{showcases} to Showcase
-    ApplicationUserOffer{tags} to Tag
+    ApplicationUserOffer{reviews} to Review{offer required}
+    ApplicationUserOffer{showcases} to Showcase{offer required}
     Country{regions} to Region{country required}
     Region{cities} to City{region required}
-    ApplicationUser{offers} to ApplicationUserOffer
+    ApplicationUser{offers} to ApplicationUserOffer{provider required}
     ApplicationUser{badges} to ApplicationUserBadge{user required}
-    Badge to ApplicationUserBadge{badge required}
+    Badge{users} to ApplicationUserBadge{badge required}
     ApplicationUserOffer{orders} to Order{offer required}
     Offer{userOffers} to ApplicationUserOffer{offer required}
-    Machine{offers} to Offer
+    // An offer may not have a machine
+    Machine{offers} to Offer{machine}
     ApplicationUser{orders} to Order{customer required}
-    City to ApplicationUser{city}
-    OfferCategory to Offer{category}
-    MachineCategory{machines} to Machine
+    // A user may not have a city
+    City{users} to ApplicationUser{city}
+    OfferCategory{offers} to Offer{category required}
+    MachineCategory{machines} to Machine{category required}
+}
+
+relationship ManyToMany {
+    ApplicationUserOffer{tags} to Tag{offers}
 }

@@ -2,18 +2,18 @@ package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * Association entity between user, offer and machine
+ * Relationship entity between user, offer and machine
  */
-@Schema(description = "Association entity between user, offer and machine")
+@Schema(description = "Relationship entity between user, offer and machine")
 @Entity
 @Table(name = "application_user_offer")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -54,29 +54,35 @@ public class ApplicationUserOffer implements Serializable {
     @Column(name = "active", nullable = false)
     private Boolean active;
 
-    @OneToMany(mappedBy = "applicationUserOffer")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "offer")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "applicationUserOffer" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "offer" }, allowSetters = true)
     private Set<Review> reviews = new HashSet<>();
 
-    @OneToMany(mappedBy = "applicationUserOffer")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "offer")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "applicationUserOffer" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "offer" }, allowSetters = true)
     private Set<Showcase> showcases = new HashSet<>();
 
-    @OneToMany(mappedBy = "applicationUserOffer")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "applicationUserOffer" }, allowSetters = true)
-    private Set<Tag> tags = new HashSet<>();
-
-    @OneToMany(mappedBy = "offer")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "offer")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "offer", "customer" }, allowSetters = true)
     private Set<Order> orders = new HashSet<>();
 
-    @ManyToOne
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "rel_application_user_offer__tags",
+        joinColumns = @JoinColumn(name = "application_user_offer_id"),
+        inverseJoinColumns = @JoinColumn(name = "tags_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "offers" }, allowSetters = true)
+    private Set<Tag> tags = new HashSet<>();
+
+    @ManyToOne(optional = false)
+    @NotNull
     @JsonIgnoreProperties(value = { "internalUser", "offers", "badges", "orders", "city" }, allowSetters = true)
-    private ApplicationUser applicationUser;
+    private ApplicationUser provider;
 
     @ManyToOne(optional = false)
     @NotNull
@@ -143,10 +149,10 @@ public class ApplicationUserOffer implements Serializable {
 
     public void setReviews(Set<Review> reviews) {
         if (this.reviews != null) {
-            this.reviews.forEach(i -> i.setApplicationUserOffer(null));
+            this.reviews.forEach(i -> i.setOffer(null));
         }
         if (reviews != null) {
-            reviews.forEach(i -> i.setApplicationUserOffer(this));
+            reviews.forEach(i -> i.setOffer(this));
         }
         this.reviews = reviews;
     }
@@ -158,13 +164,13 @@ public class ApplicationUserOffer implements Serializable {
 
     public ApplicationUserOffer addReviews(Review review) {
         this.reviews.add(review);
-        review.setApplicationUserOffer(this);
+        review.setOffer(this);
         return this;
     }
 
     public ApplicationUserOffer removeReviews(Review review) {
         this.reviews.remove(review);
-        review.setApplicationUserOffer(null);
+        review.setOffer(null);
         return this;
     }
 
@@ -174,10 +180,10 @@ public class ApplicationUserOffer implements Serializable {
 
     public void setShowcases(Set<Showcase> showcases) {
         if (this.showcases != null) {
-            this.showcases.forEach(i -> i.setApplicationUserOffer(null));
+            this.showcases.forEach(i -> i.setOffer(null));
         }
         if (showcases != null) {
-            showcases.forEach(i -> i.setApplicationUserOffer(this));
+            showcases.forEach(i -> i.setOffer(this));
         }
         this.showcases = showcases;
     }
@@ -189,44 +195,13 @@ public class ApplicationUserOffer implements Serializable {
 
     public ApplicationUserOffer addShowcases(Showcase showcase) {
         this.showcases.add(showcase);
-        showcase.setApplicationUserOffer(this);
+        showcase.setOffer(this);
         return this;
     }
 
     public ApplicationUserOffer removeShowcases(Showcase showcase) {
         this.showcases.remove(showcase);
-        showcase.setApplicationUserOffer(null);
-        return this;
-    }
-
-    public Set<Tag> getTags() {
-        return this.tags;
-    }
-
-    public void setTags(Set<Tag> tags) {
-        if (this.tags != null) {
-            this.tags.forEach(i -> i.setApplicationUserOffer(null));
-        }
-        if (tags != null) {
-            tags.forEach(i -> i.setApplicationUserOffer(this));
-        }
-        this.tags = tags;
-    }
-
-    public ApplicationUserOffer tags(Set<Tag> tags) {
-        this.setTags(tags);
-        return this;
-    }
-
-    public ApplicationUserOffer addTags(Tag tag) {
-        this.tags.add(tag);
-        tag.setApplicationUserOffer(this);
-        return this;
-    }
-
-    public ApplicationUserOffer removeTags(Tag tag) {
-        this.tags.remove(tag);
-        tag.setApplicationUserOffer(null);
+        showcase.setOffer(null);
         return this;
     }
 
@@ -261,16 +236,39 @@ public class ApplicationUserOffer implements Serializable {
         return this;
     }
 
-    public ApplicationUser getApplicationUser() {
-        return this.applicationUser;
+    public Set<Tag> getTags() {
+        return this.tags;
     }
 
-    public void setApplicationUser(ApplicationUser applicationUser) {
-        this.applicationUser = applicationUser;
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
     }
 
-    public ApplicationUserOffer applicationUser(ApplicationUser applicationUser) {
-        this.setApplicationUser(applicationUser);
+    public ApplicationUserOffer tags(Set<Tag> tags) {
+        this.setTags(tags);
+        return this;
+    }
+
+    public ApplicationUserOffer addTags(Tag tag) {
+        this.tags.add(tag);
+        return this;
+    }
+
+    public ApplicationUserOffer removeTags(Tag tag) {
+        this.tags.remove(tag);
+        return this;
+    }
+
+    public ApplicationUser getProvider() {
+        return this.provider;
+    }
+
+    public void setProvider(ApplicationUser applicationUser) {
+        this.provider = applicationUser;
+    }
+
+    public ApplicationUserOffer provider(ApplicationUser applicationUser) {
+        this.setProvider(applicationUser);
         return this;
     }
 
@@ -297,7 +295,7 @@ public class ApplicationUserOffer implements Serializable {
         if (!(o instanceof ApplicationUserOffer)) {
             return false;
         }
-        return id != null && id.equals(((ApplicationUserOffer) o).id);
+        return getId() != null && getId().equals(((ApplicationUserOffer) o).getId());
     }
 
     @Override

@@ -2,17 +2,17 @@ package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * Association entity between users and badges
+ * Relationship entity between users and badges
  */
-@Schema(description = "Association entity between users and badges")
+@Schema(description = "Relationship entity between users and badges")
 @Entity
 @Table(name = "application_user_badge")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -42,7 +42,7 @@ public class ApplicationUserBadge implements Serializable {
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "applicationUserBadges" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "users" }, allowSetters = true)
     private Badge badge;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -109,7 +109,7 @@ public class ApplicationUserBadge implements Serializable {
         if (!(o instanceof ApplicationUserBadge)) {
             return false;
         }
-        return id != null && id.equals(((ApplicationUserBadge) o).id);
+        return getId() != null && getId().equals(((ApplicationUserBadge) o).getId());
     }
 
     @Override

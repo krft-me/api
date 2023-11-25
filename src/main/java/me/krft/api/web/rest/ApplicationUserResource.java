@@ -1,12 +1,12 @@
 package me.krft.api.web.rest;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import me.krft.api.domain.ApplicationUser;
 import me.krft.api.repository.ApplicationUserRepository;
 import me.krft.api.repository.UserRepository;
@@ -24,7 +24,7 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link me.krft.api.domain.ApplicationUser}.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/application-users")
 public class ApplicationUserResource {
 
     private final Logger log = LoggerFactory.getLogger(ApplicationUserResource.class);
@@ -57,7 +57,7 @@ public class ApplicationUserResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new applicationUser, or with status {@code 400 (Bad Request)} if the applicationUser has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/application-users")
+    @PostMapping("")
     public ResponseEntity<ApplicationUser> createApplicationUser(@Valid @RequestBody ApplicationUser applicationUser)
         throws URISyntaxException {
         log.debug("REST request to save ApplicationUser : {}", applicationUser);
@@ -87,7 +87,7 @@ public class ApplicationUserResource {
      * or with status {@code 500 (Internal Server Error)} if the applicationUser couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/application-users/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<ApplicationUser> updateApplicationUser(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody ApplicationUser applicationUser
@@ -127,7 +127,7 @@ public class ApplicationUserResource {
      * or with status {@code 500 (Internal Server Error)} if the applicationUser couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/application-users/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<ApplicationUser> partialUpdateApplicationUser(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody ApplicationUser applicationUser
@@ -162,7 +162,7 @@ public class ApplicationUserResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of applicationUsers in body.
      */
-    @GetMapping("/application-users")
+    @GetMapping("")
     public List<ApplicationUser> getAllApplicationUsers() {
         log.debug("REST request to get all ApplicationUsers");
         return applicationUserService.findAll();
@@ -174,7 +174,7 @@ public class ApplicationUserResource {
      * @param id the id of the applicationUser to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the applicationUser, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/application-users/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ApplicationUser> getApplicationUser(@PathVariable Long id) {
         log.debug("REST request to get ApplicationUser : {}", id);
         Optional<ApplicationUser> applicationUser = applicationUserService.findOne(id);
@@ -187,7 +187,7 @@ public class ApplicationUserResource {
      * @param id the id of the applicationUser to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/application-users/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteApplicationUser(@PathVariable Long id) {
         log.debug("REST request to delete ApplicationUser : {}", id);
         applicationUserService.delete(id);

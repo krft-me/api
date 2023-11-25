@@ -5,7 +5,7 @@ import java.util.Optional;
 import me.krft.api.domain.Badge;
 
 /**
- * Service Interface for managing {@link Badge}.
+ * Service Interface for managing {@link me.krft.api.domain.Badge}.
  */
 public interface BadgeService {
     /**

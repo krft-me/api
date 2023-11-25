@@ -2,15 +2,16 @@ package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.UUID;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * Showcase image\nRepresents an image of a service to illustrate it
+ * Showcase image
+ * Represents an image of a service to illustrate it
  */
 @Schema(description = "Showcase image\nRepresents an image of a service to illustrate it")
 @Entity
@@ -31,9 +32,10 @@ public class Showcase implements Serializable {
     @Column(name = "image_id", nullable = false, unique = true)
     private UUID imageId;
 
-    @ManyToOne
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "applicationUser", "offer" }, allowSetters = true)
-    private ApplicationUserOffer applicationUserOffer;
+    @ManyToOne(optional = false)
+    @NotNull
+    @JsonIgnoreProperties(value = { "reviews", "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
+    private ApplicationUserOffer offer;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -63,16 +65,16 @@ public class Showcase implements Serializable {
         this.imageId = imageId;
     }
 
-    public ApplicationUserOffer getApplicationUserOffer() {
-        return this.applicationUserOffer;
+    public ApplicationUserOffer getOffer() {
+        return this.offer;
     }
 
-    public void setApplicationUserOffer(ApplicationUserOffer applicationUserOffer) {
-        this.applicationUserOffer = applicationUserOffer;
+    public void setOffer(ApplicationUserOffer applicationUserOffer) {
+        this.offer = applicationUserOffer;
     }
 
-    public Showcase applicationUserOffer(ApplicationUserOffer applicationUserOffer) {
-        this.setApplicationUserOffer(applicationUserOffer);
+    public Showcase offer(ApplicationUserOffer applicationUserOffer) {
+        this.setOffer(applicationUserOffer);
         return this;
     }
 
@@ -86,7 +88,7 @@ public class Showcase implements Serializable {
         if (!(o instanceof Showcase)) {
             return false;
         }
-        return id != null && id.equals(((Showcase) o).id);
+        return getId() != null && getId().equals(((Showcase) o).getId());
     }
 
     @Override

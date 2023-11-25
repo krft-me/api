@@ -1,8 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231125124428",
+  "changelogDate": "20231125132611",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "MachineCategory entity\\nRepresents a preset machine type",
   "dto": "no",
   "embedded": false,
   "entityTableName": "machine_category",
@@ -24,10 +25,12 @@
   "relationships": [
     {
       "otherEntityName": "machine",
-      "otherEntityRelationshipName": "machineCategory",
+      "otherEntityRelationshipName": "category",
       "relationshipName": "machines",
+      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     }
   ],
+  "searchEngine": "no",
   "service": "serviceImpl"
 }

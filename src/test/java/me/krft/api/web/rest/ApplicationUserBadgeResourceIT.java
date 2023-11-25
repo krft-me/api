@@ -6,12 +6,12 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.ApplicationUser;
 import me.krft.api.domain.ApplicationUserBadge;
@@ -41,7 +41,7 @@ class ApplicationUserBadgeResourceIT {
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
     private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     @Autowired
     private ApplicationUserBadgeRepository applicationUserBadgeRepository;
@@ -233,7 +233,9 @@ class ApplicationUserBadgeResourceIT {
         int databaseSizeBeforeUpdate = applicationUserBadgeRepository.findAll().size();
 
         // Update the applicationUserBadge
-        ApplicationUserBadge updatedApplicationUserBadge = applicationUserBadgeRepository.findById(applicationUserBadge.getId()).get();
+        ApplicationUserBadge updatedApplicationUserBadge = applicationUserBadgeRepository
+            .findById(applicationUserBadge.getId())
+            .orElseThrow();
         // Disconnect from session so that the updates on updatedApplicationUserBadge are not directly saved in db
         em.detach(updatedApplicationUserBadge);
         updatedApplicationUserBadge.obtainedDate(UPDATED_OBTAINED_DATE);
@@ -258,7 +260,7 @@ class ApplicationUserBadgeResourceIT {
     @Transactional
     void putNonExistingApplicationUserBadge() throws Exception {
         int databaseSizeBeforeUpdate = applicationUserBadgeRepository.findAll().size();
-        applicationUserBadge.setId(count.incrementAndGet());
+        applicationUserBadge.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restApplicationUserBadgeMockMvc
@@ -279,12 +281,12 @@ class ApplicationUserBadgeResourceIT {
     @Transactional
     void putWithIdMismatchApplicationUserBadge() throws Exception {
         int databaseSizeBeforeUpdate = applicationUserBadgeRepository.findAll().size();
-        applicationUserBadge.setId(count.incrementAndGet());
+        applicationUserBadge.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserBadgeMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
@@ -300,7 +302,7 @@ class ApplicationUserBadgeResourceIT {
     @Transactional
     void putWithMissingIdPathParamApplicationUserBadge() throws Exception {
         int databaseSizeBeforeUpdate = applicationUserBadgeRepository.findAll().size();
-        applicationUserBadge.setId(count.incrementAndGet());
+        applicationUserBadge.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserBadgeMockMvc
@@ -329,8 +331,6 @@ class ApplicationUserBadgeResourceIT {
         ApplicationUserBadge partialUpdatedApplicationUserBadge = new ApplicationUserBadge();
         partialUpdatedApplicationUserBadge.setId(applicationUserBadge.getId());
 
-        partialUpdatedApplicationUserBadge.obtainedDate(UPDATED_OBTAINED_DATE);
-
         restApplicationUserBadgeMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedApplicationUserBadge.getId())
@@ -344,7 +344,7 @@ class ApplicationUserBadgeResourceIT {
         List<ApplicationUserBadge> applicationUserBadgeList = applicationUserBadgeRepository.findAll();
         assertThat(applicationUserBadgeList).hasSize(databaseSizeBeforeUpdate);
         ApplicationUserBadge testApplicationUserBadge = applicationUserBadgeList.get(applicationUserBadgeList.size() - 1);
-        assertThat(testApplicationUserBadge.getObtainedDate()).isEqualTo(UPDATED_OBTAINED_DATE);
+        assertThat(testApplicationUserBadge.getObtainedDate()).isEqualTo(DEFAULT_OBTAINED_DATE);
     }
 
     @Test
@@ -381,7 +381,7 @@ class ApplicationUserBadgeResourceIT {
     @Transactional
     void patchNonExistingApplicationUserBadge() throws Exception {
         int databaseSizeBeforeUpdate = applicationUserBadgeRepository.findAll().size();
-        applicationUserBadge.setId(count.incrementAndGet());
+        applicationUserBadge.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restApplicationUserBadgeMockMvc
@@ -402,12 +402,12 @@ class ApplicationUserBadgeResourceIT {
     @Transactional
     void patchWithIdMismatchApplicationUserBadge() throws Exception {
         int databaseSizeBeforeUpdate = applicationUserBadgeRepository.findAll().size();
-        applicationUserBadge.setId(count.incrementAndGet());
+        applicationUserBadge.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserBadgeMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(applicationUserBadge))
@@ -423,7 +423,7 @@ class ApplicationUserBadgeResourceIT {
     @Transactional
     void patchWithMissingIdPathParamApplicationUserBadge() throws Exception {
         int databaseSizeBeforeUpdate = applicationUserBadgeRepository.findAll().size();
-        applicationUserBadge.setId(count.incrementAndGet());
+        applicationUserBadge.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserBadgeMockMvc

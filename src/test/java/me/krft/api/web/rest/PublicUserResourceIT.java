@@ -1,13 +1,11 @@
 package me.krft.api.web.rest;
 
 import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
-import me.krft.api.config.TestSecurityConfiguration;
 import me.krft.api.domain.User;
 import me.krft.api.repository.UserRepository;
 import me.krft.api.security.AuthoritiesConstants;
@@ -22,7 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Integration tests for the {@link UserResource} REST controller.
+ * Integration tests for the {@link PublicUserResource} REST controller.
  */
 @AutoConfigureMockMvc
 @WithMockUser(authorities = AuthoritiesConstants.ADMIN)

@@ -5,7 +5,7 @@ import java.util.Optional;
 import me.krft.api.domain.Tag;
 
 /**
- * Service Interface for managing {@link Tag}.
+ * Service Interface for managing {@link me.krft.api.domain.Tag}.
  */
 public interface TagService {
     /**

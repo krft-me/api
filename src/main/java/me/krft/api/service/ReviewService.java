@@ -5,7 +5,7 @@ import java.util.Optional;
 import me.krft.api.domain.Review;
 
 /**
- * Service Interface for managing {@link Review}.
+ * Service Interface for managing {@link me.krft.api.domain.Review}.
  */
 public interface ReviewService {
     /**

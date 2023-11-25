@@ -6,10 +6,10 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.MachineCategory;
 import me.krft.api.repository.MachineCategoryRepository;
@@ -37,7 +37,7 @@ class MachineCategoryResourceIT {
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
     private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     @Autowired
     private MachineCategoryRepository machineCategoryRepository;
@@ -189,7 +189,7 @@ class MachineCategoryResourceIT {
         int databaseSizeBeforeUpdate = machineCategoryRepository.findAll().size();
 
         // Update the machineCategory
-        MachineCategory updatedMachineCategory = machineCategoryRepository.findById(machineCategory.getId()).get();
+        MachineCategory updatedMachineCategory = machineCategoryRepository.findById(machineCategory.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedMachineCategory are not directly saved in db
         em.detach(updatedMachineCategory);
         updatedMachineCategory.label(UPDATED_LABEL);
@@ -214,7 +214,7 @@ class MachineCategoryResourceIT {
     @Transactional
     void putNonExistingMachineCategory() throws Exception {
         int databaseSizeBeforeUpdate = machineCategoryRepository.findAll().size();
-        machineCategory.setId(count.incrementAndGet());
+        machineCategory.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restMachineCategoryMockMvc
@@ -235,12 +235,12 @@ class MachineCategoryResourceIT {
     @Transactional
     void putWithIdMismatchMachineCategory() throws Exception {
         int databaseSizeBeforeUpdate = machineCategoryRepository.findAll().size();
-        machineCategory.setId(count.incrementAndGet());
+        machineCategory.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restMachineCategoryMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(machineCategory))
@@ -256,7 +256,7 @@ class MachineCategoryResourceIT {
     @Transactional
     void putWithMissingIdPathParamMachineCategory() throws Exception {
         int databaseSizeBeforeUpdate = machineCategoryRepository.findAll().size();
-        machineCategory.setId(count.incrementAndGet());
+        machineCategory.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restMachineCategoryMockMvc
@@ -285,8 +285,6 @@ class MachineCategoryResourceIT {
         MachineCategory partialUpdatedMachineCategory = new MachineCategory();
         partialUpdatedMachineCategory.setId(machineCategory.getId());
 
-        partialUpdatedMachineCategory.label(UPDATED_LABEL);
-
         restMachineCategoryMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedMachineCategory.getId())
@@ -300,7 +298,7 @@ class MachineCategoryResourceIT {
         List<MachineCategory> machineCategoryList = machineCategoryRepository.findAll();
         assertThat(machineCategoryList).hasSize(databaseSizeBeforeUpdate);
         MachineCategory testMachineCategory = machineCategoryList.get(machineCategoryList.size() - 1);
-        assertThat(testMachineCategory.getLabel()).isEqualTo(UPDATED_LABEL);
+        assertThat(testMachineCategory.getLabel()).isEqualTo(DEFAULT_LABEL);
     }
 
     @Test
@@ -337,7 +335,7 @@ class MachineCategoryResourceIT {
     @Transactional
     void patchNonExistingMachineCategory() throws Exception {
         int databaseSizeBeforeUpdate = machineCategoryRepository.findAll().size();
-        machineCategory.setId(count.incrementAndGet());
+        machineCategory.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restMachineCategoryMockMvc
@@ -358,12 +356,12 @@ class MachineCategoryResourceIT {
     @Transactional
     void patchWithIdMismatchMachineCategory() throws Exception {
         int databaseSizeBeforeUpdate = machineCategoryRepository.findAll().size();
-        machineCategory.setId(count.incrementAndGet());
+        machineCategory.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restMachineCategoryMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(machineCategory))
@@ -379,7 +377,7 @@ class MachineCategoryResourceIT {
     @Transactional
     void patchWithMissingIdPathParamMachineCategory() throws Exception {
         int databaseSizeBeforeUpdate = machineCategoryRepository.findAll().size();
-        machineCategory.setId(count.incrementAndGet());
+        machineCategory.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restMachineCategoryMockMvc

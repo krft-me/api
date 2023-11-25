@@ -6,10 +6,10 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.OfferCategory;
 import me.krft.api.repository.OfferCategoryRepository;
@@ -37,7 +37,7 @@ class OfferCategoryResourceIT {
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
     private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     @Autowired
     private OfferCategoryRepository offerCategoryRepository;
@@ -189,7 +189,7 @@ class OfferCategoryResourceIT {
         int databaseSizeBeforeUpdate = offerCategoryRepository.findAll().size();
 
         // Update the offerCategory
-        OfferCategory updatedOfferCategory = offerCategoryRepository.findById(offerCategory.getId()).get();
+        OfferCategory updatedOfferCategory = offerCategoryRepository.findById(offerCategory.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedOfferCategory are not directly saved in db
         em.detach(updatedOfferCategory);
         updatedOfferCategory.label(UPDATED_LABEL);
@@ -214,7 +214,7 @@ class OfferCategoryResourceIT {
     @Transactional
     void putNonExistingOfferCategory() throws Exception {
         int databaseSizeBeforeUpdate = offerCategoryRepository.findAll().size();
-        offerCategory.setId(count.incrementAndGet());
+        offerCategory.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restOfferCategoryMockMvc
@@ -235,12 +235,12 @@ class OfferCategoryResourceIT {
     @Transactional
     void putWithIdMismatchOfferCategory() throws Exception {
         int databaseSizeBeforeUpdate = offerCategoryRepository.findAll().size();
-        offerCategory.setId(count.incrementAndGet());
+        offerCategory.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOfferCategoryMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(offerCategory))
@@ -256,7 +256,7 @@ class OfferCategoryResourceIT {
     @Transactional
     void putWithMissingIdPathParamOfferCategory() throws Exception {
         int databaseSizeBeforeUpdate = offerCategoryRepository.findAll().size();
-        offerCategory.setId(count.incrementAndGet());
+        offerCategory.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOfferCategoryMockMvc
@@ -285,8 +285,6 @@ class OfferCategoryResourceIT {
         OfferCategory partialUpdatedOfferCategory = new OfferCategory();
         partialUpdatedOfferCategory.setId(offerCategory.getId());
 
-        partialUpdatedOfferCategory.label(UPDATED_LABEL);
-
         restOfferCategoryMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedOfferCategory.getId())
@@ -300,7 +298,7 @@ class OfferCategoryResourceIT {
         List<OfferCategory> offerCategoryList = offerCategoryRepository.findAll();
         assertThat(offerCategoryList).hasSize(databaseSizeBeforeUpdate);
         OfferCategory testOfferCategory = offerCategoryList.get(offerCategoryList.size() - 1);
-        assertThat(testOfferCategory.getLabel()).isEqualTo(UPDATED_LABEL);
+        assertThat(testOfferCategory.getLabel()).isEqualTo(DEFAULT_LABEL);
     }
 
     @Test
@@ -337,7 +335,7 @@ class OfferCategoryResourceIT {
     @Transactional
     void patchNonExistingOfferCategory() throws Exception {
         int databaseSizeBeforeUpdate = offerCategoryRepository.findAll().size();
-        offerCategory.setId(count.incrementAndGet());
+        offerCategory.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restOfferCategoryMockMvc
@@ -358,12 +356,12 @@ class OfferCategoryResourceIT {
     @Transactional
     void patchWithIdMismatchOfferCategory() throws Exception {
         int databaseSizeBeforeUpdate = offerCategoryRepository.findAll().size();
-        offerCategory.setId(count.incrementAndGet());
+        offerCategory.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOfferCategoryMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(offerCategory))
@@ -379,7 +377,7 @@ class OfferCategoryResourceIT {
     @Transactional
     void patchWithMissingIdPathParamOfferCategory() throws Exception {
         int databaseSizeBeforeUpdate = offerCategoryRepository.findAll().size();
-        offerCategory.setId(count.incrementAndGet());
+        offerCategory.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOfferCategoryMockMvc

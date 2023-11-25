@@ -6,12 +6,13 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.Machine;
+import me.krft.api.domain.MachineCategory;
 import me.krft.api.repository.MachineRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ class MachineResourceIT {
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
     private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     @Autowired
     private MachineRepository machineRepository;
@@ -58,6 +59,16 @@ class MachineResourceIT {
      */
     public static Machine createEntity(EntityManager em) {
         Machine machine = new Machine().name(DEFAULT_NAME);
+        // Add required entity
+        MachineCategory machineCategory;
+        if (TestUtil.findAll(em, MachineCategory.class).isEmpty()) {
+            machineCategory = MachineCategoryResourceIT.createEntity(em);
+            em.persist(machineCategory);
+            em.flush();
+        } else {
+            machineCategory = TestUtil.findAll(em, MachineCategory.class).get(0);
+        }
+        machine.setCategory(machineCategory);
         return machine;
     }
 
@@ -69,6 +80,16 @@ class MachineResourceIT {
      */
     public static Machine createUpdatedEntity(EntityManager em) {
         Machine machine = new Machine().name(UPDATED_NAME);
+        // Add required entity
+        MachineCategory machineCategory;
+        if (TestUtil.findAll(em, MachineCategory.class).isEmpty()) {
+            machineCategory = MachineCategoryResourceIT.createUpdatedEntity(em);
+            em.persist(machineCategory);
+            em.flush();
+        } else {
+            machineCategory = TestUtil.findAll(em, MachineCategory.class).get(0);
+        }
+        machine.setCategory(machineCategory);
         return machine;
     }
 
@@ -189,7 +210,7 @@ class MachineResourceIT {
         int databaseSizeBeforeUpdate = machineRepository.findAll().size();
 
         // Update the machine
-        Machine updatedMachine = machineRepository.findById(machine.getId()).get();
+        Machine updatedMachine = machineRepository.findById(machine.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedMachine are not directly saved in db
         em.detach(updatedMachine);
         updatedMachine.name(UPDATED_NAME);
@@ -214,7 +235,7 @@ class MachineResourceIT {
     @Transactional
     void putNonExistingMachine() throws Exception {
         int databaseSizeBeforeUpdate = machineRepository.findAll().size();
-        machine.setId(count.incrementAndGet());
+        machine.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restMachineMockMvc
@@ -235,12 +256,12 @@ class MachineResourceIT {
     @Transactional
     void putWithIdMismatchMachine() throws Exception {
         int databaseSizeBeforeUpdate = machineRepository.findAll().size();
-        machine.setId(count.incrementAndGet());
+        machine.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restMachineMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(machine))
@@ -256,7 +277,7 @@ class MachineResourceIT {
     @Transactional
     void putWithMissingIdPathParamMachine() throws Exception {
         int databaseSizeBeforeUpdate = machineRepository.findAll().size();
-        machine.setId(count.incrementAndGet());
+        machine.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restMachineMockMvc
@@ -332,7 +353,7 @@ class MachineResourceIT {
     @Transactional
     void patchNonExistingMachine() throws Exception {
         int databaseSizeBeforeUpdate = machineRepository.findAll().size();
-        machine.setId(count.incrementAndGet());
+        machine.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restMachineMockMvc
@@ -353,12 +374,12 @@ class MachineResourceIT {
     @Transactional
     void patchWithIdMismatchMachine() throws Exception {
         int databaseSizeBeforeUpdate = machineRepository.findAll().size();
-        machine.setId(count.incrementAndGet());
+        machine.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restMachineMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(machine))
@@ -374,7 +395,7 @@ class MachineResourceIT {
     @Transactional
     void patchWithMissingIdPathParamMachine() throws Exception {
         int databaseSizeBeforeUpdate = machineRepository.findAll().size();
-        machine.setId(count.incrementAndGet());
+        machine.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restMachineMockMvc

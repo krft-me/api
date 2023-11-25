@@ -2,11 +2,11 @@ package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -33,14 +33,15 @@ public class Machine implements Serializable {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "machine")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "machine")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "userOffers", "machine", "category" }, allowSetters = true)
     private Set<Offer> offers = new HashSet<>();
 
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @NotNull
     @JsonIgnoreProperties(value = { "machines" }, allowSetters = true)
-    private MachineCategory machineCategory;
+    private MachineCategory category;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -101,16 +102,16 @@ public class Machine implements Serializable {
         return this;
     }
 
-    public MachineCategory getMachineCategory() {
-        return this.machineCategory;
+    public MachineCategory getCategory() {
+        return this.category;
     }
 
-    public void setMachineCategory(MachineCategory machineCategory) {
-        this.machineCategory = machineCategory;
+    public void setCategory(MachineCategory machineCategory) {
+        this.category = machineCategory;
     }
 
-    public Machine machineCategory(MachineCategory machineCategory) {
-        this.setMachineCategory(machineCategory);
+    public Machine category(MachineCategory machineCategory) {
+        this.setCategory(machineCategory);
         return this;
     }
 
@@ -124,7 +125,7 @@ public class Machine implements Serializable {
         if (!(o instanceof Machine)) {
             return false;
         }
-        return id != null && id.equals(((Machine) o).id);
+        return getId() != null && getId().equals(((Machine) o).getId());
     }
 
     @Override

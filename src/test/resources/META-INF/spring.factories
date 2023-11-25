@@ -1,1 +1,2 @@
-org.springframework.test.context.ContextCustomizerFactory = me.krft.api.config.TestContainersSpringContextCustomizerFactory
+org.springframework.test.context.ContextCustomizerFactory = me.krft.api.config.\
+    SqlTestContainersSpringContextCustomizerFactory

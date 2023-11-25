@@ -5,7 +5,7 @@ import java.util.Optional;
 import me.krft.api.domain.Order;
 
 /**
- * Service Interface for managing {@link Order}.
+ * Service Interface for managing {@link me.krft.api.domain.Order}.
  */
 public interface OrderService {
     /**

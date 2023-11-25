@@ -5,7 +5,7 @@ import java.util.Optional;
 import me.krft.api.domain.Showcase;
 
 /**
- * Service Interface for managing {@link Showcase}.
+ * Service Interface for managing {@link me.krft.api.domain.Showcase}.
  */
 public interface ShowcaseService {
     /**

@@ -1,32 +1,33 @@
 {
   "applications": "*",
-  "changelogDate": "20231125124418",
+  "changelogDate": "20231125132601",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "User entity extending the inter {@code User} entity\\nProvides additional information about the user",
   "dto": "no",
   "embedded": false,
   "entityTableName": "application_user",
   "fields": [
     {
+      "documentation": "The user's first name",
       "fieldName": "firstName",
       "fieldType": "String",
       "fieldValidateRules": ["required", "minlength"],
-      "fieldValidateRulesMinlength": "1",
-      "javadoc": "The user's first name"
+      "fieldValidateRulesMinlength": "1"
     },
     {
+      "documentation": "The user's last name name",
       "fieldName": "lastName",
       "fieldType": "String",
       "fieldValidateRules": ["required", "minlength"],
-      "fieldValidateRulesMinlength": "1",
-      "javadoc": "The user's last name name"
+      "fieldValidateRulesMinlength": "1"
     },
     {
+      "documentation": "The user's username",
       "fieldName": "username",
       "fieldType": "String",
       "fieldValidateRules": ["required", "minlength"],
-      "fieldValidateRulesMinlength": "1",
-      "javadoc": "The user's username"
+      "fieldValidateRulesMinlength": "1"
     }
   ],
   "fluentMethods": true,
@@ -41,32 +42,38 @@
       "otherEntityName": "user",
       "ownerSide": true,
       "relationshipName": "internalUser",
+      "relationshipSide": "left",
       "relationshipType": "one-to-one"
     },
     {
       "otherEntityName": "applicationUserOffer",
-      "otherEntityRelationshipName": "applicationUser",
+      "otherEntityRelationshipName": "provider",
       "relationshipName": "offers",
+      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
       "otherEntityName": "applicationUserBadge",
       "otherEntityRelationshipName": "user",
       "relationshipName": "badges",
+      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
       "otherEntityName": "order",
       "otherEntityRelationshipName": "customer",
       "relationshipName": "orders",
+      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
       "otherEntityName": "city",
-      "otherEntityRelationshipName": "applicationUser",
+      "otherEntityRelationshipName": "users",
       "relationshipName": "city",
+      "relationshipSide": "right",
       "relationshipType": "many-to-one"
     }
   ],
+  "searchEngine": "no",
   "service": "serviceImpl"
 }

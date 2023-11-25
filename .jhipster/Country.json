@@ -1,23 +1,24 @@
 {
   "applications": "*",
-  "changelogDate": "20231125124417",
+  "changelogDate": "20231125132600",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "Country entity",
   "dto": "no",
   "embedded": false,
   "entityTableName": "country",
   "fields": [
     {
+      "documentation": "The country's name in english",
       "fieldName": "name",
-      "fieldType": "String",
-      "javadoc": "The country's name in english"
+      "fieldType": "String"
     },
     {
+      "documentation": "ISO 3166-1 alpha-2\\n@see https:",
       "fieldName": "isoCode",
       "fieldType": "String",
       "fieldValidateRules": ["required", "unique", "maxlength"],
-      "fieldValidateRulesMaxlength": "3",
-      "javadoc": "ISO 3166-1 alpha-2\\n@see https:"
+      "fieldValidateRulesMaxlength": "3"
     }
   ],
   "fluentMethods": true,
@@ -32,8 +33,10 @@
       "otherEntityName": "region",
       "otherEntityRelationshipName": "country",
       "relationshipName": "regions",
+      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     }
   ],
+  "searchEngine": "no",
   "service": "serviceImpl"
 }

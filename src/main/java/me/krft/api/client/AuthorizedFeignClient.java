@@ -2,7 +2,6 @@ package me.krft.api.client;
 
 import java.lang.annotation.*;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.cloud.openfeign.FeignClientsConfiguration;
 import org.springframework.core.annotation.AliasFor;
 
 @Retention(RetentionPolicy.RUNTIME)
@@ -21,7 +20,7 @@ public @interface AuthorizedFeignClient {
      * {@link feign.codec.Encoder}, {@link feign.Contract}.
      *
      * @return the custom {@code @Configuration} for the feign client.
-     * @see FeignClientsConfiguration for the defaults.
+     * @see org.springframework.cloud.openfeign.FeignClientsConfiguration for the defaults.
      */
     @AliasFor(annotation = FeignClient.class, attribute = "configuration")
     Class<?>[] configuration() default OAuth2InterceptedFeignConfiguration.class;

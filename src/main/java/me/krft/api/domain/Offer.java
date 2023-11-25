@@ -2,11 +2,11 @@ package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -33,16 +33,17 @@ public class Offer implements Serializable {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "offer")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "offer")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "applicationUser", "offer" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "reviews", "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
     private Set<ApplicationUserOffer> userOffers = new HashSet<>();
 
-    @ManyToOne
-    @JsonIgnoreProperties(value = { "offers", "machineCategory" }, allowSetters = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "offers", "category" }, allowSetters = true)
     private Machine machine;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @NotNull
     @JsonIgnoreProperties(value = { "offers" }, allowSetters = true)
     private OfferCategory category;
 
@@ -141,7 +142,7 @@ public class Offer implements Serializable {
         if (!(o instanceof Offer)) {
             return false;
         }
-        return id != null && id.equals(((Offer) o).id);
+        return getId() != null && getId().equals(((Offer) o).getId());
     }
 
     @Override

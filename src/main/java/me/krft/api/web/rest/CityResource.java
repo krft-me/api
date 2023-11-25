@@ -1,12 +1,12 @@
 package me.krft.api.web.rest;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import me.krft.api.domain.City;
 import me.krft.api.repository.CityRepository;
 import me.krft.api.service.CityService;
@@ -23,7 +23,7 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link me.krft.api.domain.City}.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/cities")
 public class CityResource {
 
     private final Logger log = LoggerFactory.getLogger(CityResource.class);
@@ -49,7 +49,7 @@ public class CityResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new city, or with status {@code 400 (Bad Request)} if the city has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/cities")
+    @PostMapping("")
     public ResponseEntity<City> createCity(@Valid @RequestBody City city) throws URISyntaxException {
         log.debug("REST request to save City : {}", city);
         if (city.getId() != null) {
@@ -72,7 +72,7 @@ public class CityResource {
      * or with status {@code 500 (Internal Server Error)} if the city couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/cities/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<City> updateCity(@PathVariable(value = "id", required = false) final Long id, @Valid @RequestBody City city)
         throws URISyntaxException {
         log.debug("REST request to update City : {}, {}", id, city);
@@ -105,7 +105,7 @@ public class CityResource {
      * or with status {@code 500 (Internal Server Error)} if the city couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/cities/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<City> partialUpdateCity(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody City city
@@ -135,7 +135,7 @@ public class CityResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of cities in body.
      */
-    @GetMapping("/cities")
+    @GetMapping("")
     public List<City> getAllCities() {
         log.debug("REST request to get all Cities");
         return cityService.findAll();
@@ -147,7 +147,7 @@ public class CityResource {
      * @param id the id of the city to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the city, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/cities/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<City> getCity(@PathVariable Long id) {
         log.debug("REST request to get City : {}", id);
         Optional<City> city = cityService.findOne(id);
@@ -160,7 +160,7 @@ public class CityResource {
      * @param id the id of the city to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/cities/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCity(@PathVariable Long id) {
         log.debug("REST request to delete City : {}", id);
         cityService.delete(id);

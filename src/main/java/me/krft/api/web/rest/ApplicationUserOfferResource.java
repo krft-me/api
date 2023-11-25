@@ -1,12 +1,12 @@
 package me.krft.api.web.rest;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.repository.ApplicationUserOfferRepository;
 import me.krft.api.service.ApplicationUserOfferService;
@@ -23,7 +23,7 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link me.krft.api.domain.ApplicationUserOffer}.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/application-user-offers")
 public class ApplicationUserOfferResource {
 
     private final Logger log = LoggerFactory.getLogger(ApplicationUserOfferResource.class);
@@ -52,7 +52,7 @@ public class ApplicationUserOfferResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new applicationUserOffer, or with status {@code 400 (Bad Request)} if the applicationUserOffer has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/application-user-offers")
+    @PostMapping("")
     public ResponseEntity<ApplicationUserOffer> createApplicationUserOffer(@Valid @RequestBody ApplicationUserOffer applicationUserOffer)
         throws URISyntaxException {
         log.debug("REST request to save ApplicationUserOffer : {}", applicationUserOffer);
@@ -76,7 +76,7 @@ public class ApplicationUserOfferResource {
      * or with status {@code 500 (Internal Server Error)} if the applicationUserOffer couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/application-user-offers/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<ApplicationUserOffer> updateApplicationUserOffer(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody ApplicationUserOffer applicationUserOffer
@@ -111,7 +111,7 @@ public class ApplicationUserOfferResource {
      * or with status {@code 500 (Internal Server Error)} if the applicationUserOffer couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/application-user-offers/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<ApplicationUserOffer> partialUpdateApplicationUserOffer(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody ApplicationUserOffer applicationUserOffer
@@ -139,10 +139,13 @@ public class ApplicationUserOfferResource {
     /**
      * {@code GET  /application-user-offers} : get all the applicationUserOffers.
      *
+     * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of applicationUserOffers in body.
      */
-    @GetMapping("/application-user-offers")
-    public List<ApplicationUserOffer> getAllApplicationUserOffers() {
+    @GetMapping("")
+    public List<ApplicationUserOffer> getAllApplicationUserOffers(
+        @RequestParam(required = false, defaultValue = "true") boolean eagerload
+    ) {
         log.debug("REST request to get all ApplicationUserOffers");
         return applicationUserOfferService.findAll();
     }
@@ -153,7 +156,7 @@ public class ApplicationUserOfferResource {
      * @param id the id of the applicationUserOffer to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the applicationUserOffer, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/application-user-offers/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ApplicationUserOffer> getApplicationUserOffer(@PathVariable Long id) {
         log.debug("REST request to get ApplicationUserOffer : {}", id);
         Optional<ApplicationUserOffer> applicationUserOffer = applicationUserOfferService.findOne(id);
@@ -166,7 +169,7 @@ public class ApplicationUserOfferResource {
      * @param id the id of the applicationUserOffer to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/application-user-offers/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteApplicationUserOffer(@PathVariable Long id) {
         log.debug("REST request to delete ApplicationUserOffer : {}", id);
         applicationUserOfferService.delete(id);

@@ -1,12 +1,12 @@
 package me.krft.api.web.rest;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import me.krft.api.domain.Review;
 import me.krft.api.repository.ReviewRepository;
 import me.krft.api.service.ReviewService;
@@ -23,7 +23,7 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link me.krft.api.domain.Review}.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/reviews")
 public class ReviewResource {
 
     private final Logger log = LoggerFactory.getLogger(ReviewResource.class);
@@ -49,7 +49,7 @@ public class ReviewResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new review, or with status {@code 400 (Bad Request)} if the review has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/reviews")
+    @PostMapping("")
     public ResponseEntity<Review> createReview(@Valid @RequestBody Review review) throws URISyntaxException {
         log.debug("REST request to save Review : {}", review);
         if (review.getId() != null) {
@@ -72,7 +72,7 @@ public class ReviewResource {
      * or with status {@code 500 (Internal Server Error)} if the review couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/reviews/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Review> updateReview(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody Review review
@@ -107,7 +107,7 @@ public class ReviewResource {
      * or with status {@code 500 (Internal Server Error)} if the review couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/reviews/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<Review> partialUpdateReview(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody Review review
@@ -137,7 +137,7 @@ public class ReviewResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of reviews in body.
      */
-    @GetMapping("/reviews")
+    @GetMapping("")
     public List<Review> getAllReviews() {
         log.debug("REST request to get all Reviews");
         return reviewService.findAll();
@@ -149,7 +149,7 @@ public class ReviewResource {
      * @param id the id of the review to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the review, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/reviews/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Review> getReview(@PathVariable Long id) {
         log.debug("REST request to get Review : {}", id);
         Optional<Review> review = reviewService.findOne(id);
@@ -162,7 +162,7 @@ public class ReviewResource {
      * @param id the id of the review to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/reviews/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReview(@PathVariable Long id) {
         log.debug("REST request to delete Review : {}", id);
         reviewService.delete(id);

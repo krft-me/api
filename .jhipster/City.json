@@ -1,24 +1,25 @@
 {
   "applications": "*",
-  "changelogDate": "20231125124415",
+  "changelogDate": "20231125132558",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "City entity",
   "dto": "no",
   "embedded": false,
   "entityTableName": "city",
   "fields": [
     {
+      "documentation": "The city's name",
       "fieldName": "name",
       "fieldType": "String",
       "fieldValidateRules": ["required", "minlength"],
-      "fieldValidateRulesMinlength": "1",
-      "javadoc": "The city's name"
+      "fieldValidateRulesMinlength": "1"
     },
     {
+      "documentation": "The city's zipcode",
       "fieldName": "zipCode",
       "fieldType": "String",
-      "fieldValidateRules": ["required"],
-      "javadoc": "The city's zipcode"
+      "fieldValidateRules": ["required"]
     }
   ],
   "fluentMethods": true,
@@ -32,16 +33,19 @@
     {
       "otherEntityName": "applicationUser",
       "otherEntityRelationshipName": "city",
-      "relationshipName": "applicationUser",
+      "relationshipName": "users",
+      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
       "otherEntityName": "region",
       "otherEntityRelationshipName": "cities",
       "relationshipName": "region",
+      "relationshipSide": "right",
       "relationshipType": "many-to-one",
       "relationshipValidateRules": "required"
     }
   ],
+  "searchEngine": "no",
   "service": "serviceImpl"
 }

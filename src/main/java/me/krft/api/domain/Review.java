@@ -2,14 +2,15 @@ package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * Review entity\nRepresents a user's opinion of a service they have purchased
+ * Review entity
+ * Represents a user's opinion of a service they have purchased
  */
 @Schema(description = "Review entity\nRepresents a user's opinion of a service they have purchased")
 @Entity
@@ -43,9 +44,10 @@ public class Review implements Serializable {
     @Column(name = "comment")
     private String comment;
 
-    @ManyToOne
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "applicationUser", "offer" }, allowSetters = true)
-    private ApplicationUserOffer applicationUserOffer;
+    @ManyToOne(optional = false)
+    @NotNull
+    @JsonIgnoreProperties(value = { "reviews", "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
+    private ApplicationUserOffer offer;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -88,16 +90,16 @@ public class Review implements Serializable {
         this.comment = comment;
     }
 
-    public ApplicationUserOffer getApplicationUserOffer() {
-        return this.applicationUserOffer;
+    public ApplicationUserOffer getOffer() {
+        return this.offer;
     }
 
-    public void setApplicationUserOffer(ApplicationUserOffer applicationUserOffer) {
-        this.applicationUserOffer = applicationUserOffer;
+    public void setOffer(ApplicationUserOffer applicationUserOffer) {
+        this.offer = applicationUserOffer;
     }
 
-    public Review applicationUserOffer(ApplicationUserOffer applicationUserOffer) {
-        this.setApplicationUserOffer(applicationUserOffer);
+    public Review offer(ApplicationUserOffer applicationUserOffer) {
+        this.setOffer(applicationUserOffer);
         return this;
     }
 
@@ -111,7 +113,7 @@ public class Review implements Serializable {
         if (!(o instanceof Review)) {
             return false;
         }
-        return id != null && id.equals(((Review) o).id);
+        return getId() != null && getId().equals(((Review) o).getId());
     }
 
     @Override

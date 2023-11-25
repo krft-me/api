@@ -5,7 +5,7 @@ import java.util.Optional;
 import me.krft.api.domain.ApplicationUserBadge;
 
 /**
- * Service Interface for managing {@link ApplicationUserBadge}.
+ * Service Interface for managing {@link me.krft.api.domain.ApplicationUserBadge}.
  */
 public interface ApplicationUserBadgeService {
     /**

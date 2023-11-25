@@ -2,16 +2,17 @@ package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * MachineCategory entity\nRepresents a preset machine type
+ * MachineCategory entity
+ * Represents a preset machine type
  */
 @Schema(description = "MachineCategory entity\nRepresents a preset machine type")
 @Entity
@@ -33,9 +34,9 @@ public class MachineCategory implements Serializable {
     @Column(name = "label", nullable = false, unique = true)
     private String label;
 
-    @OneToMany(mappedBy = "machineCategory")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "offers", "machineCategory" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "offers", "category" }, allowSetters = true)
     private Set<Machine> machines = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -72,10 +73,10 @@ public class MachineCategory implements Serializable {
 
     public void setMachines(Set<Machine> machines) {
         if (this.machines != null) {
-            this.machines.forEach(i -> i.setMachineCategory(null));
+            this.machines.forEach(i -> i.setCategory(null));
         }
         if (machines != null) {
-            machines.forEach(i -> i.setMachineCategory(this));
+            machines.forEach(i -> i.setCategory(this));
         }
         this.machines = machines;
     }
@@ -87,13 +88,13 @@ public class MachineCategory implements Serializable {
 
     public MachineCategory addMachines(Machine machine) {
         this.machines.add(machine);
-        machine.setMachineCategory(this);
+        machine.setCategory(this);
         return this;
     }
 
     public MachineCategory removeMachines(Machine machine) {
         this.machines.remove(machine);
-        machine.setMachineCategory(null);
+        machine.setCategory(null);
         return this;
     }
 
@@ -107,7 +108,7 @@ public class MachineCategory implements Serializable {
         if (!(o instanceof MachineCategory)) {
             return false;
         }
-        return id != null && id.equals(((MachineCategory) o).id);
+        return getId() != null && getId().equals(((MachineCategory) o).getId());
     }
 
     @Override

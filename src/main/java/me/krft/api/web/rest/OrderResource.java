@@ -1,12 +1,12 @@
 package me.krft.api.web.rest;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import me.krft.api.domain.Order;
 import me.krft.api.repository.OrderRepository;
 import me.krft.api.service.OrderService;
@@ -23,7 +23,7 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link me.krft.api.domain.Order}.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/orders")
 public class OrderResource {
 
     private final Logger log = LoggerFactory.getLogger(OrderResource.class);
@@ -49,7 +49,7 @@ public class OrderResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new order, or with status {@code 400 (Bad Request)} if the order has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/orders")
+    @PostMapping("")
     public ResponseEntity<Order> createOrder(@Valid @RequestBody Order order) throws URISyntaxException {
         log.debug("REST request to save Order : {}", order);
         if (order.getId() != null) {
@@ -72,7 +72,7 @@ public class OrderResource {
      * or with status {@code 500 (Internal Server Error)} if the order couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/orders/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Order> updateOrder(@PathVariable(value = "id", required = false) final Long id, @Valid @RequestBody Order order)
         throws URISyntaxException {
         log.debug("REST request to update Order : {}, {}", id, order);
@@ -105,7 +105,7 @@ public class OrderResource {
      * or with status {@code 500 (Internal Server Error)} if the order couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/orders/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<Order> partialUpdateOrder(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody Order order
@@ -135,7 +135,7 @@ public class OrderResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of orders in body.
      */
-    @GetMapping("/orders")
+    @GetMapping("")
     public List<Order> getAllOrders() {
         log.debug("REST request to get all Orders");
         return orderService.findAll();
@@ -147,7 +147,7 @@ public class OrderResource {
      * @param id the id of the order to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the order, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/orders/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Order> getOrder(@PathVariable Long id) {
         log.debug("REST request to get Order : {}", id);
         Optional<Order> order = orderService.findOne(id);
@@ -160,7 +160,7 @@ public class OrderResource {
      * @param id the id of the order to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/orders/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
         log.debug("REST request to delete Order : {}", id);
         orderService.delete(id);

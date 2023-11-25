@@ -1,8 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231125124419",
+  "changelogDate": "20231125132602",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "Machine entity",
   "dto": "no",
   "embedded": false,
   "entityTableName": "machine",
@@ -26,14 +27,18 @@
       "otherEntityName": "offer",
       "otherEntityRelationshipName": "machine",
       "relationshipName": "offers",
+      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
       "otherEntityName": "machineCategory",
       "otherEntityRelationshipName": "machines",
-      "relationshipName": "machineCategory",
-      "relationshipType": "many-to-one"
+      "relationshipName": "category",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
     }
   ],
+  "searchEngine": "no",
   "service": "serviceImpl"
 }

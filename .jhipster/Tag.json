@@ -1,8 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231125124426",
+  "changelogDate": "20231125132609",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "Tag entity\\nRepresents a preset keyword for an offer",
   "dto": "no",
   "embedded": false,
   "entityTableName": "tag",
@@ -25,9 +26,12 @@
     {
       "otherEntityName": "applicationUserOffer",
       "otherEntityRelationshipName": "tags",
-      "relationshipName": "applicationUserOffer",
-      "relationshipType": "many-to-one"
+      "ownerSide": false,
+      "relationshipName": "offers",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-many"
     }
   ],
+  "searchEngine": "no",
   "service": "serviceImpl"
 }

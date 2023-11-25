@@ -2,11 +2,11 @@ package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -37,9 +37,9 @@ public class Region implements Serializable {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "region")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "region")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "applicationUsers", "region" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "users", "region" }, allowSetters = true)
     private Set<City> cities = new HashSet<>();
 
     @ManyToOne(optional = false)
@@ -129,7 +129,7 @@ public class Region implements Serializable {
         if (!(o instanceof Region)) {
             return false;
         }
-        return id != null && id.equals(((Region) o).id);
+        return getId() != null && getId().equals(((Region) o).getId());
     }
 
     @Override

@@ -2,11 +2,11 @@ package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -45,10 +45,10 @@ public class City implements Serializable {
     @Column(name = "zip_code", nullable = false)
     private String zipCode;
 
-    @OneToMany(mappedBy = "city")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "city")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "internalUser", "offers", "badges", "orders", "city" }, allowSetters = true)
-    private Set<ApplicationUser> applicationUsers = new HashSet<>();
+    private Set<ApplicationUser> users = new HashSet<>();
 
     @ManyToOne(optional = false)
     @NotNull
@@ -96,33 +96,33 @@ public class City implements Serializable {
         this.zipCode = zipCode;
     }
 
-    public Set<ApplicationUser> getApplicationUsers() {
-        return this.applicationUsers;
+    public Set<ApplicationUser> getUsers() {
+        return this.users;
     }
 
-    public void setApplicationUsers(Set<ApplicationUser> applicationUsers) {
-        if (this.applicationUsers != null) {
-            this.applicationUsers.forEach(i -> i.setCity(null));
+    public void setUsers(Set<ApplicationUser> applicationUsers) {
+        if (this.users != null) {
+            this.users.forEach(i -> i.setCity(null));
         }
         if (applicationUsers != null) {
             applicationUsers.forEach(i -> i.setCity(this));
         }
-        this.applicationUsers = applicationUsers;
+        this.users = applicationUsers;
     }
 
-    public City applicationUsers(Set<ApplicationUser> applicationUsers) {
-        this.setApplicationUsers(applicationUsers);
+    public City users(Set<ApplicationUser> applicationUsers) {
+        this.setUsers(applicationUsers);
         return this;
     }
 
-    public City addApplicationUser(ApplicationUser applicationUser) {
-        this.applicationUsers.add(applicationUser);
+    public City addUsers(ApplicationUser applicationUser) {
+        this.users.add(applicationUser);
         applicationUser.setCity(this);
         return this;
     }
 
-    public City removeApplicationUser(ApplicationUser applicationUser) {
-        this.applicationUsers.remove(applicationUser);
+    public City removeUsers(ApplicationUser applicationUser) {
+        this.users.remove(applicationUser);
         applicationUser.setCity(null);
         return this;
     }
@@ -150,7 +150,7 @@ public class City implements Serializable {
         if (!(o instanceof City)) {
             return false;
         }
-        return id != null && id.equals(((City) o).id);
+        return getId() != null && getId().equals(((City) o).getId());
     }
 
     @Override

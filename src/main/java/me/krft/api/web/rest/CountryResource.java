@@ -1,12 +1,12 @@
 package me.krft.api.web.rest;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import me.krft.api.domain.Country;
 import me.krft.api.repository.CountryRepository;
 import me.krft.api.service.CountryService;
@@ -23,7 +23,7 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link me.krft.api.domain.Country}.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/countries")
 public class CountryResource {
 
     private final Logger log = LoggerFactory.getLogger(CountryResource.class);
@@ -49,7 +49,7 @@ public class CountryResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new country, or with status {@code 400 (Bad Request)} if the country has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/countries")
+    @PostMapping("")
     public ResponseEntity<Country> createCountry(@Valid @RequestBody Country country) throws URISyntaxException {
         log.debug("REST request to save Country : {}", country);
         if (country.getId() != null) {
@@ -72,7 +72,7 @@ public class CountryResource {
      * or with status {@code 500 (Internal Server Error)} if the country couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/countries/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Country> updateCountry(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody Country country
@@ -107,7 +107,7 @@ public class CountryResource {
      * or with status {@code 500 (Internal Server Error)} if the country couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/countries/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<Country> partialUpdateCountry(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody Country country
@@ -137,7 +137,7 @@ public class CountryResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of countries in body.
      */
-    @GetMapping("/countries")
+    @GetMapping("")
     public List<Country> getAllCountries() {
         log.debug("REST request to get all Countries");
         return countryService.findAll();
@@ -149,7 +149,7 @@ public class CountryResource {
      * @param id the id of the country to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the country, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/countries/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Country> getCountry(@PathVariable Long id) {
         log.debug("REST request to get Country : {}", id);
         Optional<Country> country = countryService.findOne(id);
@@ -162,7 +162,7 @@ public class CountryResource {
      * @param id the id of the country to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/countries/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCountry(@PathVariable Long id) {
         log.debug("REST request to delete Country : {}", id);
         countryService.delete(id);

@@ -1,12 +1,12 @@
 package me.krft.api.web.rest;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import me.krft.api.domain.Offer;
 import me.krft.api.repository.OfferRepository;
 import me.krft.api.service.OfferService;
@@ -23,7 +23,7 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link me.krft.api.domain.Offer}.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/offers")
 public class OfferResource {
 
     private final Logger log = LoggerFactory.getLogger(OfferResource.class);
@@ -49,7 +49,7 @@ public class OfferResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new offer, or with status {@code 400 (Bad Request)} if the offer has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/offers")
+    @PostMapping("")
     public ResponseEntity<Offer> createOffer(@Valid @RequestBody Offer offer) throws URISyntaxException {
         log.debug("REST request to save Offer : {}", offer);
         if (offer.getId() != null) {
@@ -72,7 +72,7 @@ public class OfferResource {
      * or with status {@code 500 (Internal Server Error)} if the offer couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/offers/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Offer> updateOffer(@PathVariable(value = "id", required = false) final Long id, @Valid @RequestBody Offer offer)
         throws URISyntaxException {
         log.debug("REST request to update Offer : {}, {}", id, offer);
@@ -105,7 +105,7 @@ public class OfferResource {
      * or with status {@code 500 (Internal Server Error)} if the offer couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/offers/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<Offer> partialUpdateOffer(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody Offer offer
@@ -135,7 +135,7 @@ public class OfferResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of offers in body.
      */
-    @GetMapping("/offers")
+    @GetMapping("")
     public List<Offer> getAllOffers() {
         log.debug("REST request to get all Offers");
         return offerService.findAll();
@@ -147,7 +147,7 @@ public class OfferResource {
      * @param id the id of the offer to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the offer, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/offers/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Offer> getOffer(@PathVariable Long id) {
         log.debug("REST request to get Offer : {}", id);
         Optional<Offer> offer = offerService.findOne(id);
@@ -160,7 +160,7 @@ public class OfferResource {
      * @param id the id of the offer to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/offers/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOffer(@PathVariable Long id) {
         log.debug("REST request to delete Offer : {}", id);
         offerService.delete(id);

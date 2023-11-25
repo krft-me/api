@@ -2,16 +2,17 @@ package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * User entity extending the inter {@code User} entity\nProvides additional information about the user
+ * User entity extending the inter {@code User} entity
+ * Provides additional information about the user
  */
 @Schema(description = "User entity extending the inter {@code User} entity\nProvides additional information about the user")
 @Entity
@@ -55,27 +56,27 @@ public class ApplicationUser implements Serializable {
     @Column(name = "username", nullable = false)
     private String username;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(unique = true)
     private User internalUser;
 
-    @OneToMany(mappedBy = "applicationUser")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "provider")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "applicationUser", "offer" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "reviews", "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
     private Set<ApplicationUserOffer> offers = new HashSet<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "user", "badge" }, allowSetters = true)
     private Set<ApplicationUserBadge> badges = new HashSet<>();
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "offer", "customer" }, allowSetters = true)
     private Set<Order> orders = new HashSet<>();
 
-    @ManyToOne
-    @JsonIgnoreProperties(value = { "applicationUsers", "region" }, allowSetters = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "users", "region" }, allowSetters = true)
     private City city;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -151,10 +152,10 @@ public class ApplicationUser implements Serializable {
 
     public void setOffers(Set<ApplicationUserOffer> applicationUserOffers) {
         if (this.offers != null) {
-            this.offers.forEach(i -> i.setApplicationUser(null));
+            this.offers.forEach(i -> i.setProvider(null));
         }
         if (applicationUserOffers != null) {
-            applicationUserOffers.forEach(i -> i.setApplicationUser(this));
+            applicationUserOffers.forEach(i -> i.setProvider(this));
         }
         this.offers = applicationUserOffers;
     }
@@ -166,13 +167,13 @@ public class ApplicationUser implements Serializable {
 
     public ApplicationUser addOffers(ApplicationUserOffer applicationUserOffer) {
         this.offers.add(applicationUserOffer);
-        applicationUserOffer.setApplicationUser(this);
+        applicationUserOffer.setProvider(this);
         return this;
     }
 
     public ApplicationUser removeOffers(ApplicationUserOffer applicationUserOffer) {
         this.offers.remove(applicationUserOffer);
-        applicationUserOffer.setApplicationUser(null);
+        applicationUserOffer.setProvider(null);
         return this;
     }
 
@@ -261,7 +262,7 @@ public class ApplicationUser implements Serializable {
         if (!(o instanceof ApplicationUser)) {
             return false;
         }
-        return id != null && id.equals(((ApplicationUser) o).id);
+        return getId() != null && getId().equals(((ApplicationUser) o).getId());
     }
 
     @Override

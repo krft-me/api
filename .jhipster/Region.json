@@ -1,18 +1,19 @@
 {
   "applications": "*",
-  "changelogDate": "20231125124416",
+  "changelogDate": "20231125132559",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "Region entity",
   "dto": "no",
   "embedded": false,
   "entityTableName": "region",
   "fields": [
     {
+      "documentation": "The region's name",
       "fieldName": "name",
       "fieldType": "String",
       "fieldValidateRules": ["required", "minlength"],
-      "fieldValidateRulesMinlength": "1",
-      "javadoc": "The region's name"
+      "fieldValidateRulesMinlength": "1"
     }
   ],
   "fluentMethods": true,
@@ -27,15 +28,18 @@
       "otherEntityName": "city",
       "otherEntityRelationshipName": "region",
       "relationshipName": "cities",
+      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
       "otherEntityName": "country",
       "otherEntityRelationshipName": "regions",
       "relationshipName": "country",
+      "relationshipSide": "right",
       "relationshipType": "many-to-one",
       "relationshipValidateRules": "required"
     }
   ],
+  "searchEngine": "no",
   "service": "serviceImpl"
 }

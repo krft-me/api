@@ -1,8 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231125124423",
+  "changelogDate": "20231125132606",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "Badge entity\\nRepresents a certification (example: 100 completed orders)",
   "dto": "no",
   "embedded": false,
   "entityTableName": "badge",
@@ -14,10 +15,10 @@
       "fieldValidateRulesMinlength": "1"
     },
     {
+      "documentation": "The badge's icon, should be a blob later",
       "fieldName": "picture",
       "fieldType": "String",
-      "fieldValidateRules": ["required", "unique"],
-      "javadoc": "The badge's icon, should be a blob later"
+      "fieldValidateRules": ["required", "unique"]
     }
   ],
   "fluentMethods": true,
@@ -31,9 +32,11 @@
     {
       "otherEntityName": "applicationUserBadge",
       "otherEntityRelationshipName": "badge",
-      "relationshipName": "applicationUserBadge",
+      "relationshipName": "users",
+      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     }
   ],
+  "searchEngine": "no",
   "service": "serviceImpl"
 }

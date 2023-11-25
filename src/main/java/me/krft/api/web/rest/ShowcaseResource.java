@@ -1,12 +1,12 @@
 package me.krft.api.web.rest;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import me.krft.api.domain.Showcase;
 import me.krft.api.repository.ShowcaseRepository;
 import me.krft.api.service.ShowcaseService;
@@ -23,7 +23,7 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link me.krft.api.domain.Showcase}.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/showcases")
 public class ShowcaseResource {
 
     private final Logger log = LoggerFactory.getLogger(ShowcaseResource.class);
@@ -49,7 +49,7 @@ public class ShowcaseResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new showcase, or with status {@code 400 (Bad Request)} if the showcase has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/showcases")
+    @PostMapping("")
     public ResponseEntity<Showcase> createShowcase(@Valid @RequestBody Showcase showcase) throws URISyntaxException {
         log.debug("REST request to save Showcase : {}", showcase);
         if (showcase.getId() != null) {
@@ -72,7 +72,7 @@ public class ShowcaseResource {
      * or with status {@code 500 (Internal Server Error)} if the showcase couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/showcases/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Showcase> updateShowcase(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody Showcase showcase
@@ -107,7 +107,7 @@ public class ShowcaseResource {
      * or with status {@code 500 (Internal Server Error)} if the showcase couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/showcases/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<Showcase> partialUpdateShowcase(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody Showcase showcase
@@ -137,7 +137,7 @@ public class ShowcaseResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of showcases in body.
      */
-    @GetMapping("/showcases")
+    @GetMapping("")
     public List<Showcase> getAllShowcases() {
         log.debug("REST request to get all Showcases");
         return showcaseService.findAll();
@@ -149,7 +149,7 @@ public class ShowcaseResource {
      * @param id the id of the showcase to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the showcase, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/showcases/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Showcase> getShowcase(@PathVariable Long id) {
         log.debug("REST request to get Showcase : {}", id);
         Optional<Showcase> showcase = showcaseService.findOne(id);
@@ -162,7 +162,7 @@ public class ShowcaseResource {
      * @param id the id of the showcase to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/showcases/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteShowcase(@PathVariable Long id) {
         log.debug("REST request to delete Showcase : {}", id);
         showcaseService.delete(id);

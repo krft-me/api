@@ -1,8 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231125124420",
+  "changelogDate": "20231125132603",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "Offer entity representing a service stereotype",
   "dto": "no",
   "embedded": false,
   "entityTableName": "offer",
@@ -26,20 +27,25 @@
       "otherEntityName": "applicationUserOffer",
       "otherEntityRelationshipName": "offer",
       "relationshipName": "userOffers",
+      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
       "otherEntityName": "machine",
       "otherEntityRelationshipName": "offers",
       "relationshipName": "machine",
+      "relationshipSide": "right",
       "relationshipType": "many-to-one"
     },
     {
       "otherEntityName": "offerCategory",
-      "otherEntityRelationshipName": "offer",
+      "otherEntityRelationshipName": "offers",
       "relationshipName": "category",
-      "relationshipType": "many-to-one"
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
     }
   ],
+  "searchEngine": "no",
   "service": "serviceImpl"
 }

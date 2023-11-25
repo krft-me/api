@@ -1,8 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231125124422",
+  "changelogDate": "20231125132605",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "Showcase image\\nRepresents an image of a service to illustrate it",
   "dto": "no",
   "embedded": false,
   "entityTableName": "showcase",
@@ -24,9 +25,12 @@
     {
       "otherEntityName": "applicationUserOffer",
       "otherEntityRelationshipName": "showcases",
-      "relationshipName": "applicationUserOffer",
-      "relationshipType": "many-to-one"
+      "relationshipName": "offer",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
     }
   ],
+  "searchEngine": "no",
   "service": "serviceImpl"
 }

@@ -2,16 +2,17 @@ package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * OfferCategory entity\nRepresents a preset offer type
+ * OfferCategory entity
+ * Represents a preset offer type
  */
 @Schema(description = "OfferCategory entity\nRepresents a preset offer type")
 @Entity
@@ -33,7 +34,7 @@ public class OfferCategory implements Serializable {
     @Column(name = "label", nullable = false, unique = true)
     private String label;
 
-    @OneToMany(mappedBy = "category")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "userOffers", "machine", "category" }, allowSetters = true)
     private Set<Offer> offers = new HashSet<>();
@@ -85,13 +86,13 @@ public class OfferCategory implements Serializable {
         return this;
     }
 
-    public OfferCategory addOffer(Offer offer) {
+    public OfferCategory addOffers(Offer offer) {
         this.offers.add(offer);
         offer.setCategory(this);
         return this;
     }
 
-    public OfferCategory removeOffer(Offer offer) {
+    public OfferCategory removeOffers(Offer offer) {
         this.offers.remove(offer);
         offer.setCategory(null);
         return this;
@@ -107,7 +108,7 @@ public class OfferCategory implements Serializable {
         if (!(o instanceof OfferCategory)) {
             return false;
         }
-        return id != null && id.equals(((OfferCategory) o).id);
+        return getId() != null && getId().equals(((OfferCategory) o).getId());
     }
 
     @Override

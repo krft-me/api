@@ -6,12 +6,13 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.Offer;
+import me.krft.api.domain.OfferCategory;
 import me.krft.api.repository.OfferRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ class OfferResourceIT {
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
     private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     @Autowired
     private OfferRepository offerRepository;
@@ -58,6 +59,16 @@ class OfferResourceIT {
      */
     public static Offer createEntity(EntityManager em) {
         Offer offer = new Offer().name(DEFAULT_NAME);
+        // Add required entity
+        OfferCategory offerCategory;
+        if (TestUtil.findAll(em, OfferCategory.class).isEmpty()) {
+            offerCategory = OfferCategoryResourceIT.createEntity(em);
+            em.persist(offerCategory);
+            em.flush();
+        } else {
+            offerCategory = TestUtil.findAll(em, OfferCategory.class).get(0);
+        }
+        offer.setCategory(offerCategory);
         return offer;
     }
 
@@ -69,6 +80,16 @@ class OfferResourceIT {
      */
     public static Offer createUpdatedEntity(EntityManager em) {
         Offer offer = new Offer().name(UPDATED_NAME);
+        // Add required entity
+        OfferCategory offerCategory;
+        if (TestUtil.findAll(em, OfferCategory.class).isEmpty()) {
+            offerCategory = OfferCategoryResourceIT.createUpdatedEntity(em);
+            em.persist(offerCategory);
+            em.flush();
+        } else {
+            offerCategory = TestUtil.findAll(em, OfferCategory.class).get(0);
+        }
+        offer.setCategory(offerCategory);
         return offer;
     }
 
@@ -180,7 +201,7 @@ class OfferResourceIT {
         int databaseSizeBeforeUpdate = offerRepository.findAll().size();
 
         // Update the offer
-        Offer updatedOffer = offerRepository.findById(offer.getId()).get();
+        Offer updatedOffer = offerRepository.findById(offer.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedOffer are not directly saved in db
         em.detach(updatedOffer);
         updatedOffer.name(UPDATED_NAME);
@@ -205,7 +226,7 @@ class OfferResourceIT {
     @Transactional
     void putNonExistingOffer() throws Exception {
         int databaseSizeBeforeUpdate = offerRepository.findAll().size();
-        offer.setId(count.incrementAndGet());
+        offer.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restOfferMockMvc
@@ -226,12 +247,12 @@ class OfferResourceIT {
     @Transactional
     void putWithIdMismatchOffer() throws Exception {
         int databaseSizeBeforeUpdate = offerRepository.findAll().size();
-        offer.setId(count.incrementAndGet());
+        offer.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOfferMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(offer))
@@ -247,7 +268,7 @@ class OfferResourceIT {
     @Transactional
     void putWithMissingIdPathParamOffer() throws Exception {
         int databaseSizeBeforeUpdate = offerRepository.findAll().size();
-        offer.setId(count.incrementAndGet());
+        offer.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOfferMockMvc
@@ -273,6 +294,8 @@ class OfferResourceIT {
         Offer partialUpdatedOffer = new Offer();
         partialUpdatedOffer.setId(offer.getId());
 
+        partialUpdatedOffer.name(UPDATED_NAME);
+
         restOfferMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedOffer.getId())
@@ -286,7 +309,7 @@ class OfferResourceIT {
         List<Offer> offerList = offerRepository.findAll();
         assertThat(offerList).hasSize(databaseSizeBeforeUpdate);
         Offer testOffer = offerList.get(offerList.size() - 1);
-        assertThat(testOffer.getName()).isEqualTo(DEFAULT_NAME);
+        assertThat(testOffer.getName()).isEqualTo(UPDATED_NAME);
     }
 
     @Test
@@ -323,7 +346,7 @@ class OfferResourceIT {
     @Transactional
     void patchNonExistingOffer() throws Exception {
         int databaseSizeBeforeUpdate = offerRepository.findAll().size();
-        offer.setId(count.incrementAndGet());
+        offer.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restOfferMockMvc
@@ -344,12 +367,12 @@ class OfferResourceIT {
     @Transactional
     void patchWithIdMismatchOffer() throws Exception {
         int databaseSizeBeforeUpdate = offerRepository.findAll().size();
-        offer.setId(count.incrementAndGet());
+        offer.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOfferMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(offer))
@@ -365,7 +388,7 @@ class OfferResourceIT {
     @Transactional
     void patchWithMissingIdPathParamOffer() throws Exception {
         int databaseSizeBeforeUpdate = offerRepository.findAll().size();
-        offer.setId(count.incrementAndGet());
+        offer.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOfferMockMvc

@@ -2,22 +2,31 @@ package me.krft.api.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import jakarta.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
+import me.krft.api.domain.ApplicationUser;
 import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.domain.Offer;
 import me.krft.api.repository.ApplicationUserOfferRepository;
+import me.krft.api.service.ApplicationUserOfferService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Integration tests for the {@link ApplicationUserOfferResource} REST controller.
  */
 @IntegrationTest
+@ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockUser
 class ApplicationUserOfferResourceIT {
@@ -44,10 +54,16 @@ class ApplicationUserOfferResourceIT {
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
     private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     @Autowired
     private ApplicationUserOfferRepository applicationUserOfferRepository;
+
+    @Mock
+    private ApplicationUserOfferRepository applicationUserOfferRepositoryMock;
+
+    @Mock
+    private ApplicationUserOfferService applicationUserOfferServiceMock;
 
     @Autowired
     private EntityManager em;
@@ -68,6 +84,16 @@ class ApplicationUserOfferResourceIT {
             .description(DEFAULT_DESCRIPTION)
             .price(DEFAULT_PRICE)
             .active(DEFAULT_ACTIVE);
+        // Add required entity
+        ApplicationUser applicationUser;
+        if (TestUtil.findAll(em, ApplicationUser.class).isEmpty()) {
+            applicationUser = ApplicationUserResourceIT.createEntity(em);
+            em.persist(applicationUser);
+            em.flush();
+        } else {
+            applicationUser = TestUtil.findAll(em, ApplicationUser.class).get(0);
+        }
+        applicationUserOffer.setProvider(applicationUser);
         // Add required entity
         Offer offer;
         if (TestUtil.findAll(em, Offer.class).isEmpty()) {
@@ -92,6 +118,16 @@ class ApplicationUserOfferResourceIT {
             .description(UPDATED_DESCRIPTION)
             .price(UPDATED_PRICE)
             .active(UPDATED_ACTIVE);
+        // Add required entity
+        ApplicationUser applicationUser;
+        if (TestUtil.findAll(em, ApplicationUser.class).isEmpty()) {
+            applicationUser = ApplicationUserResourceIT.createUpdatedEntity(em);
+            em.persist(applicationUser);
+            em.flush();
+        } else {
+            applicationUser = TestUtil.findAll(em, ApplicationUser.class).get(0);
+        }
+        applicationUserOffer.setProvider(applicationUser);
         // Add required entity
         Offer offer;
         if (TestUtil.findAll(em, Offer.class).isEmpty()) {
@@ -239,6 +275,23 @@ class ApplicationUserOfferResourceIT {
             .andExpect(jsonPath("$.[*].active").value(hasItem(DEFAULT_ACTIVE.booleanValue())));
     }
 
+    @SuppressWarnings({ "unchecked" })
+    void getAllApplicationUserOffersWithEagerRelationshipsIsEnabled() throws Exception {
+        when(applicationUserOfferServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+
+        restApplicationUserOfferMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
+
+        verify(applicationUserOfferServiceMock, times(1)).findAllWithEagerRelationships(any());
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllApplicationUserOffersWithEagerRelationshipsIsNotEnabled() throws Exception {
+        when(applicationUserOfferServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+
+        restApplicationUserOfferMockMvc.perform(get(ENTITY_API_URL + "?eagerload=false")).andExpect(status().isOk());
+        verify(applicationUserOfferRepositoryMock, times(1)).findAll(any(Pageable.class));
+    }
+
     @Test
     @Transactional
     void getApplicationUserOffer() throws Exception {
@@ -272,7 +325,9 @@ class ApplicationUserOfferResourceIT {
         int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
 
         // Update the applicationUserOffer
-        ApplicationUserOffer updatedApplicationUserOffer = applicationUserOfferRepository.findById(applicationUserOffer.getId()).get();
+        ApplicationUserOffer updatedApplicationUserOffer = applicationUserOfferRepository
+            .findById(applicationUserOffer.getId())
+            .orElseThrow();
         // Disconnect from session so that the updates on updatedApplicationUserOffer are not directly saved in db
         em.detach(updatedApplicationUserOffer);
         updatedApplicationUserOffer.description(UPDATED_DESCRIPTION).price(UPDATED_PRICE).active(UPDATED_ACTIVE);
@@ -299,7 +354,7 @@ class ApplicationUserOfferResourceIT {
     @Transactional
     void putNonExistingApplicationUserOffer() throws Exception {
         int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
-        applicationUserOffer.setId(count.incrementAndGet());
+        applicationUserOffer.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restApplicationUserOfferMockMvc
@@ -320,12 +375,12 @@ class ApplicationUserOfferResourceIT {
     @Transactional
     void putWithIdMismatchApplicationUserOffer() throws Exception {
         int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
-        applicationUserOffer.setId(count.incrementAndGet());
+        applicationUserOffer.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserOfferMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(applicationUserOffer))
@@ -341,7 +396,7 @@ class ApplicationUserOfferResourceIT {
     @Transactional
     void putWithMissingIdPathParamApplicationUserOffer() throws Exception {
         int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
-        applicationUserOffer.setId(count.incrementAndGet());
+        applicationUserOffer.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserOfferMockMvc
@@ -370,7 +425,7 @@ class ApplicationUserOfferResourceIT {
         ApplicationUserOffer partialUpdatedApplicationUserOffer = new ApplicationUserOffer();
         partialUpdatedApplicationUserOffer.setId(applicationUserOffer.getId());
 
-        partialUpdatedApplicationUserOffer.description(UPDATED_DESCRIPTION).price(UPDATED_PRICE).active(UPDATED_ACTIVE);
+        partialUpdatedApplicationUserOffer.active(UPDATED_ACTIVE);
 
         restApplicationUserOfferMockMvc
             .perform(
@@ -385,8 +440,8 @@ class ApplicationUserOfferResourceIT {
         List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeUpdate);
         ApplicationUserOffer testApplicationUserOffer = applicationUserOfferList.get(applicationUserOfferList.size() - 1);
-        assertThat(testApplicationUserOffer.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
-        assertThat(testApplicationUserOffer.getPrice()).isEqualTo(UPDATED_PRICE);
+        assertThat(testApplicationUserOffer.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
+        assertThat(testApplicationUserOffer.getPrice()).isEqualTo(DEFAULT_PRICE);
         assertThat(testApplicationUserOffer.getActive()).isEqualTo(UPDATED_ACTIVE);
     }
 
@@ -426,7 +481,7 @@ class ApplicationUserOfferResourceIT {
     @Transactional
     void patchNonExistingApplicationUserOffer() throws Exception {
         int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
-        applicationUserOffer.setId(count.incrementAndGet());
+        applicationUserOffer.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restApplicationUserOfferMockMvc
@@ -447,12 +502,12 @@ class ApplicationUserOfferResourceIT {
     @Transactional
     void patchWithIdMismatchApplicationUserOffer() throws Exception {
         int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
-        applicationUserOffer.setId(count.incrementAndGet());
+        applicationUserOffer.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserOfferMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(applicationUserOffer))
@@ -468,7 +523,7 @@ class ApplicationUserOfferResourceIT {
     @Transactional
     void patchWithMissingIdPathParamApplicationUserOffer() throws Exception {
         int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
-        applicationUserOffer.setId(count.incrementAndGet());
+        applicationUserOffer.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserOfferMockMvc

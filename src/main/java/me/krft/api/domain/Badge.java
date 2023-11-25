@@ -2,16 +2,17 @@ package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * Badge entity\nRepresents a certification (example: 100 completed orders)
+ * Badge entity
+ * Represents a certification (example: 100 completed orders)
  */
 @Schema(description = "Badge entity\nRepresents a certification (example: 100 completed orders)")
 @Entity
@@ -41,10 +42,10 @@ public class Badge implements Serializable {
     @Column(name = "picture", nullable = false, unique = true)
     private String picture;
 
-    @OneToMany(mappedBy = "badge")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "badge")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "user", "badge" }, allowSetters = true)
-    private Set<ApplicationUserBadge> applicationUserBadges = new HashSet<>();
+    private Set<ApplicationUserBadge> users = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -87,33 +88,33 @@ public class Badge implements Serializable {
         this.picture = picture;
     }
 
-    public Set<ApplicationUserBadge> getApplicationUserBadges() {
-        return this.applicationUserBadges;
+    public Set<ApplicationUserBadge> getUsers() {
+        return this.users;
     }
 
-    public void setApplicationUserBadges(Set<ApplicationUserBadge> applicationUserBadges) {
-        if (this.applicationUserBadges != null) {
-            this.applicationUserBadges.forEach(i -> i.setBadge(null));
+    public void setUsers(Set<ApplicationUserBadge> applicationUserBadges) {
+        if (this.users != null) {
+            this.users.forEach(i -> i.setBadge(null));
         }
         if (applicationUserBadges != null) {
             applicationUserBadges.forEach(i -> i.setBadge(this));
         }
-        this.applicationUserBadges = applicationUserBadges;
+        this.users = applicationUserBadges;
     }
 
-    public Badge applicationUserBadges(Set<ApplicationUserBadge> applicationUserBadges) {
-        this.setApplicationUserBadges(applicationUserBadges);
+    public Badge users(Set<ApplicationUserBadge> applicationUserBadges) {
+        this.setUsers(applicationUserBadges);
         return this;
     }
 
-    public Badge addApplicationUserBadge(ApplicationUserBadge applicationUserBadge) {
-        this.applicationUserBadges.add(applicationUserBadge);
+    public Badge addUsers(ApplicationUserBadge applicationUserBadge) {
+        this.users.add(applicationUserBadge);
         applicationUserBadge.setBadge(this);
         return this;
     }
 
-    public Badge removeApplicationUserBadge(ApplicationUserBadge applicationUserBadge) {
-        this.applicationUserBadges.remove(applicationUserBadge);
+    public Badge removeUsers(ApplicationUserBadge applicationUserBadge) {
+        this.users.remove(applicationUserBadge);
         applicationUserBadge.setBadge(null);
         return this;
     }
@@ -128,7 +129,7 @@ public class Badge implements Serializable {
         if (!(o instanceof Badge)) {
             return false;
         }
-        return id != null && id.equals(((Badge) o).id);
+        return getId() != null && getId().equals(((Badge) o).getId());
     }
 
     @Override

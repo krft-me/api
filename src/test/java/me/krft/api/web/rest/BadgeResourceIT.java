@@ -6,10 +6,10 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.Badge;
 import me.krft.api.repository.BadgeRepository;
@@ -40,7 +40,7 @@ class BadgeResourceIT {
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
     private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     @Autowired
     private BadgeRepository badgeRepository;
@@ -205,7 +205,7 @@ class BadgeResourceIT {
         int databaseSizeBeforeUpdate = badgeRepository.findAll().size();
 
         // Update the badge
-        Badge updatedBadge = badgeRepository.findById(badge.getId()).get();
+        Badge updatedBadge = badgeRepository.findById(badge.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedBadge are not directly saved in db
         em.detach(updatedBadge);
         updatedBadge.label(UPDATED_LABEL).picture(UPDATED_PICTURE);
@@ -231,7 +231,7 @@ class BadgeResourceIT {
     @Transactional
     void putNonExistingBadge() throws Exception {
         int databaseSizeBeforeUpdate = badgeRepository.findAll().size();
-        badge.setId(count.incrementAndGet());
+        badge.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restBadgeMockMvc
@@ -252,12 +252,12 @@ class BadgeResourceIT {
     @Transactional
     void putWithIdMismatchBadge() throws Exception {
         int databaseSizeBeforeUpdate = badgeRepository.findAll().size();
-        badge.setId(count.incrementAndGet());
+        badge.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBadgeMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(badge))
@@ -273,7 +273,7 @@ class BadgeResourceIT {
     @Transactional
     void putWithMissingIdPathParamBadge() throws Exception {
         int databaseSizeBeforeUpdate = badgeRepository.findAll().size();
-        badge.setId(count.incrementAndGet());
+        badge.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBadgeMockMvc
@@ -299,8 +299,6 @@ class BadgeResourceIT {
         Badge partialUpdatedBadge = new Badge();
         partialUpdatedBadge.setId(badge.getId());
 
-        partialUpdatedBadge.picture(UPDATED_PICTURE);
-
         restBadgeMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedBadge.getId())
@@ -315,7 +313,7 @@ class BadgeResourceIT {
         assertThat(badgeList).hasSize(databaseSizeBeforeUpdate);
         Badge testBadge = badgeList.get(badgeList.size() - 1);
         assertThat(testBadge.getLabel()).isEqualTo(DEFAULT_LABEL);
-        assertThat(testBadge.getPicture()).isEqualTo(UPDATED_PICTURE);
+        assertThat(testBadge.getPicture()).isEqualTo(DEFAULT_PICTURE);
     }
 
     @Test
@@ -353,7 +351,7 @@ class BadgeResourceIT {
     @Transactional
     void patchNonExistingBadge() throws Exception {
         int databaseSizeBeforeUpdate = badgeRepository.findAll().size();
-        badge.setId(count.incrementAndGet());
+        badge.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restBadgeMockMvc
@@ -374,12 +372,12 @@ class BadgeResourceIT {
     @Transactional
     void patchWithIdMismatchBadge() throws Exception {
         int databaseSizeBeforeUpdate = badgeRepository.findAll().size();
-        badge.setId(count.incrementAndGet());
+        badge.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBadgeMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(badge))
@@ -395,7 +393,7 @@ class BadgeResourceIT {
     @Transactional
     void patchWithMissingIdPathParamBadge() throws Exception {
         int databaseSizeBeforeUpdate = badgeRepository.findAll().size();
-        badge.setId(count.incrementAndGet());
+        badge.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBadgeMockMvc

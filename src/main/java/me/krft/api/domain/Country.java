@@ -2,11 +2,11 @@ package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -36,7 +36,8 @@ public class Country implements Serializable {
     private String name;
 
     /**
-     * ISO 3166-1 alpha-2\n@see https:
+     * ISO 3166-1 alpha-2
+     * @see https:
      */
     @Schema(description = "ISO 3166-1 alpha-2\n@see https:", required = true)
     @NotNull
@@ -44,7 +45,7 @@ public class Country implements Serializable {
     @Column(name = "iso_code", length = 3, nullable = false, unique = true)
     private String isoCode;
 
-    @OneToMany(mappedBy = "country")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "country")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "cities", "country" }, allowSetters = true)
     private Set<Region> regions = new HashSet<>();
@@ -131,7 +132,7 @@ public class Country implements Serializable {
         if (!(o instanceof Country)) {
             return false;
         }
-        return id != null && id.equals(((Country) o).id);
+        return getId() != null && getId().equals(((Country) o).getId());
     }
 
     @Override

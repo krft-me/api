@@ -2,14 +2,17 @@ package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import javax.persistence.*;
-import javax.validation.constraints.*;
+import java.util.HashSet;
+import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * Tag entity\nRepresents a preset keyword for an offer
+ * Tag entity
+ * Represents a preset keyword for an offer
  */
 @Schema(description = "Tag entity\nRepresents a preset keyword for an offer")
 @Entity
@@ -31,9 +34,10 @@ public class Tag implements Serializable {
     @Column(name = "label", nullable = false, unique = true)
     private String label;
 
-    @ManyToOne
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "tags", "orders", "applicationUser", "offer" }, allowSetters = true)
-    private ApplicationUserOffer applicationUserOffer;
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "tags")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "reviews", "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
+    private Set<ApplicationUserOffer> offers = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -63,16 +67,34 @@ public class Tag implements Serializable {
         this.label = label;
     }
 
-    public ApplicationUserOffer getApplicationUserOffer() {
-        return this.applicationUserOffer;
+    public Set<ApplicationUserOffer> getOffers() {
+        return this.offers;
     }
 
-    public void setApplicationUserOffer(ApplicationUserOffer applicationUserOffer) {
-        this.applicationUserOffer = applicationUserOffer;
+    public void setOffers(Set<ApplicationUserOffer> applicationUserOffers) {
+        if (this.offers != null) {
+            this.offers.forEach(i -> i.removeTags(this));
+        }
+        if (applicationUserOffers != null) {
+            applicationUserOffers.forEach(i -> i.addTags(this));
+        }
+        this.offers = applicationUserOffers;
     }
 
-    public Tag applicationUserOffer(ApplicationUserOffer applicationUserOffer) {
-        this.setApplicationUserOffer(applicationUserOffer);
+    public Tag offers(Set<ApplicationUserOffer> applicationUserOffers) {
+        this.setOffers(applicationUserOffers);
+        return this;
+    }
+
+    public Tag addOffers(ApplicationUserOffer applicationUserOffer) {
+        this.offers.add(applicationUserOffer);
+        applicationUserOffer.getTags().add(this);
+        return this;
+    }
+
+    public Tag removeOffers(ApplicationUserOffer applicationUserOffer) {
+        this.offers.remove(applicationUserOffer);
+        applicationUserOffer.getTags().remove(this);
         return this;
     }
 
@@ -86,7 +108,7 @@ public class Tag implements Serializable {
         if (!(o instanceof Tag)) {
             return false;
         }
-        return id != null && id.equals(((Tag) o).id);
+        return getId() != null && getId().equals(((Tag) o).getId());
     }
 
     @Override
