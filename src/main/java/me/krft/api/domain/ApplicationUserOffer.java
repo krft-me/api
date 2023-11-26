@@ -56,11 +56,6 @@ public class ApplicationUserOffer implements Serializable {
 
     @OneToMany(mappedBy = "offer")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "order", "offer" }, allowSetters = true)
-    private Set<Review> reviews = new HashSet<>();
-
-    @OneToMany(mappedBy = "offer")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "offer" }, allowSetters = true)
     private Set<Showcase> showcases = new HashSet<>();
 
@@ -141,37 +136,6 @@ public class ApplicationUserOffer implements Serializable {
 
     public void setActive(Boolean active) {
         this.active = active;
-    }
-
-    public Set<Review> getReviews() {
-        return this.reviews;
-    }
-
-    public void setReviews(Set<Review> reviews) {
-        if (this.reviews != null) {
-            this.reviews.forEach(i -> i.setOffer(null));
-        }
-        if (reviews != null) {
-            reviews.forEach(i -> i.setOffer(this));
-        }
-        this.reviews = reviews;
-    }
-
-    public ApplicationUserOffer reviews(Set<Review> reviews) {
-        this.setReviews(reviews);
-        return this;
-    }
-
-    public ApplicationUserOffer addReviews(Review review) {
-        this.reviews.add(review);
-        review.setOffer(this);
-        return this;
-    }
-
-    public ApplicationUserOffer removeReviews(Review review) {
-        this.reviews.remove(review);
-        review.setOffer(null);
-        return this;
     }
 
     public Set<Showcase> getShowcases() {

@@ -39,12 +39,6 @@
   "readOnly": false,
   "relationships": [
     {
-      "otherEntityName": "review",
-      "otherEntityRelationshipName": "offer",
-      "relationshipName": "reviews",
-      "relationshipType": "one-to-many"
-    },
-    {
       "otherEntityName": "showcase",
       "otherEntityRelationshipName": "offer",
       "relationshipName": "showcases",

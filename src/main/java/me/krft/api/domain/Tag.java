@@ -35,7 +35,7 @@ public class Tag implements Serializable {
 
     @ManyToMany(mappedBy = "tags")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
     private Set<ApplicationUserOffer> offers = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

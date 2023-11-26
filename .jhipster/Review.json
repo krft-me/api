@@ -36,13 +36,6 @@
       "ownerSide": false,
       "relationshipName": "order",
       "relationshipType": "one-to-one"
-    },
-    {
-      "otherEntityName": "applicationUserOffer",
-      "otherEntityRelationshipName": "reviews",
-      "relationshipName": "offer",
-      "relationshipType": "many-to-one",
-      "relationshipValidateRules": "required"
     }
   ],
   "searchEngine": false,

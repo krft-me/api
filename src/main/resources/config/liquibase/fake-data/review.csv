@@ -1,11 +1,11 @@
-id;rating;comment;offer_id
-1;42;mindshare XSS Guatemala;1
-2;16;expedite Credit payment;2
-3;40;content;3
-4;30;payment Nigeria;4
-5;26;programming open-source Taiwan;5
-6;24;Garden Berkshire;6
-7;12;wireless;7
-8;16;pixel Somali;8
-9;3;support holistic;9
-10;34;Industrial;10
+id;rating;comment
+1;42;mindshare XSS Guatemala
+2;16;expedite Credit payment
+3;40;content
+4;30;payment Nigeria
+5;26;programming open-source Taiwan
+6;24;Garden Berkshire
+7;12;wireless
+8;16;pixel Somali
+9;3;support holistic
+10;34;Industrial

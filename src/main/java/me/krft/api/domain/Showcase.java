@@ -33,7 +33,7 @@ public class Showcase implements Serializable {
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
     private ApplicationUserOffer offer;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

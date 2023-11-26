@@ -45,14 +45,14 @@ public class Order implements Serializable {
     @Column(name = "state", nullable = false)
     private State state;
 
-    @JsonIgnoreProperties(value = { "order", "offer" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "order" }, allowSetters = true)
     @OneToOne
     @JoinColumn(unique = true)
     private Review review;
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
     private ApplicationUserOffer offer;
 
     @ManyToOne(optional = false)

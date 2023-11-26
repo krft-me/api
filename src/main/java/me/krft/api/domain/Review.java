@@ -47,11 +47,6 @@ public class Review implements Serializable {
     @OneToOne(mappedBy = "review")
     private Order order;
 
-    @ManyToOne(optional = false)
-    @NotNull
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
-    private ApplicationUserOffer offer;
-
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -109,19 +104,6 @@ public class Review implements Serializable {
 
     public Review order(Order order) {
         this.setOrder(order);
-        return this;
-    }
-
-    public ApplicationUserOffer getOffer() {
-        return this.offer;
-    }
-
-    public void setOffer(ApplicationUserOffer applicationUserOffer) {
-        this.offer = applicationUserOffer;
-    }
-
-    public Review offer(ApplicationUserOffer applicationUserOffer) {
-        this.setOffer(applicationUserOffer);
         return this;
     }
 

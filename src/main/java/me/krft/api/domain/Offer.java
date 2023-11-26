@@ -35,7 +35,7 @@ public class Offer implements Serializable {
 
     @OneToMany(mappedBy = "offer")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
     private Set<ApplicationUserOffer> userOffers = new HashSet<>();
 
     @ManyToOne

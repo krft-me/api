@@ -69,7 +69,7 @@ public class ApplicationUser implements Serializable {
 
     @OneToMany(mappedBy = "provider")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
     private Set<ApplicationUserOffer> offers = new HashSet<>();
 
     @OneToMany(mappedBy = "user")

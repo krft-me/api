@@ -11,7 +11,6 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
-import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.domain.Review;
 import me.krft.api.repository.ReviewRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,16 +61,6 @@ class ReviewResourceIT {
      */
     public static Review createEntity(EntityManager em) {
         Review review = new Review().rating(DEFAULT_RATING).comment(DEFAULT_COMMENT);
-        // Add required entity
-        ApplicationUserOffer applicationUserOffer;
-        if (TestUtil.findAll(em, ApplicationUserOffer.class).isEmpty()) {
-            applicationUserOffer = ApplicationUserOfferResourceIT.createEntity(em);
-            em.persist(applicationUserOffer);
-            em.flush();
-        } else {
-            applicationUserOffer = TestUtil.findAll(em, ApplicationUserOffer.class).get(0);
-        }
-        review.setOffer(applicationUserOffer);
         return review;
     }
 
@@ -83,16 +72,6 @@ class ReviewResourceIT {
      */
     public static Review createUpdatedEntity(EntityManager em) {
         Review review = new Review().rating(UPDATED_RATING).comment(UPDATED_COMMENT);
-        // Add required entity
-        ApplicationUserOffer applicationUserOffer;
-        if (TestUtil.findAll(em, ApplicationUserOffer.class).isEmpty()) {
-            applicationUserOffer = ApplicationUserOfferResourceIT.createUpdatedEntity(em);
-            em.persist(applicationUserOffer);
-            em.flush();
-        } else {
-            applicationUserOffer = TestUtil.findAll(em, ApplicationUserOffer.class).get(0);
-        }
-        review.setOffer(applicationUserOffer);
         return review;
     }
 
