@@ -1,7 +1,5 @@
 package me.krft.api.config;
 
-import static org.mockito.Mockito.mock;
-
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -13,7 +11,6 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 
 /**
  * This class allows you to run unit and integration tests without an IdP.
@@ -51,11 +48,6 @@ public class TestSecurityConfiguration {
             .clientName("Client Name")
             .clientId("client-id")
             .clientSecret("client-secret");
-    }
-
-    @Bean
-    JwtDecoder jwtDecoder() {
-        return mock(JwtDecoder.class);
     }
 
     @Bean
