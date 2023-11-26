@@ -290,22 +290,6 @@ For more information refer to [Using Docker and Docker-Compose][], this page als
 docker-compose sub-generator (`jhipster docker-compose`), which is able to generate docker configurations for one or
 several JHipster applications.
 
-## Local run
-
-If you want to run the application locally:
-You need to modify SecurityConfiguration.java like bellow :
-
-```
-@Override
-public void configure(HttpSecurity http) throws Exception {
-    http
-        .csrf()
-        .disable();
-    http.headers().frameOptions().disable();
-    return http.build();
-}
-```
-
 ## Continuous Integration (optional)
 
 To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`), this will let you generate
