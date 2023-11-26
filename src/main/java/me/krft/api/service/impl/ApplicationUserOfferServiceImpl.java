@@ -99,4 +99,14 @@ public class ApplicationUserOfferServiceImpl implements ApplicationUserOfferServ
         log.debug("Request to get all ApplicationUserOfferDTO");
         return applicationUserOfferRepository.findAll().stream().map(this.applicationUserOfferMapper::toDTO).collect(Collectors.toList());
     }
+
+    @Override
+    public List<ApplicationUserOfferDTO> getApplicationUserOffersCards() {
+        log.debug("Request to get all ApplicationUserOfferDTO cards");
+        return applicationUserOfferRepository
+            .findAll()
+            .stream()
+            .map(this.applicationUserOfferMapper::toDTOCard)
+            .collect(Collectors.toList());
+    }
 }

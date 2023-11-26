@@ -25,7 +25,12 @@ public class ShowcaseMapper implements EntityDTOMapper<Showcase, ShowcaseDTO> {
 
     @Override
     public ShowcaseDTO toDTO(Showcase entity) {
-        return ShowcaseDTO.builder().id(entity.getId()).offer(this.applicationUserOfferMapper.toDTOId(entity.getOffer())).build();
+        return ShowcaseDTO
+            .builder()
+            .id(entity.getId())
+            .imageId(entity.getImageId())
+            .offer(this.applicationUserOfferMapper.toDTOId(entity.getOffer()))
+            .build();
     }
 
     @Override
@@ -39,5 +44,13 @@ public class ShowcaseMapper implements EntityDTOMapper<Showcase, ShowcaseDTO> {
 
     public Set<ShowcaseDTO> toDTOId(Set<Showcase> entities) {
         return entities.stream().map(this::toDTOId).collect(Collectors.toSet());
+    }
+
+    public ShowcaseDTO toDTOImageId(Showcase showcase) {
+        return ShowcaseDTO.builder().id(showcase.getId()).imageId(showcase.getImageId()).build();
+    }
+
+    public Set<ShowcaseDTO> toDTOImageId(Set<Showcase> showcases) {
+        return showcases.stream().map(this::toDTOImageId).collect(Collectors.toSet());
     }
 }

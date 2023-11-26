@@ -1,7 +1,9 @@
 package me.krft.api.service.mapper;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.domain.Offer;
 import me.krft.api.service.dto.OfferDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,5 +58,13 @@ public class OfferMapper implements EntityDTOMapper<Offer, OfferDTO> {
 
     public Set<OfferDTO> toDTOId(Set<Offer> entities) {
         return entities.stream().map(this::toDTOId).collect(Collectors.toSet());
+    }
+
+    public OfferDTO toDTOMachineName(Offer offer) {
+        OfferDTO.OfferDTOBuilder<?, ?> offerDTOBuilder = OfferDTO.builder().id(offer.getId());
+
+        Optional.ofNullable(offer.getMachine()).ifPresent(machine -> offerDTOBuilder.machine(this.machineMapper.toDTOName(machine)));
+
+        return offerDTOBuilder.build();
     }
 }

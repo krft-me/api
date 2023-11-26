@@ -45,4 +45,12 @@ public class TagMapper implements EntityDTOMapper<Tag, TagDTO> {
     public Set<TagDTO> toDTOId(Set<Tag> entities) {
         return entities.stream().map(this::toDTOId).collect(Collectors.toSet());
     }
+
+    public TagDTO toDTOLabel(Tag tag) {
+        return TagDTO.builder().id(tag.getId()).label(tag.getLabel()).build();
+    }
+
+    public Set<TagDTO> toDTOLabel(Set<Tag> tags) {
+        return tags.stream().map(this::toDTOLabel).collect(Collectors.toSet());
+    }
 }

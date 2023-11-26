@@ -1,5 +1,6 @@
 package me.krft.api.service.mapper;
 
+import java.util.Optional;
 import java.util.Set;
 import me.krft.api.domain.ApplicationUser;
 import me.krft.api.service.dto.ApplicationUserDTO;
@@ -64,5 +65,16 @@ public class ApplicationUserMapper implements EntityDTOMapper<ApplicationUser, A
 
     public Set<ApplicationUserDTO> toDTOId(Set<ApplicationUser> entities) {
         return entities.stream().map(this::toDTOId).collect(java.util.stream.Collectors.toSet());
+    }
+
+    public ApplicationUserDTO toDTOUsernameCityName(ApplicationUser provider) {
+        ApplicationUserDTO.ApplicationUserDTOBuilder<?, ?> applicationUserDTOBuilder = ApplicationUserDTO
+            .builder()
+            .id(provider.getId())
+            .username(provider.getUsername());
+
+        Optional.ofNullable(provider.getCity()).ifPresent(city -> applicationUserDTOBuilder.city(this.cityMapper.toDTOName(city)));
+
+        return applicationUserDTOBuilder.build();
     }
 }

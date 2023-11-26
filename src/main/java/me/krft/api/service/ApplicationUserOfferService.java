@@ -66,4 +66,6 @@ public interface ApplicationUserOfferService {
     void delete(Long id);
 
     List<ApplicationUserOfferDTO> testMapper();
+
+    List<ApplicationUserOfferDTO> getApplicationUserOffersCards();
 }

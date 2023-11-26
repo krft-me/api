@@ -50,4 +50,8 @@ public class CityMapper implements EntityDTOMapper<City, CityDTO> {
     public Set<CityDTO> toDTOId(Set<City> entities) {
         return entities.stream().map(this::toDTOId).collect(Collectors.toSet());
     }
+
+    public CityDTO toDTOName(City city) {
+        return CityDTO.builder().id(city.getId()).name(city.getName()).build();
+    }
 }

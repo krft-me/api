@@ -186,4 +186,11 @@ public class ApplicationUserOfferResource {
         List<ApplicationUserOfferDTO> list = applicationUserOfferService.testMapper();
         return ResponseEntity.ok().body(list);
     }
+
+    @GetMapping("/cards")
+    public ResponseEntity<List<ApplicationUserOfferDTO>> getApplicationUserOffersCards() {
+        log.debug("REST request to get all ApplicationUserOffers Cards");
+        List<ApplicationUserOfferDTO> list = applicationUserOfferService.getApplicationUserOffersCards();
+        return ResponseEntity.ok().body(list);
+    }
 }

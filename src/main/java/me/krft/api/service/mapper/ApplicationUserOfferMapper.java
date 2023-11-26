@@ -1,5 +1,6 @@
 package me.krft.api.service.mapper;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import me.krft.api.domain.ApplicationUserOffer;
@@ -73,5 +74,19 @@ public class ApplicationUserOfferMapper implements EntityDTOMapper<ApplicationUs
 
     public Set<ApplicationUserOfferDTO> toDTOId(Set<ApplicationUserOffer> offers) {
         return offers.stream().map(this::toDTOId).collect(Collectors.toSet());
+    }
+
+    public ApplicationUserOfferDTO toDTOCard(ApplicationUserOffer applicationUserOffer) {
+        return ApplicationUserOfferDTO
+            .builder()
+            .id(applicationUserOffer.getId())
+            .price(applicationUserOffer.getPrice())
+            .description(applicationUserOffer.getDescription())
+            .reviews(this.reviewMapper.toDTORating(applicationUserOffer.getReviews()))
+            .tags(this.tagMapper.toDTOLabel(applicationUserOffer.getTags()))
+            .provider(this.applicationUserMapper.toDTOUsernameCityName(applicationUserOffer.getProvider()))
+            .offer(this.offerMapper.toDTOMachineName(applicationUserOffer.getOffer()))
+            .showcases(this.showcaseMapper.toDTOImageId(applicationUserOffer.getShowcases()))
+            .build();
     }
 }

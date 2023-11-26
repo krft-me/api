@@ -49,4 +49,8 @@ public class MachineMapper implements EntityDTOMapper<Machine, MachineDTO> {
     public Set<MachineDTO> toDTOId(Set<Machine> entities) {
         return entities.stream().map(this::toDTOId).collect(Collectors.toSet());
     }
+
+    public MachineDTO toDTOName(Machine machine) {
+        return MachineDTO.builder().id(machine.getId()).name(machine.getName()).build();
+    }
 }
