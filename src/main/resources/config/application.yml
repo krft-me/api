@@ -33,74 +33,74 @@ feign:
   #       connectTimeout: 5000
   #       readTimeout: 5000
 management:
-    endpoints:
-        web:
-            base-path: /management
-            exposure:
-                include:
-                  [
-                      'configprops',
-                      'env',
-                      'health',
-                      'info',
-                      'jhimetrics',
-                      'jhiopenapigroups',
-                      'logfile',
-                      'loggers',
-                      'prometheus',
-                      'threaddump',
-                      'caches',
-                      'liquibase',
-                  ]
-    endpoint:
-        health:
-        show-details: when_authorized
-        roles: 'ROLE_ADMIN'
-        probes:
+  endpoints:
+    web:
+      base-path: /management
+      exposure:
+        include:
+          [
+            'configprops',
+            'env',
+            'health',
+            'info',
+            'jhimetrics',
+            'jhiopenapigroups',
+            'logfile',
+            'loggers',
+            'prometheus',
+            'threaddump',
+            'caches',
+            'liquibase',
+          ]
+  endpoint:
+    health:
+      show-details: when_authorized
+      roles: 'ROLE_ADMIN'
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState,db
+    jhimetrics:
+      enabled: true
+  info:
+    git:
+      mode: full
+    env:
+      enabled: true
+  health:
+    mail:
+      enabled: false # When using the MailService, configure an SMTP server and set this to true
+  metrics:
+    export:
+      # Prometheus is the default metrics backend
+      prometheus:
+        enabled: true
+        step: 60
+    enable:
+      http: true
+      jvm: true
+      logback: true
+      process: true
+      system: true
+    distribution:
+      percentiles-histogram:
+        all: true
+      percentiles:
+        all: 0, 0.5, 0.75, 0.95, 0.99, 1.0
+    tags:
+      application: ${spring.application.name}
+    web:
+      server:
+        request:
+          autotime:
             enabled: true
-        group:
-            liveness:
-                include: livenessState
-            readiness:
-                include: readinessState,db
-        jhimetrics:
-            enabled: true
-        info:
-          git:
-            mode: full
-            env:
-              enabled: true
-            health:
-            mail:
-              enabled: false # When using the MailService, configure an SMTP server and set this to true
-        metrics:
-            export:
-                # Prometheus is the default metrics backend
-                prometheus:
-                    enabled: true
-                    step: 60
-            enable:
-                http: true
-                jvm: true
-                logback: true
-                process: true
-                system: true
-            distribution:
-                percentiles-histogram:
-                all: true
-            percentiles:
-                all: 0, 0.5, 0.75, 0.95, 0.99, 1.0
-            tags:
-                application: ${spring.application.name}
-            web:
-                server:
-                    request:
-                        autotime:
-                            enabled: true
 
 spring:
   application:
-  name: krftme
+    name: krftme
   cloud:
     consul:
       discovery:
@@ -151,13 +151,13 @@ spring:
       naming:
         physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
-    messages:
-      basename: i18n/messages
-      main:
-        allow-bean-definition-overriding: true
-        mvc:
-          pathmatch:
-            matching-strategy: ant_path_matcher
+  messages:
+    basename: i18n/messages
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   task:
     execution:
       thread-name-prefix: krftme-task-
@@ -173,18 +173,18 @@ spring:
     mode: HTML
   output:
     ansi:
-      console-available: true
+      enabled: always
   security:
-  oauth2:
-    client:
-      provider:
-        oidc:
-          issuer-uri: http://localhost:9080/realms/krftme
-      registration:
-        oidc:
-          client-id: internal
-          client-secret: internal
-          scope: openid, profile, email, offline_access # last one for refresh tokens
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: http://localhost:9080/realms/krftme
+        registration:
+          oidc:
+            client-id: internal
+            client-secret: internal
+            scope: openid, profile, email, offline_access # last one for refresh tokens
 
 server:
   servlet:
@@ -207,7 +207,7 @@ info:
 # ===================================================================
 
 jhipster:
-    clientApp:
+  clientApp:
     name: 'krftmeApp'
     # By default CORS is disabled. Uncomment to enable.
     # cors:
@@ -217,25 +217,25 @@ jhipster:
     #   exposed-headers: "Authorization,Link,X-Total-Count,X-${jhipster.clientApp.name}-alert,X-${jhipster.clientApp.name}-error,X-${jhipster.clientApp.name}-params"
     #   allow-credentials: true
     #   max-age: 1800
-    mail:
-        from: krftme@localhost
-        api-docs:
-            default-include-pattern: ${server.servlet.context-path:}/api/**
-            management-include-pattern: ${server.servlet.context-path:}/management/**
-            title: Krftme API
-            description: Krftme API documentation
-            version: 0.0.1
-            terms-of-service-url:
-            contact-name:
-            contact-url:
-            contact-email:
-            license: unlicensed
-            license-url:
-    security:
-        oauth2:
-            audience:
-                - account
-                - api://default
+  mail:
+    from: krftme@localhost
+  api-docs:
+    default-include-pattern: ${server.servlet.context-path:}/api/**
+    management-include-pattern: ${server.servlet.context-path:}/management/**
+    title: Krftme API
+    description: Krftme API documentation
+    version: 0.0.1
+    terms-of-service-url:
+    contact-name:
+    contact-url:
+    contact-email:
+    license: unlicensed
+    license-url:
+  security:
+    oauth2:
+      audience:
+        - account
+        - api://default
 # ===================================================================
 # Application specific properties
 # Add your own application properties here, see the ApplicationProperties class
