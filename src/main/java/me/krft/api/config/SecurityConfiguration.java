@@ -71,12 +71,6 @@ public class SecurityConfiguration {
             .and()
             .oauth2Client();
         return http.build();
-        // FOR LOCAL ENVIRONMENT
-        //        http
-        //            .csrf()
-        //            .disable();
-        //        http.headers().frameOptions().disable();
-        //        return http.build();
         // @formatter:on
     }
 

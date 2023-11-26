@@ -15,5 +15,5 @@ import lombok.experimental.SuperBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AbstractDTO implements Serializable {
 
-    Map<AbstractDTOSeverity, String> messages;
+    private Map<AbstractDTOSeverity, String> messages;
 }
