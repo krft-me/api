@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.repository.ApplicationUserOfferRepository;
 import me.krft.api.service.ApplicationUserOfferService;
+import me.krft.api.service.dto.ApplicationUserOfferDTO;
 import me.krft.api.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,5 +178,12 @@ public class ApplicationUserOfferResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    @GetMapping("/testmapper")
+    public ResponseEntity<List<ApplicationUserOfferDTO>> testMapper() {
+        log.debug("REST request to get all ApplicationUserOffers");
+        List<ApplicationUserOfferDTO> list = applicationUserOfferService.testMapper();
+        return ResponseEntity.ok().body(list);
     }
 }
