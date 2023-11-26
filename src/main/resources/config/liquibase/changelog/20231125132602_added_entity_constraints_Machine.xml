@@ -12,7 +12,6 @@
                                  baseTableName="machine"
                                  constraintName="fk_machine__category_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="machine_category"
-                                 />
+                                 referencedTableName="machine_category"/>
     </changeSet>
 </databaseChangeLog>

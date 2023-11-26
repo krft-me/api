@@ -12,28 +12,24 @@
                                  baseTableName="rel_application_user_offer__tags"
                                  constraintName="fk_rel_application_user_offer__tags__application_user_offer_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="application_user_offer"
-                                 />
+                                 referencedTableName="application_user_offer"/>
 
         <addForeignKeyConstraint baseColumnNames="tags_id"
                                  baseTableName="rel_application_user_offer__tags"
                                  constraintName="fk_rel_application_user_offer__tags__tags_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="tag"
-                                 />
+                                 referencedTableName="tag"/>
 
         <addForeignKeyConstraint baseColumnNames="provider_id"
                                  baseTableName="application_user_offer"
                                  constraintName="fk_application_user_offer__provider_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="application_user"
-                                 />
+                                 referencedTableName="application_user"/>
 
         <addForeignKeyConstraint baseColumnNames="offer_id"
                                  baseTableName="application_user_offer"
                                  constraintName="fk_application_user_offer__offer_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="offer"
-                                 />
+                                 referencedTableName="offer"/>
     </changeSet>
 </databaseChangeLog>

@@ -9,17 +9,17 @@
   "entityTableName": "review",
   "fields": [
     {
-      "documentation": "The rating of the service from 0.0 to 5.0",
       "fieldName": "rating",
       "fieldType": "Integer",
       "fieldValidateRules": ["required", "min", "max"],
       "fieldValidateRulesMax": "50",
-      "fieldValidateRulesMin": "0"
+      "fieldValidateRulesMin": "0",
+      "javadoc": "The rating of the service from 0.0 to 5.0"
     },
     {
-      "documentation": "Optional comment about the service or the service provider",
       "fieldName": "comment",
-      "fieldType": "String"
+      "fieldType": "String",
+      "javadoc": "Optional comment about the service or the service provider"
     }
   ],
   "fluentMethods": true,
@@ -31,14 +31,20 @@
   "readOnly": false,
   "relationships": [
     {
+      "otherEntityName": "order",
+      "otherEntityRelationshipName": "review",
+      "ownerSide": false,
+      "relationshipName": "order",
+      "relationshipType": "one-to-one"
+    },
+    {
       "otherEntityName": "applicationUserOffer",
       "otherEntityRelationshipName": "reviews",
       "relationshipName": "offer",
-      "relationshipSide": "right",
       "relationshipType": "many-to-one",
       "relationshipValidateRules": "required"
     }
   ],
-  "searchEngine": "no",
+  "searchEngine": false,
   "service": "serviceImpl"
 }

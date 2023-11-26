@@ -23,7 +23,7 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link me.krft.api.domain.OfferCategory}.
  */
 @RestController
-@RequestMapping("/api/offer-categories")
+@RequestMapping("/api")
 public class OfferCategoryResource {
 
     private final Logger log = LoggerFactory.getLogger(OfferCategoryResource.class);
@@ -49,7 +49,7 @@ public class OfferCategoryResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new offerCategory, or with status {@code 400 (Bad Request)} if the offerCategory has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("")
+    @PostMapping("/offer-categories")
     public ResponseEntity<OfferCategory> createOfferCategory(@Valid @RequestBody OfferCategory offerCategory) throws URISyntaxException {
         log.debug("REST request to save OfferCategory : {}", offerCategory);
         if (offerCategory.getId() != null) {
@@ -72,7 +72,7 @@ public class OfferCategoryResource {
      * or with status {@code 500 (Internal Server Error)} if the offerCategory couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/{id}")
+    @PutMapping("/offer-categories/{id}")
     public ResponseEntity<OfferCategory> updateOfferCategory(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody OfferCategory offerCategory
@@ -107,7 +107,7 @@ public class OfferCategoryResource {
      * or with status {@code 500 (Internal Server Error)} if the offerCategory couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/offer-categories/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<OfferCategory> partialUpdateOfferCategory(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody OfferCategory offerCategory
@@ -137,7 +137,7 @@ public class OfferCategoryResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of offerCategories in body.
      */
-    @GetMapping("")
+    @GetMapping("/offer-categories")
     public List<OfferCategory> getAllOfferCategories() {
         log.debug("REST request to get all OfferCategories");
         return offerCategoryService.findAll();
@@ -149,7 +149,7 @@ public class OfferCategoryResource {
      * @param id the id of the offerCategory to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the offerCategory, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/{id}")
+    @GetMapping("/offer-categories/{id}")
     public ResponseEntity<OfferCategory> getOfferCategory(@PathVariable Long id) {
         log.debug("REST request to get OfferCategory : {}", id);
         Optional<OfferCategory> offerCategory = offerCategoryService.findOne(id);
@@ -162,7 +162,7 @@ public class OfferCategoryResource {
      * @param id the id of the offerCategory to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/offer-categories/{id}")
     public ResponseEntity<Void> deleteOfferCategory(@PathVariable Long id) {
         log.debug("REST request to delete OfferCategory : {}", id);
         offerCategoryService.delete(id);

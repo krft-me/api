@@ -36,8 +36,8 @@ class TagResourceIT {
     private static final String ENTITY_API_URL = "/api/tags";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static final Random random = new Random();
-    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     @Autowired
     private TagRepository tagRepository;
@@ -180,7 +180,7 @@ class TagResourceIT {
         int databaseSizeBeforeUpdate = tagRepository.findAll().size();
 
         // Update the tag
-        Tag updatedTag = tagRepository.findById(tag.getId()).orElseThrow();
+        Tag updatedTag = tagRepository.findById(tag.getId()).get();
         // Disconnect from session so that the updates on updatedTag are not directly saved in db
         em.detach(updatedTag);
         updatedTag.label(UPDATED_LABEL);
@@ -205,7 +205,7 @@ class TagResourceIT {
     @Transactional
     void putNonExistingTag() throws Exception {
         int databaseSizeBeforeUpdate = tagRepository.findAll().size();
-        tag.setId(longCount.incrementAndGet());
+        tag.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restTagMockMvc
@@ -226,12 +226,12 @@ class TagResourceIT {
     @Transactional
     void putWithIdMismatchTag() throws Exception {
         int databaseSizeBeforeUpdate = tagRepository.findAll().size();
-        tag.setId(longCount.incrementAndGet());
+        tag.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTagMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(tag))
@@ -247,7 +247,7 @@ class TagResourceIT {
     @Transactional
     void putWithMissingIdPathParamTag() throws Exception {
         int databaseSizeBeforeUpdate = tagRepository.findAll().size();
-        tag.setId(longCount.incrementAndGet());
+        tag.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTagMockMvc
@@ -325,7 +325,7 @@ class TagResourceIT {
     @Transactional
     void patchNonExistingTag() throws Exception {
         int databaseSizeBeforeUpdate = tagRepository.findAll().size();
-        tag.setId(longCount.incrementAndGet());
+        tag.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restTagMockMvc
@@ -346,12 +346,12 @@ class TagResourceIT {
     @Transactional
     void patchWithIdMismatchTag() throws Exception {
         int databaseSizeBeforeUpdate = tagRepository.findAll().size();
-        tag.setId(longCount.incrementAndGet());
+        tag.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTagMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(tag))
@@ -367,7 +367,7 @@ class TagResourceIT {
     @Transactional
     void patchWithMissingIdPathParamTag() throws Exception {
         int databaseSizeBeforeUpdate = tagRepository.findAll().size();
-        tag.setId(longCount.incrementAndGet());
+        tag.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTagMockMvc

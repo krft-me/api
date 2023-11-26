@@ -9,17 +9,17 @@
   "entityTableName": "city",
   "fields": [
     {
-      "documentation": "The city's name",
       "fieldName": "name",
       "fieldType": "String",
       "fieldValidateRules": ["required", "minlength"],
-      "fieldValidateRulesMinlength": "1"
+      "fieldValidateRulesMinlength": "1",
+      "javadoc": "The city's name"
     },
     {
-      "documentation": "The city's zipcode",
       "fieldName": "zipCode",
       "fieldType": "String",
-      "fieldValidateRules": ["required"]
+      "fieldValidateRules": ["required"],
+      "javadoc": "The city's zipcode"
     }
   ],
   "fluentMethods": true,
@@ -34,18 +34,16 @@
       "otherEntityName": "applicationUser",
       "otherEntityRelationshipName": "city",
       "relationshipName": "users",
-      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
       "otherEntityName": "region",
       "otherEntityRelationshipName": "cities",
       "relationshipName": "region",
-      "relationshipSide": "right",
       "relationshipType": "many-to-one",
       "relationshipValidateRules": "required"
     }
   ],
-  "searchEngine": "no",
+  "searchEngine": false,
   "service": "serviceImpl"
 }

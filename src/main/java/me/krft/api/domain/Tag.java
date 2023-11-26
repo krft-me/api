@@ -6,14 +6,12 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * Tag entity
- * Represents a preset keyword for an offer
+ * Tag entity\nRepresents a preset keyword for an offer
  */
 @Schema(description = "Tag entity\nRepresents a preset keyword for an offer")
 @Entity
@@ -35,7 +33,7 @@ public class Tag implements Serializable {
     @Column(name = "label", nullable = false, unique = true)
     private String label;
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "tags")
+    @ManyToMany(mappedBy = "tags")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "reviews", "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
     private Set<ApplicationUserOffer> offers = new HashSet<>();
@@ -109,7 +107,7 @@ public class Tag implements Serializable {
         if (!(o instanceof Tag)) {
             return false;
         }
-        return getId() != null && getId().equals(((Tag) o).getId());
+        return id != null && id.equals(((Tag) o).id);
     }
 
     @Override

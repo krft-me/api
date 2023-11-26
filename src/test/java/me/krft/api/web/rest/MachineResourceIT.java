@@ -37,8 +37,8 @@ class MachineResourceIT {
     private static final String ENTITY_API_URL = "/api/machines";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static final Random random = new Random();
-    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     @Autowired
     private MachineRepository machineRepository;
@@ -210,7 +210,7 @@ class MachineResourceIT {
         int databaseSizeBeforeUpdate = machineRepository.findAll().size();
 
         // Update the machine
-        Machine updatedMachine = machineRepository.findById(machine.getId()).orElseThrow();
+        Machine updatedMachine = machineRepository.findById(machine.getId()).get();
         // Disconnect from session so that the updates on updatedMachine are not directly saved in db
         em.detach(updatedMachine);
         updatedMachine.name(UPDATED_NAME);
@@ -235,7 +235,7 @@ class MachineResourceIT {
     @Transactional
     void putNonExistingMachine() throws Exception {
         int databaseSizeBeforeUpdate = machineRepository.findAll().size();
-        machine.setId(longCount.incrementAndGet());
+        machine.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restMachineMockMvc
@@ -256,12 +256,12 @@ class MachineResourceIT {
     @Transactional
     void putWithIdMismatchMachine() throws Exception {
         int databaseSizeBeforeUpdate = machineRepository.findAll().size();
-        machine.setId(longCount.incrementAndGet());
+        machine.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restMachineMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(machine))
@@ -277,7 +277,7 @@ class MachineResourceIT {
     @Transactional
     void putWithMissingIdPathParamMachine() throws Exception {
         int databaseSizeBeforeUpdate = machineRepository.findAll().size();
-        machine.setId(longCount.incrementAndGet());
+        machine.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restMachineMockMvc
@@ -353,7 +353,7 @@ class MachineResourceIT {
     @Transactional
     void patchNonExistingMachine() throws Exception {
         int databaseSizeBeforeUpdate = machineRepository.findAll().size();
-        machine.setId(longCount.incrementAndGet());
+        machine.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restMachineMockMvc
@@ -374,12 +374,12 @@ class MachineResourceIT {
     @Transactional
     void patchWithIdMismatchMachine() throws Exception {
         int databaseSizeBeforeUpdate = machineRepository.findAll().size();
-        machine.setId(longCount.incrementAndGet());
+        machine.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restMachineMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(machine))
@@ -395,7 +395,7 @@ class MachineResourceIT {
     @Transactional
     void patchWithMissingIdPathParamMachine() throws Exception {
         int databaseSizeBeforeUpdate = machineRepository.findAll().size();
-        machine.setId(longCount.incrementAndGet());
+        machine.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restMachineMockMvc

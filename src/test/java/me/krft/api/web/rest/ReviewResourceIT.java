@@ -40,8 +40,8 @@ class ReviewResourceIT {
     private static final String ENTITY_API_URL = "/api/reviews";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static final Random random = new Random();
-    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     @Autowired
     private ReviewRepository reviewRepository;
@@ -207,7 +207,7 @@ class ReviewResourceIT {
         int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
 
         // Update the review
-        Review updatedReview = reviewRepository.findById(review.getId()).orElseThrow();
+        Review updatedReview = reviewRepository.findById(review.getId()).get();
         // Disconnect from session so that the updates on updatedReview are not directly saved in db
         em.detach(updatedReview);
         updatedReview.rating(UPDATED_RATING).comment(UPDATED_COMMENT);
@@ -233,7 +233,7 @@ class ReviewResourceIT {
     @Transactional
     void putNonExistingReview() throws Exception {
         int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
-        review.setId(longCount.incrementAndGet());
+        review.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restReviewMockMvc
@@ -254,12 +254,12 @@ class ReviewResourceIT {
     @Transactional
     void putWithIdMismatchReview() throws Exception {
         int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
-        review.setId(longCount.incrementAndGet());
+        review.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restReviewMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(review))
@@ -275,7 +275,7 @@ class ReviewResourceIT {
     @Transactional
     void putWithMissingIdPathParamReview() throws Exception {
         int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
-        review.setId(longCount.incrementAndGet());
+        review.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restReviewMockMvc
@@ -301,8 +301,6 @@ class ReviewResourceIT {
         Review partialUpdatedReview = new Review();
         partialUpdatedReview.setId(review.getId());
 
-        partialUpdatedReview.comment(UPDATED_COMMENT);
-
         restReviewMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedReview.getId())
@@ -317,7 +315,7 @@ class ReviewResourceIT {
         assertThat(reviewList).hasSize(databaseSizeBeforeUpdate);
         Review testReview = reviewList.get(reviewList.size() - 1);
         assertThat(testReview.getRating()).isEqualTo(DEFAULT_RATING);
-        assertThat(testReview.getComment()).isEqualTo(UPDATED_COMMENT);
+        assertThat(testReview.getComment()).isEqualTo(DEFAULT_COMMENT);
     }
 
     @Test
@@ -355,7 +353,7 @@ class ReviewResourceIT {
     @Transactional
     void patchNonExistingReview() throws Exception {
         int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
-        review.setId(longCount.incrementAndGet());
+        review.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restReviewMockMvc
@@ -376,12 +374,12 @@ class ReviewResourceIT {
     @Transactional
     void patchWithIdMismatchReview() throws Exception {
         int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
-        review.setId(longCount.incrementAndGet());
+        review.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restReviewMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(review))
@@ -397,7 +395,7 @@ class ReviewResourceIT {
     @Transactional
     void patchWithMissingIdPathParamReview() throws Exception {
         int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
-        review.setId(longCount.incrementAndGet());
+        review.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restReviewMockMvc

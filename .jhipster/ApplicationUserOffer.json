@@ -9,25 +9,25 @@
   "entityTableName": "application_user_offer",
   "fields": [
     {
-      "documentation": "Description of the service provided, written by the user providing it",
       "fieldName": "description",
       "fieldType": "String",
       "fieldValidateRules": ["required", "minlength", "maxlength"],
       "fieldValidateRulesMaxlength": "512",
-      "fieldValidateRulesMinlength": "1"
+      "fieldValidateRulesMinlength": "1",
+      "javadoc": "Description of the service provided, written by the user providing it"
     },
     {
-      "documentation": "The price of the service, set by the user providing it",
       "fieldName": "price",
       "fieldType": "Integer",
       "fieldValidateRules": ["required", "min"],
-      "fieldValidateRulesMin": "0"
+      "fieldValidateRulesMin": "0",
+      "javadoc": "The price of the service, set by the user providing it"
     },
     {
-      "documentation": "Active means the offer is visible to the users, we shouldn't delete it",
       "fieldName": "active",
       "fieldType": "Boolean",
-      "fieldValidateRules": ["required"]
+      "fieldValidateRules": ["required"],
+      "javadoc": "Active means the offer is visible to the users, we shouldn't delete it"
     }
   ],
   "fluentMethods": true,
@@ -42,21 +42,18 @@
       "otherEntityName": "review",
       "otherEntityRelationshipName": "offer",
       "relationshipName": "reviews",
-      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
       "otherEntityName": "showcase",
       "otherEntityRelationshipName": "offer",
       "relationshipName": "showcases",
-      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
       "otherEntityName": "order",
       "otherEntityRelationshipName": "offer",
       "relationshipName": "orders",
-      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
@@ -64,14 +61,12 @@
       "otherEntityRelationshipName": "offers",
       "ownerSide": true,
       "relationshipName": "tags",
-      "relationshipSide": "left",
       "relationshipType": "many-to-many"
     },
     {
       "otherEntityName": "applicationUser",
       "otherEntityRelationshipName": "offers",
       "relationshipName": "provider",
-      "relationshipSide": "right",
       "relationshipType": "many-to-one",
       "relationshipValidateRules": "required"
     },
@@ -79,11 +74,10 @@
       "otherEntityName": "offer",
       "otherEntityRelationshipName": "userOffers",
       "relationshipName": "offer",
-      "relationshipSide": "right",
       "relationshipType": "many-to-one",
       "relationshipValidateRules": "required"
     }
   ],
-  "searchEngine": "no",
+  "searchEngine": false,
   "service": "serviceImpl"
 }

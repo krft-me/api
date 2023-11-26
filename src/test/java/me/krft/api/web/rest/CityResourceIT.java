@@ -40,8 +40,8 @@ class CityResourceIT {
     private static final String ENTITY_API_URL = "/api/cities";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static final Random random = new Random();
-    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     @Autowired
     private CityRepository cityRepository;
@@ -226,7 +226,7 @@ class CityResourceIT {
         int databaseSizeBeforeUpdate = cityRepository.findAll().size();
 
         // Update the city
-        City updatedCity = cityRepository.findById(city.getId()).orElseThrow();
+        City updatedCity = cityRepository.findById(city.getId()).get();
         // Disconnect from session so that the updates on updatedCity are not directly saved in db
         em.detach(updatedCity);
         updatedCity.name(UPDATED_NAME).zipCode(UPDATED_ZIP_CODE);
@@ -252,7 +252,7 @@ class CityResourceIT {
     @Transactional
     void putNonExistingCity() throws Exception {
         int databaseSizeBeforeUpdate = cityRepository.findAll().size();
-        city.setId(longCount.incrementAndGet());
+        city.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restCityMockMvc
@@ -273,12 +273,12 @@ class CityResourceIT {
     @Transactional
     void putWithIdMismatchCity() throws Exception {
         int databaseSizeBeforeUpdate = cityRepository.findAll().size();
-        city.setId(longCount.incrementAndGet());
+        city.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restCityMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(city))
@@ -294,7 +294,7 @@ class CityResourceIT {
     @Transactional
     void putWithMissingIdPathParamCity() throws Exception {
         int databaseSizeBeforeUpdate = cityRepository.findAll().size();
-        city.setId(longCount.incrementAndGet());
+        city.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restCityMockMvc
@@ -320,6 +320,8 @@ class CityResourceIT {
         City partialUpdatedCity = new City();
         partialUpdatedCity.setId(city.getId());
 
+        partialUpdatedCity.zipCode(UPDATED_ZIP_CODE);
+
         restCityMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedCity.getId())
@@ -334,7 +336,7 @@ class CityResourceIT {
         assertThat(cityList).hasSize(databaseSizeBeforeUpdate);
         City testCity = cityList.get(cityList.size() - 1);
         assertThat(testCity.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testCity.getZipCode()).isEqualTo(DEFAULT_ZIP_CODE);
+        assertThat(testCity.getZipCode()).isEqualTo(UPDATED_ZIP_CODE);
     }
 
     @Test
@@ -372,7 +374,7 @@ class CityResourceIT {
     @Transactional
     void patchNonExistingCity() throws Exception {
         int databaseSizeBeforeUpdate = cityRepository.findAll().size();
-        city.setId(longCount.incrementAndGet());
+        city.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restCityMockMvc
@@ -393,12 +395,12 @@ class CityResourceIT {
     @Transactional
     void patchWithIdMismatchCity() throws Exception {
         int databaseSizeBeforeUpdate = cityRepository.findAll().size();
-        city.setId(longCount.incrementAndGet());
+        city.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restCityMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(city))
@@ -414,7 +416,7 @@ class CityResourceIT {
     @Transactional
     void patchWithMissingIdPathParamCity() throws Exception {
         int databaseSizeBeforeUpdate = cityRepository.findAll().size();
-        city.setId(longCount.incrementAndGet());
+        city.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restCityMockMvc

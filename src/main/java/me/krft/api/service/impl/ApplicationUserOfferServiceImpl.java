@@ -2,12 +2,9 @@ package me.krft.api.service.impl;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.repository.ApplicationUserOfferRepository;
 import me.krft.api.service.ApplicationUserOfferService;
-import me.krft.api.service.dto.ApplicationUserOfferDTO;
-import me.krft.api.service.mapper.ApplicationUserOfferMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -16,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link me.krft.api.domain.ApplicationUserOffer}.
+ * Service Implementation for managing {@link ApplicationUserOffer}.
  */
 @Service
 @Transactional
@@ -26,14 +23,8 @@ public class ApplicationUserOfferServiceImpl implements ApplicationUserOfferServ
 
     private final ApplicationUserOfferRepository applicationUserOfferRepository;
 
-    private final ApplicationUserOfferMapper applicationUserOfferMapper;
-
-    public ApplicationUserOfferServiceImpl(
-        ApplicationUserOfferRepository applicationUserOfferRepository,
-        ApplicationUserOfferMapper applicationUserOfferMapper
-    ) {
+    public ApplicationUserOfferServiceImpl(ApplicationUserOfferRepository applicationUserOfferRepository) {
         this.applicationUserOfferRepository = applicationUserOfferRepository;
-        this.applicationUserOfferMapper = applicationUserOfferMapper;
     }
 
     @Override
@@ -92,21 +83,5 @@ public class ApplicationUserOfferServiceImpl implements ApplicationUserOfferServ
     public void delete(Long id) {
         log.debug("Request to delete ApplicationUserOffer : {}", id);
         applicationUserOfferRepository.deleteById(id);
-    }
-
-    @Override
-    public List<ApplicationUserOfferDTO> testMapper() {
-        log.debug("Request to get all ApplicationUserOfferDTO");
-        return applicationUserOfferRepository.findAll().stream().map(this.applicationUserOfferMapper::toDTO).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<ApplicationUserOfferDTO> getApplicationUserOffersCards() {
-        log.debug("Request to get all ApplicationUserOfferDTO cards");
-        return applicationUserOfferRepository
-            .findAll()
-            .stream()
-            .map(this.applicationUserOfferMapper::toDTOCard)
-            .collect(Collectors.toList());
     }
 }

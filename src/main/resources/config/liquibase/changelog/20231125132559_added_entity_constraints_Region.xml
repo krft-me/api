@@ -12,7 +12,6 @@
                                  baseTableName="region"
                                  constraintName="fk_region__country_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="country"
-                                 />
+                                 referencedTableName="country"/>
     </changeSet>
 </databaseChangeLog>

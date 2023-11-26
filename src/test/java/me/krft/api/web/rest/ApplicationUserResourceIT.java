@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
@@ -40,11 +41,14 @@ class ApplicationUserResourceIT {
     private static final String DEFAULT_USERNAME = "AAAAAAAAAA";
     private static final String UPDATED_USERNAME = "BBBBBBBBBB";
 
+    private static final UUID DEFAULT_PROFILE_PICTURE_ID = UUID.randomUUID();
+    private static final UUID UPDATED_PROFILE_PICTURE_ID = UUID.randomUUID();
+
     private static final String ENTITY_API_URL = "/api/application-users";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static final Random random = new Random();
-    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     @Autowired
     private ApplicationUserRepository applicationUserRepository;
@@ -70,7 +74,8 @@ class ApplicationUserResourceIT {
         ApplicationUser applicationUser = new ApplicationUser()
             .firstName(DEFAULT_FIRST_NAME)
             .lastName(DEFAULT_LAST_NAME)
-            .username(DEFAULT_USERNAME);
+            .username(DEFAULT_USERNAME)
+            .profilePictureId(DEFAULT_PROFILE_PICTURE_ID);
         return applicationUser;
     }
 
@@ -84,7 +89,8 @@ class ApplicationUserResourceIT {
         ApplicationUser applicationUser = new ApplicationUser()
             .firstName(UPDATED_FIRST_NAME)
             .lastName(UPDATED_LAST_NAME)
-            .username(UPDATED_USERNAME);
+            .username(UPDATED_USERNAME)
+            .profilePictureId(UPDATED_PROFILE_PICTURE_ID);
         return applicationUser;
     }
 
@@ -114,6 +120,7 @@ class ApplicationUserResourceIT {
         assertThat(testApplicationUser.getFirstName()).isEqualTo(DEFAULT_FIRST_NAME);
         assertThat(testApplicationUser.getLastName()).isEqualTo(DEFAULT_LAST_NAME);
         assertThat(testApplicationUser.getUsername()).isEqualTo(DEFAULT_USERNAME);
+        assertThat(testApplicationUser.getProfilePictureId()).isEqualTo(DEFAULT_PROFILE_PICTURE_ID);
     }
 
     @Test
@@ -219,7 +226,8 @@ class ApplicationUserResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(applicationUser.getId().intValue())))
             .andExpect(jsonPath("$.[*].firstName").value(hasItem(DEFAULT_FIRST_NAME)))
             .andExpect(jsonPath("$.[*].lastName").value(hasItem(DEFAULT_LAST_NAME)))
-            .andExpect(jsonPath("$.[*].username").value(hasItem(DEFAULT_USERNAME)));
+            .andExpect(jsonPath("$.[*].username").value(hasItem(DEFAULT_USERNAME)))
+            .andExpect(jsonPath("$.[*].profilePictureId").value(hasItem(DEFAULT_PROFILE_PICTURE_ID.toString())));
     }
 
     @Test
@@ -236,7 +244,8 @@ class ApplicationUserResourceIT {
             .andExpect(jsonPath("$.id").value(applicationUser.getId().intValue()))
             .andExpect(jsonPath("$.firstName").value(DEFAULT_FIRST_NAME))
             .andExpect(jsonPath("$.lastName").value(DEFAULT_LAST_NAME))
-            .andExpect(jsonPath("$.username").value(DEFAULT_USERNAME));
+            .andExpect(jsonPath("$.username").value(DEFAULT_USERNAME))
+            .andExpect(jsonPath("$.profilePictureId").value(DEFAULT_PROFILE_PICTURE_ID.toString()));
     }
 
     @Test
@@ -255,10 +264,14 @@ class ApplicationUserResourceIT {
         int databaseSizeBeforeUpdate = applicationUserRepository.findAll().size();
 
         // Update the applicationUser
-        ApplicationUser updatedApplicationUser = applicationUserRepository.findById(applicationUser.getId()).orElseThrow();
+        ApplicationUser updatedApplicationUser = applicationUserRepository.findById(applicationUser.getId()).get();
         // Disconnect from session so that the updates on updatedApplicationUser are not directly saved in db
         em.detach(updatedApplicationUser);
-        updatedApplicationUser.firstName(UPDATED_FIRST_NAME).lastName(UPDATED_LAST_NAME).username(UPDATED_USERNAME);
+        updatedApplicationUser
+            .firstName(UPDATED_FIRST_NAME)
+            .lastName(UPDATED_LAST_NAME)
+            .username(UPDATED_USERNAME)
+            .profilePictureId(UPDATED_PROFILE_PICTURE_ID);
 
         restApplicationUserMockMvc
             .perform(
@@ -276,13 +289,14 @@ class ApplicationUserResourceIT {
         assertThat(testApplicationUser.getFirstName()).isEqualTo(UPDATED_FIRST_NAME);
         assertThat(testApplicationUser.getLastName()).isEqualTo(UPDATED_LAST_NAME);
         assertThat(testApplicationUser.getUsername()).isEqualTo(UPDATED_USERNAME);
+        assertThat(testApplicationUser.getProfilePictureId()).isEqualTo(UPDATED_PROFILE_PICTURE_ID);
     }
 
     @Test
     @Transactional
     void putNonExistingApplicationUser() throws Exception {
         int databaseSizeBeforeUpdate = applicationUserRepository.findAll().size();
-        applicationUser.setId(longCount.incrementAndGet());
+        applicationUser.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restApplicationUserMockMvc
@@ -303,12 +317,12 @@ class ApplicationUserResourceIT {
     @Transactional
     void putWithIdMismatchApplicationUser() throws Exception {
         int databaseSizeBeforeUpdate = applicationUserRepository.findAll().size();
-        applicationUser.setId(longCount.incrementAndGet());
+        applicationUser.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(applicationUser))
@@ -324,7 +338,7 @@ class ApplicationUserResourceIT {
     @Transactional
     void putWithMissingIdPathParamApplicationUser() throws Exception {
         int databaseSizeBeforeUpdate = applicationUserRepository.findAll().size();
-        applicationUser.setId(longCount.incrementAndGet());
+        applicationUser.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserMockMvc
@@ -353,6 +367,8 @@ class ApplicationUserResourceIT {
         ApplicationUser partialUpdatedApplicationUser = new ApplicationUser();
         partialUpdatedApplicationUser.setId(applicationUser.getId());
 
+        partialUpdatedApplicationUser.lastName(UPDATED_LAST_NAME).username(UPDATED_USERNAME);
+
         restApplicationUserMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedApplicationUser.getId())
@@ -367,8 +383,9 @@ class ApplicationUserResourceIT {
         assertThat(applicationUserList).hasSize(databaseSizeBeforeUpdate);
         ApplicationUser testApplicationUser = applicationUserList.get(applicationUserList.size() - 1);
         assertThat(testApplicationUser.getFirstName()).isEqualTo(DEFAULT_FIRST_NAME);
-        assertThat(testApplicationUser.getLastName()).isEqualTo(DEFAULT_LAST_NAME);
-        assertThat(testApplicationUser.getUsername()).isEqualTo(DEFAULT_USERNAME);
+        assertThat(testApplicationUser.getLastName()).isEqualTo(UPDATED_LAST_NAME);
+        assertThat(testApplicationUser.getUsername()).isEqualTo(UPDATED_USERNAME);
+        assertThat(testApplicationUser.getProfilePictureId()).isEqualTo(DEFAULT_PROFILE_PICTURE_ID);
     }
 
     @Test
@@ -383,7 +400,11 @@ class ApplicationUserResourceIT {
         ApplicationUser partialUpdatedApplicationUser = new ApplicationUser();
         partialUpdatedApplicationUser.setId(applicationUser.getId());
 
-        partialUpdatedApplicationUser.firstName(UPDATED_FIRST_NAME).lastName(UPDATED_LAST_NAME).username(UPDATED_USERNAME);
+        partialUpdatedApplicationUser
+            .firstName(UPDATED_FIRST_NAME)
+            .lastName(UPDATED_LAST_NAME)
+            .username(UPDATED_USERNAME)
+            .profilePictureId(UPDATED_PROFILE_PICTURE_ID);
 
         restApplicationUserMockMvc
             .perform(
@@ -401,13 +422,14 @@ class ApplicationUserResourceIT {
         assertThat(testApplicationUser.getFirstName()).isEqualTo(UPDATED_FIRST_NAME);
         assertThat(testApplicationUser.getLastName()).isEqualTo(UPDATED_LAST_NAME);
         assertThat(testApplicationUser.getUsername()).isEqualTo(UPDATED_USERNAME);
+        assertThat(testApplicationUser.getProfilePictureId()).isEqualTo(UPDATED_PROFILE_PICTURE_ID);
     }
 
     @Test
     @Transactional
     void patchNonExistingApplicationUser() throws Exception {
         int databaseSizeBeforeUpdate = applicationUserRepository.findAll().size();
-        applicationUser.setId(longCount.incrementAndGet());
+        applicationUser.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restApplicationUserMockMvc
@@ -428,12 +450,12 @@ class ApplicationUserResourceIT {
     @Transactional
     void patchWithIdMismatchApplicationUser() throws Exception {
         int databaseSizeBeforeUpdate = applicationUserRepository.findAll().size();
-        applicationUser.setId(longCount.incrementAndGet());
+        applicationUser.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(applicationUser))
@@ -449,7 +471,7 @@ class ApplicationUserResourceIT {
     @Transactional
     void patchWithMissingIdPathParamApplicationUser() throws Exception {
         int databaseSizeBeforeUpdate = applicationUserRepository.findAll().size();
-        applicationUser.setId(longCount.incrementAndGet());
+        applicationUser.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restApplicationUserMockMvc

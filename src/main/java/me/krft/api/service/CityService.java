@@ -5,7 +5,7 @@ import java.util.Optional;
 import me.krft.api.domain.City;
 
 /**
- * Service Interface for managing {@link me.krft.api.domain.City}.
+ * Service Interface for managing {@link City}.
  */
 public interface CityService {
     /**

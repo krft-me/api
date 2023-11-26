@@ -6,14 +6,12 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * OfferCategory entity
- * Represents a preset offer type
+ * OfferCategory entity\nRepresents a preset offer type
  */
 @Schema(description = "OfferCategory entity\nRepresents a preset offer type")
 @Entity
@@ -35,7 +33,7 @@ public class OfferCategory implements Serializable {
     @Column(name = "label", nullable = false, unique = true)
     private String label;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
+    @OneToMany(mappedBy = "category")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "userOffers", "machine", "category" }, allowSetters = true)
     private Set<Offer> offers = new HashSet<>();
@@ -109,7 +107,7 @@ public class OfferCategory implements Serializable {
         if (!(o instanceof OfferCategory)) {
             return false;
         }
-        return getId() != null && getId().equals(((OfferCategory) o).getId());
+        return id != null && id.equals(((OfferCategory) o).id);
     }
 
     @Override

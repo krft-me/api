@@ -5,7 +5,7 @@ import java.util.Optional;
 import me.krft.api.domain.MachineCategory;
 
 /**
- * Service Interface for managing {@link me.krft.api.domain.MachineCategory}.
+ * Service Interface for managing {@link MachineCategory}.
  */
 public interface MachineCategoryService {
     /**

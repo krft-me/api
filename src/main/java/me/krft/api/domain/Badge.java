@@ -6,14 +6,12 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * Badge entity
- * Represents a certification (example: 100 completed orders)
+ * Badge entity\nRepresents a certification (example: 100 completed orders)
  */
 @Schema(description = "Badge entity\nRepresents a certification (example: 100 completed orders)")
 @Entity
@@ -43,7 +41,7 @@ public class Badge implements Serializable {
     @Column(name = "picture", nullable = false, unique = true)
     private String picture;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "badge")
+    @OneToMany(mappedBy = "badge")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "user", "badge" }, allowSetters = true)
     private Set<ApplicationUserBadge> users = new HashSet<>();
@@ -130,7 +128,7 @@ public class Badge implements Serializable {
         if (!(o instanceof Badge)) {
             return false;
         }
-        return getId() != null && getId().equals(((Badge) o).getId());
+        return id != null && id.equals(((Badge) o).id);
     }
 
     @Override

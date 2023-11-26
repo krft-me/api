@@ -27,18 +27,16 @@
       "otherEntityName": "offer",
       "otherEntityRelationshipName": "machine",
       "relationshipName": "offers",
-      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
       "otherEntityName": "machineCategory",
       "otherEntityRelationshipName": "machines",
       "relationshipName": "category",
-      "relationshipSide": "right",
       "relationshipType": "many-to-one",
       "relationshipValidateRules": "required"
     }
   ],
-  "searchEngine": "no",
+  "searchEngine": false,
   "service": "serviceImpl"
 }

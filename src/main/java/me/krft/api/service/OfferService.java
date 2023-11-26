@@ -5,7 +5,7 @@ import java.util.Optional;
 import me.krft.api.domain.Offer;
 
 /**
- * Service Interface for managing {@link me.krft.api.domain.Offer}.
+ * Service Interface for managing {@link Offer}.
  */
 public interface OfferService {
     /**

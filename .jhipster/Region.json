@@ -9,11 +9,11 @@
   "entityTableName": "region",
   "fields": [
     {
-      "documentation": "The region's name",
       "fieldName": "name",
       "fieldType": "String",
       "fieldValidateRules": ["required", "minlength"],
-      "fieldValidateRulesMinlength": "1"
+      "fieldValidateRulesMinlength": "1",
+      "javadoc": "The region's name"
     }
   ],
   "fluentMethods": true,
@@ -28,18 +28,16 @@
       "otherEntityName": "city",
       "otherEntityRelationshipName": "region",
       "relationshipName": "cities",
-      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
       "otherEntityName": "country",
       "otherEntityRelationshipName": "regions",
       "relationshipName": "country",
-      "relationshipSide": "right",
       "relationshipType": "many-to-one",
       "relationshipValidateRules": "required"
     }
   ],
-  "searchEngine": "no",
+  "searchEngine": false,
   "service": "serviceImpl"
 }

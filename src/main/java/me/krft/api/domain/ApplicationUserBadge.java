@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.time.Instant;
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -109,7 +109,7 @@ public class ApplicationUserBadge implements Serializable {
         if (!(o instanceof ApplicationUserBadge)) {
             return false;
         }
-        return getId() != null && getId().equals(((ApplicationUserBadge) o).getId());
+        return id != null && id.equals(((ApplicationUserBadge) o).id);
     }
 
     @Override

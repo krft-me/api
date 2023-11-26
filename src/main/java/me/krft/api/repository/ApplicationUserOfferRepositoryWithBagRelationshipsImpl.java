@@ -8,6 +8,7 @@ import java.util.stream.IntStream;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import me.krft.api.domain.ApplicationUserOffer;
+import org.hibernate.annotations.QueryHints;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
@@ -41,10 +42,11 @@ public class ApplicationUserOfferRepositoryWithBagRelationshipsImpl implements A
     ApplicationUserOffer fetchTags(ApplicationUserOffer result) {
         return entityManager
             .createQuery(
-                "select applicationUserOffer from ApplicationUserOffer applicationUserOffer left join fetch applicationUserOffer.tags where applicationUserOffer.id = :id",
+                "select applicationUserOffer from ApplicationUserOffer applicationUserOffer left join fetch applicationUserOffer.tags where applicationUserOffer is :applicationUserOffer",
                 ApplicationUserOffer.class
             )
-            .setParameter("id", result.getId())
+            .setParameter("applicationUserOffer", result)
+            .setHint(QueryHints.PASS_DISTINCT_THROUGH, false)
             .getSingleResult();
     }
 
@@ -53,10 +55,11 @@ public class ApplicationUserOfferRepositoryWithBagRelationshipsImpl implements A
         IntStream.range(0, applicationUserOffers.size()).forEach(index -> order.put(applicationUserOffers.get(index).getId(), index));
         List<ApplicationUserOffer> result = entityManager
             .createQuery(
-                "select applicationUserOffer from ApplicationUserOffer applicationUserOffer left join fetch applicationUserOffer.tags where applicationUserOffer in :applicationUserOffers",
+                "select distinct applicationUserOffer from ApplicationUserOffer applicationUserOffer left join fetch applicationUserOffer.tags where applicationUserOffer in :applicationUserOffers",
                 ApplicationUserOffer.class
             )
             .setParameter("applicationUserOffers", applicationUserOffers)
+            .setHint(QueryHints.PASS_DISTINCT_THROUGH, false)
             .getResultList();
         Collections.sort(result, (o1, o2) -> Integer.compare(order.get(o1.getId()), order.get(o2.getId())));
         return result;

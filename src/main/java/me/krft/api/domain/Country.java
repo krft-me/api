@@ -6,8 +6,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -45,7 +44,7 @@ public class Country implements Serializable {
     @Column(name = "iso_code", length = 3, nullable = false, unique = true)
     private String isoCode;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "country")
+    @OneToMany(mappedBy = "country")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "cities", "country" }, allowSetters = true)
     private Set<Region> regions = new HashSet<>();
@@ -132,7 +131,7 @@ public class Country implements Serializable {
         if (!(o instanceof Country)) {
             return false;
         }
-        return getId() != null && getId().equals(((Country) o).getId());
+        return id != null && id.equals(((Country) o).id);
     }
 
     @Override

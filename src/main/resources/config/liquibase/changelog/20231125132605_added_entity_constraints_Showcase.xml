@@ -12,7 +12,6 @@
                                  baseTableName="showcase"
                                  constraintName="fk_showcase__offer_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="application_user_offer"
-                                 />
+                                 referencedTableName="application_user_offer"/>
     </changeSet>
 </databaseChangeLog>
