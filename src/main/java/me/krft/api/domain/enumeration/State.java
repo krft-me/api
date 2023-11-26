@@ -1,8 +1,7 @@
 package me.krft.api.domain.enumeration;
 
 /**
- * State enum
- * Represents the state of an order
+ * State enum\nRepresents the state of an order
  */
 public enum State {
     WAITING,

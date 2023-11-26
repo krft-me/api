@@ -12,14 +12,12 @@
                                  baseTableName="offer"
                                  constraintName="fk_offer__machine_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="machine"
-                                 />
+                                 referencedTableName="machine"/>
 
         <addForeignKeyConstraint baseColumnNames="category_id"
                                  baseTableName="offer"
                                  constraintName="fk_offer__category_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="offer_category"
-                                 />
+                                 referencedTableName="offer_category"/>
     </changeSet>
 </databaseChangeLog>

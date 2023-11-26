@@ -9,10 +9,10 @@
   "entityTableName": "application_user_badge",
   "fields": [
     {
-      "documentation": "Date the user obtained the badge",
       "fieldName": "obtainedDate",
       "fieldType": "Instant",
-      "fieldValidateRules": ["required"]
+      "fieldValidateRules": ["required"],
+      "javadoc": "Date the user obtained the badge"
     }
   ],
   "fluentMethods": true,
@@ -27,7 +27,6 @@
       "otherEntityName": "applicationUser",
       "otherEntityRelationshipName": "badges",
       "relationshipName": "user",
-      "relationshipSide": "right",
       "relationshipType": "many-to-one",
       "relationshipValidateRules": "required"
     },
@@ -35,11 +34,10 @@
       "otherEntityName": "badge",
       "otherEntityRelationshipName": "users",
       "relationshipName": "badge",
-      "relationshipSide": "right",
       "relationshipType": "many-to-one",
       "relationshipValidateRules": "required"
     }
   ],
-  "searchEngine": "no",
+  "searchEngine": false,
   "service": "serviceImpl"
 }

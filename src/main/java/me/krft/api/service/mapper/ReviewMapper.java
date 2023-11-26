@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class ReviewMapper implements EntityDTOMapper<Review, ReviewDTO> {
 
-    private final ApplicationUserOfferMapper applicationUserOfferMapper;
+    private final OrderMapper orderMapper;
 
     @Autowired
-    public ReviewMapper(@Lazy ApplicationUserOfferMapper applicationUserOfferMapper) {
-        this.applicationUserOfferMapper = applicationUserOfferMapper;
+    public ReviewMapper(@Lazy OrderMapper orderMapper) {
+        this.orderMapper = orderMapper;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class ReviewMapper implements EntityDTOMapper<Review, ReviewDTO> {
             .id(entity.getId())
             .rating(entity.getRating())
             .comment(entity.getComment())
-            .offer(this.applicationUserOfferMapper.toDTOId(entity.getOffer()))
+            .order(this.orderMapper.toDTOId(entity.getOrder()))
             .build();
     }
 

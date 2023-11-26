@@ -38,8 +38,8 @@ class ShowcaseResourceIT {
     private static final String ENTITY_API_URL = "/api/showcases";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static final Random random = new Random();
-    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     @Autowired
     private ShowcaseRepository showcaseRepository;
@@ -211,7 +211,7 @@ class ShowcaseResourceIT {
         int databaseSizeBeforeUpdate = showcaseRepository.findAll().size();
 
         // Update the showcase
-        Showcase updatedShowcase = showcaseRepository.findById(showcase.getId()).orElseThrow();
+        Showcase updatedShowcase = showcaseRepository.findById(showcase.getId()).get();
         // Disconnect from session so that the updates on updatedShowcase are not directly saved in db
         em.detach(updatedShowcase);
         updatedShowcase.imageId(UPDATED_IMAGE_ID);
@@ -236,7 +236,7 @@ class ShowcaseResourceIT {
     @Transactional
     void putNonExistingShowcase() throws Exception {
         int databaseSizeBeforeUpdate = showcaseRepository.findAll().size();
-        showcase.setId(longCount.incrementAndGet());
+        showcase.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restShowcaseMockMvc
@@ -257,12 +257,12 @@ class ShowcaseResourceIT {
     @Transactional
     void putWithIdMismatchShowcase() throws Exception {
         int databaseSizeBeforeUpdate = showcaseRepository.findAll().size();
-        showcase.setId(longCount.incrementAndGet());
+        showcase.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restShowcaseMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(showcase))
@@ -278,7 +278,7 @@ class ShowcaseResourceIT {
     @Transactional
     void putWithMissingIdPathParamShowcase() throws Exception {
         int databaseSizeBeforeUpdate = showcaseRepository.findAll().size();
-        showcase.setId(longCount.incrementAndGet());
+        showcase.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restShowcaseMockMvc
@@ -307,6 +307,8 @@ class ShowcaseResourceIT {
         Showcase partialUpdatedShowcase = new Showcase();
         partialUpdatedShowcase.setId(showcase.getId());
 
+        partialUpdatedShowcase.imageId(UPDATED_IMAGE_ID);
+
         restShowcaseMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedShowcase.getId())
@@ -320,7 +322,7 @@ class ShowcaseResourceIT {
         List<Showcase> showcaseList = showcaseRepository.findAll();
         assertThat(showcaseList).hasSize(databaseSizeBeforeUpdate);
         Showcase testShowcase = showcaseList.get(showcaseList.size() - 1);
-        assertThat(testShowcase.getImageId()).isEqualTo(DEFAULT_IMAGE_ID);
+        assertThat(testShowcase.getImageId()).isEqualTo(UPDATED_IMAGE_ID);
     }
 
     @Test
@@ -357,7 +359,7 @@ class ShowcaseResourceIT {
     @Transactional
     void patchNonExistingShowcase() throws Exception {
         int databaseSizeBeforeUpdate = showcaseRepository.findAll().size();
-        showcase.setId(longCount.incrementAndGet());
+        showcase.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restShowcaseMockMvc
@@ -378,12 +380,12 @@ class ShowcaseResourceIT {
     @Transactional
     void patchWithIdMismatchShowcase() throws Exception {
         int databaseSizeBeforeUpdate = showcaseRepository.findAll().size();
-        showcase.setId(longCount.incrementAndGet());
+        showcase.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restShowcaseMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(showcase))
@@ -399,7 +401,7 @@ class ShowcaseResourceIT {
     @Transactional
     void patchWithMissingIdPathParamShowcase() throws Exception {
         int databaseSizeBeforeUpdate = showcaseRepository.findAll().size();
-        showcase.setId(longCount.incrementAndGet());
+        showcase.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restShowcaseMockMvc

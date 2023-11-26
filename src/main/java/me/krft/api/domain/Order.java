@@ -5,14 +5,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.time.Instant;
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import me.krft.api.domain.enumeration.State;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * Order entity
- * Represents an order placed by a customer for an offer
+ * Order entity\nRepresents an order placed by a customer for an offer
  */
 @Schema(description = "Order entity\nRepresents an order placed by a customer for an offer")
 @Entity
@@ -46,9 +45,14 @@ public class Order implements Serializable {
     @Column(name = "state", nullable = false)
     private State state;
 
+    @JsonIgnoreProperties(value = { "order" }, allowSetters = true)
+    @OneToOne
+    @JoinColumn(unique = true)
+    private Review review;
+
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
     private ApplicationUserOffer offer;
 
     @ManyToOne(optional = false)
@@ -97,6 +101,19 @@ public class Order implements Serializable {
         this.state = state;
     }
 
+    public Review getReview() {
+        return this.review;
+    }
+
+    public void setReview(Review review) {
+        this.review = review;
+    }
+
+    public Order review(Review review) {
+        this.setReview(review);
+        return this;
+    }
+
     public ApplicationUserOffer getOffer() {
         return this.offer;
     }
@@ -133,7 +150,7 @@ public class Order implements Serializable {
         if (!(o instanceof Order)) {
             return false;
         }
-        return getId() != null && getId().equals(((Order) o).getId());
+        return id != null && id.equals(((Order) o).id);
     }
 
     @Override

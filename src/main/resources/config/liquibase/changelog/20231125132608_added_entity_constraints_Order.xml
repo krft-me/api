@@ -8,18 +8,22 @@
     -->
     <changeSet id="20231125132608-2" author="jhipster">
 
+        <addForeignKeyConstraint baseColumnNames="review_id"
+                                 baseTableName="krftme_order"
+                                 constraintName="fk_krftme_order__review_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="review"/>
+
         <addForeignKeyConstraint baseColumnNames="offer_id"
                                  baseTableName="krftme_order"
                                  constraintName="fk_krftme_order__offer_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="application_user_offer"
-                                 />
+                                 referencedTableName="application_user_offer"/>
 
         <addForeignKeyConstraint baseColumnNames="customer_id"
                                  baseTableName="krftme_order"
                                  constraintName="fk_krftme_order__customer_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="application_user"
-                                 />
+                                 referencedTableName="application_user"/>
     </changeSet>
 </databaseChangeLog>

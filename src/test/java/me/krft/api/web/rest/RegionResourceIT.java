@@ -37,8 +37,8 @@ class RegionResourceIT {
     private static final String ENTITY_API_URL = "/api/regions";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static final Random random = new Random();
-    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     @Autowired
     private RegionRepository regionRepository;
@@ -201,7 +201,7 @@ class RegionResourceIT {
         int databaseSizeBeforeUpdate = regionRepository.findAll().size();
 
         // Update the region
-        Region updatedRegion = regionRepository.findById(region.getId()).orElseThrow();
+        Region updatedRegion = regionRepository.findById(region.getId()).get();
         // Disconnect from session so that the updates on updatedRegion are not directly saved in db
         em.detach(updatedRegion);
         updatedRegion.name(UPDATED_NAME);
@@ -226,7 +226,7 @@ class RegionResourceIT {
     @Transactional
     void putNonExistingRegion() throws Exception {
         int databaseSizeBeforeUpdate = regionRepository.findAll().size();
-        region.setId(longCount.incrementAndGet());
+        region.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restRegionMockMvc
@@ -247,12 +247,12 @@ class RegionResourceIT {
     @Transactional
     void putWithIdMismatchRegion() throws Exception {
         int databaseSizeBeforeUpdate = regionRepository.findAll().size();
-        region.setId(longCount.incrementAndGet());
+        region.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restRegionMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(region))
@@ -268,7 +268,7 @@ class RegionResourceIT {
     @Transactional
     void putWithMissingIdPathParamRegion() throws Exception {
         int databaseSizeBeforeUpdate = regionRepository.findAll().size();
-        region.setId(longCount.incrementAndGet());
+        region.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restRegionMockMvc
@@ -294,6 +294,8 @@ class RegionResourceIT {
         Region partialUpdatedRegion = new Region();
         partialUpdatedRegion.setId(region.getId());
 
+        partialUpdatedRegion.name(UPDATED_NAME);
+
         restRegionMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedRegion.getId())
@@ -307,7 +309,7 @@ class RegionResourceIT {
         List<Region> regionList = regionRepository.findAll();
         assertThat(regionList).hasSize(databaseSizeBeforeUpdate);
         Region testRegion = regionList.get(regionList.size() - 1);
-        assertThat(testRegion.getName()).isEqualTo(DEFAULT_NAME);
+        assertThat(testRegion.getName()).isEqualTo(UPDATED_NAME);
     }
 
     @Test
@@ -344,7 +346,7 @@ class RegionResourceIT {
     @Transactional
     void patchNonExistingRegion() throws Exception {
         int databaseSizeBeforeUpdate = regionRepository.findAll().size();
-        region.setId(longCount.incrementAndGet());
+        region.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restRegionMockMvc
@@ -365,12 +367,12 @@ class RegionResourceIT {
     @Transactional
     void patchWithIdMismatchRegion() throws Exception {
         int databaseSizeBeforeUpdate = regionRepository.findAll().size();
-        region.setId(longCount.incrementAndGet());
+        region.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restRegionMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(region))
@@ -386,7 +388,7 @@ class RegionResourceIT {
     @Transactional
     void patchWithMissingIdPathParamRegion() throws Exception {
         int databaseSizeBeforeUpdate = regionRepository.findAll().size();
-        region.setId(longCount.incrementAndGet());
+        region.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restRegionMockMvc

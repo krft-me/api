@@ -4,15 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import javax.persistence.*;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * Review entity
- * Represents a user's opinion of a service they have purchased
+ * Review entity\nRepresents a user's opinion of a service they have purchased
  */
 @Schema(description = "Review entity\nRepresents a user's opinion of a service they have purchased")
 @Entity
@@ -46,10 +43,9 @@ public class Review implements Serializable {
     @Column(name = "comment")
     private String comment;
 
-    @ManyToOne(optional = false)
-    @NotNull
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
-    private ApplicationUserOffer offer;
+    @JsonIgnoreProperties(value = { "review", "offer", "customer" }, allowSetters = true)
+    @OneToOne(mappedBy = "review")
+    private Order order;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -92,16 +88,22 @@ public class Review implements Serializable {
         this.comment = comment;
     }
 
-    public ApplicationUserOffer getOffer() {
-        return this.offer;
+    public Order getOrder() {
+        return this.order;
     }
 
-    public void setOffer(ApplicationUserOffer applicationUserOffer) {
-        this.offer = applicationUserOffer;
+    public void setOrder(Order order) {
+        if (this.order != null) {
+            this.order.setReview(null);
+        }
+        if (order != null) {
+            order.setReview(this);
+        }
+        this.order = order;
     }
 
-    public Review offer(ApplicationUserOffer applicationUserOffer) {
-        this.setOffer(applicationUserOffer);
+    public Review order(Order order) {
+        this.setOrder(order);
         return this;
     }
 
@@ -115,7 +117,7 @@ public class Review implements Serializable {
         if (!(o instanceof Review)) {
             return false;
         }
-        return getId() != null && getId().equals(((Review) o).getId());
+        return id != null && id.equals(((Review) o).id);
     }
 
     @Override

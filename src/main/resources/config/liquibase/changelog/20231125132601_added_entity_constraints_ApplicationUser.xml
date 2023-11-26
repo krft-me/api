@@ -12,14 +12,12 @@
                                  baseTableName="application_user"
                                  constraintName="fk_application_user__internal_user_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="krftme_user"
-                                 />
+                                 referencedTableName="krftme_user"/>
 
         <addForeignKeyConstraint baseColumnNames="city_id"
                                  baseTableName="application_user"
                                  constraintName="fk_application_user__city_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="city"
-                                 />
+                                 referencedTableName="city"/>
     </changeSet>
 </databaseChangeLog>

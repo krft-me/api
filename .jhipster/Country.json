@@ -9,16 +9,16 @@
   "entityTableName": "country",
   "fields": [
     {
-      "documentation": "The country's name in english",
       "fieldName": "name",
-      "fieldType": "String"
+      "fieldType": "String",
+      "javadoc": "The country's name in english"
     },
     {
-      "documentation": "ISO 3166-1 alpha-2",
       "fieldName": "isoCode",
       "fieldType": "String",
       "fieldValidateRules": ["required", "unique", "maxlength"],
-      "fieldValidateRulesMaxlength": "3"
+      "fieldValidateRulesMaxlength": "3",
+      "javadoc": "ISO 3166-1 alpha-2"
     }
   ],
   "fluentMethods": true,
@@ -33,10 +33,9 @@
       "otherEntityName": "region",
       "otherEntityRelationshipName": "country",
       "relationshipName": "regions",
-      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     }
   ],
-  "searchEngine": "no",
+  "searchEngine": false,
   "service": "serviceImpl"
 }

@@ -44,8 +44,8 @@ class OrderResourceIT {
     private static final String ENTITY_API_URL = "/api/orders";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static final Random random = new Random();
-    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     @Autowired
     private OrderRepository orderRepository;
@@ -250,7 +250,7 @@ class OrderResourceIT {
         int databaseSizeBeforeUpdate = orderRepository.findAll().size();
 
         // Update the order
-        Order updatedOrder = orderRepository.findById(order.getId()).orElseThrow();
+        Order updatedOrder = orderRepository.findById(order.getId()).get();
         // Disconnect from session so that the updates on updatedOrder are not directly saved in db
         em.detach(updatedOrder);
         updatedOrder.date(UPDATED_DATE).state(UPDATED_STATE);
@@ -276,7 +276,7 @@ class OrderResourceIT {
     @Transactional
     void putNonExistingOrder() throws Exception {
         int databaseSizeBeforeUpdate = orderRepository.findAll().size();
-        order.setId(longCount.incrementAndGet());
+        order.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restOrderMockMvc
@@ -297,12 +297,12 @@ class OrderResourceIT {
     @Transactional
     void putWithIdMismatchOrder() throws Exception {
         int databaseSizeBeforeUpdate = orderRepository.findAll().size();
-        order.setId(longCount.incrementAndGet());
+        order.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOrderMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(order))
@@ -318,7 +318,7 @@ class OrderResourceIT {
     @Transactional
     void putWithMissingIdPathParamOrder() throws Exception {
         int databaseSizeBeforeUpdate = orderRepository.findAll().size();
-        order.setId(longCount.incrementAndGet());
+        order.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOrderMockMvc
@@ -344,6 +344,8 @@ class OrderResourceIT {
         Order partialUpdatedOrder = new Order();
         partialUpdatedOrder.setId(order.getId());
 
+        partialUpdatedOrder.date(UPDATED_DATE);
+
         restOrderMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedOrder.getId())
@@ -357,7 +359,7 @@ class OrderResourceIT {
         List<Order> orderList = orderRepository.findAll();
         assertThat(orderList).hasSize(databaseSizeBeforeUpdate);
         Order testOrder = orderList.get(orderList.size() - 1);
-        assertThat(testOrder.getDate()).isEqualTo(DEFAULT_DATE);
+        assertThat(testOrder.getDate()).isEqualTo(UPDATED_DATE);
         assertThat(testOrder.getState()).isEqualTo(DEFAULT_STATE);
     }
 
@@ -396,7 +398,7 @@ class OrderResourceIT {
     @Transactional
     void patchNonExistingOrder() throws Exception {
         int databaseSizeBeforeUpdate = orderRepository.findAll().size();
-        order.setId(longCount.incrementAndGet());
+        order.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restOrderMockMvc
@@ -417,12 +419,12 @@ class OrderResourceIT {
     @Transactional
     void patchWithIdMismatchOrder() throws Exception {
         int databaseSizeBeforeUpdate = orderRepository.findAll().size();
-        order.setId(longCount.incrementAndGet());
+        order.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOrderMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(order))
@@ -438,7 +440,7 @@ class OrderResourceIT {
     @Transactional
     void patchWithMissingIdPathParamOrder() throws Exception {
         int databaseSizeBeforeUpdate = orderRepository.findAll().size();
-        order.setId(longCount.incrementAndGet());
+        order.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restOrderMockMvc

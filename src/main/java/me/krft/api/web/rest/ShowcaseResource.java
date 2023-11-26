@@ -23,7 +23,7 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link me.krft.api.domain.Showcase}.
  */
 @RestController
-@RequestMapping("/api/showcases")
+@RequestMapping("/api")
 public class ShowcaseResource {
 
     private final Logger log = LoggerFactory.getLogger(ShowcaseResource.class);
@@ -49,7 +49,7 @@ public class ShowcaseResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new showcase, or with status {@code 400 (Bad Request)} if the showcase has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("")
+    @PostMapping("/showcases")
     public ResponseEntity<Showcase> createShowcase(@Valid @RequestBody Showcase showcase) throws URISyntaxException {
         log.debug("REST request to save Showcase : {}", showcase);
         if (showcase.getId() != null) {
@@ -72,7 +72,7 @@ public class ShowcaseResource {
      * or with status {@code 500 (Internal Server Error)} if the showcase couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/{id}")
+    @PutMapping("/showcases/{id}")
     public ResponseEntity<Showcase> updateShowcase(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody Showcase showcase
@@ -107,7 +107,7 @@ public class ShowcaseResource {
      * or with status {@code 500 (Internal Server Error)} if the showcase couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/showcases/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<Showcase> partialUpdateShowcase(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody Showcase showcase
@@ -137,7 +137,7 @@ public class ShowcaseResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of showcases in body.
      */
-    @GetMapping("")
+    @GetMapping("/showcases")
     public List<Showcase> getAllShowcases() {
         log.debug("REST request to get all Showcases");
         return showcaseService.findAll();
@@ -149,7 +149,7 @@ public class ShowcaseResource {
      * @param id the id of the showcase to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the showcase, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/{id}")
+    @GetMapping("/showcases/{id}")
     public ResponseEntity<Showcase> getShowcase(@PathVariable Long id) {
         log.debug("REST request to get Showcase : {}", id);
         Optional<Showcase> showcase = showcaseService.findOne(id);
@@ -162,7 +162,7 @@ public class ShowcaseResource {
      * @param id the id of the showcase to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/showcases/{id}")
     public ResponseEntity<Void> deleteShowcase(@PathVariable Long id) {
         log.debug("REST request to delete Showcase : {}", id);
         showcaseService.delete(id);

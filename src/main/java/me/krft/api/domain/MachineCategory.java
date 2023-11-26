@@ -6,14 +6,12 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * MachineCategory entity
- * Represents a preset machine type
+ * MachineCategory entity\nRepresents a preset machine type
  */
 @Schema(description = "MachineCategory entity\nRepresents a preset machine type")
 @Entity
@@ -35,7 +33,7 @@ public class MachineCategory implements Serializable {
     @Column(name = "label", nullable = false, unique = true)
     private String label;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
+    @OneToMany(mappedBy = "category")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "offers", "category" }, allowSetters = true)
     private Set<Machine> machines = new HashSet<>();
@@ -109,7 +107,7 @@ public class MachineCategory implements Serializable {
         if (!(o instanceof MachineCategory)) {
             return false;
         }
-        return getId() != null && getId().equals(((MachineCategory) o).getId());
+        return id != null && id.equals(((MachineCategory) o).id);
     }
 
     @Override

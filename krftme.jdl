@@ -57,6 +57,10 @@ entity ApplicationUser {
      * The user's username
      */
     username String required minlength(1)
+    /**
+     * The user's profile picture ID
+     */
+    profilePictureId UUID unique
 }
 
 /**
@@ -204,11 +208,11 @@ enum State {
 
 relationship OneToOne {
     ApplicationUser{internalUser} to User
+    Order{review} to Review
 }
 
 // FIRST CONTAINS MANY SECOND, AND SECOND CONTAINS ONE FIRST
 relationship OneToMany {
-    ApplicationUserOffer{reviews} to Review{offer required}
     ApplicationUserOffer{showcases} to Showcase{offer required}
     Country{regions} to Region{country required}
     Region{cities} to City{region required}

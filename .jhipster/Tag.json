@@ -28,10 +28,9 @@
       "otherEntityRelationshipName": "tags",
       "ownerSide": false,
       "relationshipName": "offers",
-      "relationshipSide": "right",
       "relationshipType": "many-to-many"
     }
   ],
-  "searchEngine": "no",
+  "searchEngine": false,
   "service": "serviceImpl"
 }

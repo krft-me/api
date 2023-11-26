@@ -5,13 +5,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.UUID;
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * Showcase image
- * Represents an image of a service to illustrate it
+ * Showcase image\nRepresents an image of a service to illustrate it
  */
 @Schema(description = "Showcase image\nRepresents an image of a service to illustrate it")
 @Entity
@@ -34,7 +33,7 @@ public class Showcase implements Serializable {
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
     private ApplicationUserOffer offer;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -88,7 +87,7 @@ public class Showcase implements Serializable {
         if (!(o instanceof Showcase)) {
             return false;
         }
-        return getId() != null && getId().equals(((Showcase) o).getId());
+        return id != null && id.equals(((Showcase) o).id);
     }
 
     @Override

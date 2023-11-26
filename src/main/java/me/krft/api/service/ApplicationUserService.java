@@ -5,7 +5,7 @@ import java.util.Optional;
 import me.krft.api.domain.ApplicationUser;
 
 /**
- * Service Interface for managing {@link me.krft.api.domain.ApplicationUser}.
+ * Service Interface for managing {@link ApplicationUser}.
  */
 public interface ApplicationUserService {
     /**

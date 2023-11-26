@@ -23,7 +23,7 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link me.krft.api.domain.MachineCategory}.
  */
 @RestController
-@RequestMapping("/api/machine-categories")
+@RequestMapping("/api")
 public class MachineCategoryResource {
 
     private final Logger log = LoggerFactory.getLogger(MachineCategoryResource.class);
@@ -49,7 +49,7 @@ public class MachineCategoryResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new machineCategory, or with status {@code 400 (Bad Request)} if the machineCategory has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("")
+    @PostMapping("/machine-categories")
     public ResponseEntity<MachineCategory> createMachineCategory(@Valid @RequestBody MachineCategory machineCategory)
         throws URISyntaxException {
         log.debug("REST request to save MachineCategory : {}", machineCategory);
@@ -73,7 +73,7 @@ public class MachineCategoryResource {
      * or with status {@code 500 (Internal Server Error)} if the machineCategory couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/{id}")
+    @PutMapping("/machine-categories/{id}")
     public ResponseEntity<MachineCategory> updateMachineCategory(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody MachineCategory machineCategory
@@ -108,7 +108,7 @@ public class MachineCategoryResource {
      * or with status {@code 500 (Internal Server Error)} if the machineCategory couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/machine-categories/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<MachineCategory> partialUpdateMachineCategory(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody MachineCategory machineCategory
@@ -138,7 +138,7 @@ public class MachineCategoryResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of machineCategories in body.
      */
-    @GetMapping("")
+    @GetMapping("/machine-categories")
     public List<MachineCategory> getAllMachineCategories() {
         log.debug("REST request to get all MachineCategories");
         return machineCategoryService.findAll();
@@ -150,7 +150,7 @@ public class MachineCategoryResource {
      * @param id the id of the machineCategory to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the machineCategory, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/{id}")
+    @GetMapping("/machine-categories/{id}")
     public ResponseEntity<MachineCategory> getMachineCategory(@PathVariable Long id) {
         log.debug("REST request to get MachineCategory : {}", id);
         Optional<MachineCategory> machineCategory = machineCategoryService.findOne(id);
@@ -163,7 +163,7 @@ public class MachineCategoryResource {
      * @param id the id of the machineCategory to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/machine-categories/{id}")
     public ResponseEntity<Void> deleteMachineCategory(@PathVariable Long id) {
         log.debug("REST request to delete MachineCategory : {}", id);
         machineCategoryService.delete(id);

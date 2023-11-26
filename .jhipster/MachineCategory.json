@@ -27,10 +27,9 @@
       "otherEntityName": "machine",
       "otherEntityRelationshipName": "category",
       "relationshipName": "machines",
-      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     }
   ],
-  "searchEngine": "no",
+  "searchEngine": false,
   "service": "serviceImpl"
 }

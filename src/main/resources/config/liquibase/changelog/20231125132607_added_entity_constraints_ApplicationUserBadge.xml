@@ -12,14 +12,12 @@
                                  baseTableName="application_user_badge"
                                  constraintName="fk_application_user_badge__user_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="application_user"
-                                 />
+                                 referencedTableName="application_user"/>
 
         <addForeignKeyConstraint baseColumnNames="badge_id"
                                  baseTableName="application_user_badge"
                                  constraintName="fk_application_user_badge__badge_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="badge"
-                                 />
+                                 referencedTableName="badge"/>
     </changeSet>
 </databaseChangeLog>

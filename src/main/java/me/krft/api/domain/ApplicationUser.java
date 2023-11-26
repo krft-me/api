@@ -5,15 +5,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * User entity extending the inter {@code User} entity
- * Provides additional information about the user
+ * User entity extending the inter {@code User} entity\nProvides additional information about the user
  */
 @Schema(description = "User entity extending the inter {@code User} entity\nProvides additional information about the user")
 @Entity
@@ -57,26 +56,33 @@ public class ApplicationUser implements Serializable {
     @Column(name = "username", nullable = false)
     private String username;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    /**
+     * The user's profile picture ID
+     */
+    @Schema(description = "The user's profile picture ID")
+    @Column(name = "profile_picture_id", unique = true)
+    private UUID profilePictureId;
+
+    @OneToOne
     @JoinColumn(unique = true)
     private User internalUser;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "provider")
+    @OneToMany(mappedBy = "provider")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "reviews", "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
     private Set<ApplicationUserOffer> offers = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    @OneToMany(mappedBy = "user")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "user", "badge" }, allowSetters = true)
     private Set<ApplicationUserBadge> badges = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
+    @OneToMany(mappedBy = "customer")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "offer", "customer" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "review", "offer", "customer" }, allowSetters = true)
     private Set<Order> orders = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JsonIgnoreProperties(value = { "users", "region" }, allowSetters = true)
     private City city;
 
@@ -132,6 +138,19 @@ public class ApplicationUser implements Serializable {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public UUID getProfilePictureId() {
+        return this.profilePictureId;
+    }
+
+    public ApplicationUser profilePictureId(UUID profilePictureId) {
+        this.setProfilePictureId(profilePictureId);
+        return this;
+    }
+
+    public void setProfilePictureId(UUID profilePictureId) {
+        this.profilePictureId = profilePictureId;
     }
 
     public User getInternalUser() {
@@ -263,7 +282,7 @@ public class ApplicationUser implements Serializable {
         if (!(o instanceof ApplicationUser)) {
             return false;
         }
-        return getId() != null && getId().equals(((ApplicationUser) o).getId());
+        return id != null && id.equals(((ApplicationUser) o).id);
     }
 
     @Override
@@ -280,6 +299,7 @@ public class ApplicationUser implements Serializable {
             ", firstName='" + getFirstName() + "'" +
             ", lastName='" + getLastName() + "'" +
             ", username='" + getUsername() + "'" +
+            ", profilePictureId='" + getProfilePictureId() + "'" +
             "}";
     }
 }

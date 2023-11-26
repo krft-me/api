@@ -5,7 +5,7 @@ import java.util.Optional;
 import me.krft.api.domain.Review;
 
 /**
- * Service Interface for managing {@link me.krft.api.domain.Review}.
+ * Service Interface for managing {@link Review}.
  */
 public interface ReviewService {
     /**
@@ -38,6 +38,12 @@ public interface ReviewService {
      * @return the list of entities.
      */
     List<Review> findAll();
+    /**
+     * Get all the Review where Order is {@code null}.
+     *
+     * @return the {@link List} of entities.
+     */
+    List<Review> findAllWhereOrderIsNull();
 
     /**
      * Get the "id" review.

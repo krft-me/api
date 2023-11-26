@@ -26,11 +26,10 @@
       "otherEntityName": "applicationUserOffer",
       "otherEntityRelationshipName": "showcases",
       "relationshipName": "offer",
-      "relationshipSide": "right",
       "relationshipType": "many-to-one",
       "relationshipValidateRules": "required"
     }
   ],
-  "searchEngine": "no",
+  "searchEngine": false,
   "service": "serviceImpl"
 }

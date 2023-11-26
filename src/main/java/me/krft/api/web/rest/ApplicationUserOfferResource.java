@@ -145,7 +145,7 @@ public class ApplicationUserOfferResource {
      */
     @GetMapping("")
     public List<ApplicationUserOffer> getAllApplicationUserOffers(
-        @RequestParam(required = false, defaultValue = "true") boolean eagerload
+        @RequestParam(required = false, defaultValue = "false") boolean eagerload
     ) {
         log.debug("REST request to get all ApplicationUserOffers");
         return applicationUserOfferService.findAll();

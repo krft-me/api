@@ -5,7 +5,7 @@ import java.util.Optional;
 import me.krft.api.domain.Region;
 
 /**
- * Service Interface for managing {@link me.krft.api.domain.Region}.
+ * Service Interface for managing {@link Region}.
  */
 public interface RegionService {
     /**

@@ -6,8 +6,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -34,7 +33,7 @@ public class Machine implements Serializable {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "machine")
+    @OneToMany(mappedBy = "machine")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "userOffers", "machine", "category" }, allowSetters = true)
     private Set<Offer> offers = new HashSet<>();
@@ -126,7 +125,7 @@ public class Machine implements Serializable {
         if (!(o instanceof Machine)) {
             return false;
         }
-        return getId() != null && getId().equals(((Machine) o).getId());
+        return id != null && id.equals(((Machine) o).id);
     }
 
     @Override

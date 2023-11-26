@@ -6,8 +6,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -46,7 +45,7 @@ public class City implements Serializable {
     @Column(name = "zip_code", nullable = false)
     private String zipCode;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "city")
+    @OneToMany(mappedBy = "city")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "internalUser", "offers", "badges", "orders", "city" }, allowSetters = true)
     private Set<ApplicationUser> users = new HashSet<>();
@@ -151,7 +150,7 @@ public class City implements Serializable {
         if (!(o instanceof City)) {
             return false;
         }
-        return getId() != null && getId().equals(((City) o).getId());
+        return id != null && id.equals(((City) o).id);
     }
 
     @Override

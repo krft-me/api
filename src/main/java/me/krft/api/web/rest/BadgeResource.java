@@ -23,7 +23,7 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link me.krft.api.domain.Badge}.
  */
 @RestController
-@RequestMapping("/api/badges")
+@RequestMapping("/api")
 public class BadgeResource {
 
     private final Logger log = LoggerFactory.getLogger(BadgeResource.class);
@@ -49,7 +49,7 @@ public class BadgeResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new badge, or with status {@code 400 (Bad Request)} if the badge has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("")
+    @PostMapping("/badges")
     public ResponseEntity<Badge> createBadge(@Valid @RequestBody Badge badge) throws URISyntaxException {
         log.debug("REST request to save Badge : {}", badge);
         if (badge.getId() != null) {
@@ -72,7 +72,7 @@ public class BadgeResource {
      * or with status {@code 500 (Internal Server Error)} if the badge couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/{id}")
+    @PutMapping("/badges/{id}")
     public ResponseEntity<Badge> updateBadge(@PathVariable(value = "id", required = false) final Long id, @Valid @RequestBody Badge badge)
         throws URISyntaxException {
         log.debug("REST request to update Badge : {}, {}", id, badge);
@@ -105,7 +105,7 @@ public class BadgeResource {
      * or with status {@code 500 (Internal Server Error)} if the badge couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/badges/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<Badge> partialUpdateBadge(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody Badge badge
@@ -135,7 +135,7 @@ public class BadgeResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of badges in body.
      */
-    @GetMapping("")
+    @GetMapping("/badges")
     public List<Badge> getAllBadges() {
         log.debug("REST request to get all Badges");
         return badgeService.findAll();
@@ -147,7 +147,7 @@ public class BadgeResource {
      * @param id the id of the badge to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the badge, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/{id}")
+    @GetMapping("/badges/{id}")
     public ResponseEntity<Badge> getBadge(@PathVariable Long id) {
         log.debug("REST request to get Badge : {}", id);
         Optional<Badge> badge = badgeService.findOne(id);
@@ -160,7 +160,7 @@ public class BadgeResource {
      * @param id the id of the badge to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/badges/{id}")
     public ResponseEntity<Void> deleteBadge(@PathVariable Long id) {
         log.debug("REST request to delete Badge : {}", id);
         badgeService.delete(id);

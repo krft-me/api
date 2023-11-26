@@ -27,10 +27,9 @@
       "otherEntityName": "offer",
       "otherEntityRelationshipName": "category",
       "relationshipName": "offers",
-      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     }
   ],
-  "searchEngine": "no",
+  "searchEngine": false,
   "service": "serviceImpl"
 }

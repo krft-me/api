@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link me.krft.api.domain.Tag}.
+ * Service Implementation for managing {@link Tag}.
  */
 @Service
 @Transactional

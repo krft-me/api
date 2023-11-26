@@ -12,7 +12,6 @@
                                  baseTableName="city"
                                  constraintName="fk_city__region_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="region"
-                                 />
+                                 referencedTableName="region"/>
     </changeSet>
 </databaseChangeLog>

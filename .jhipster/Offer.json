@@ -27,25 +27,22 @@
       "otherEntityName": "applicationUserOffer",
       "otherEntityRelationshipName": "offer",
       "relationshipName": "userOffers",
-      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
       "otherEntityName": "machine",
       "otherEntityRelationshipName": "offers",
       "relationshipName": "machine",
-      "relationshipSide": "right",
       "relationshipType": "many-to-one"
     },
     {
       "otherEntityName": "offerCategory",
       "otherEntityRelationshipName": "offers",
       "relationshipName": "category",
-      "relationshipSide": "right",
       "relationshipType": "many-to-one",
       "relationshipValidateRules": "required"
     }
   ],
-  "searchEngine": "no",
+  "searchEngine": false,
   "service": "serviceImpl"
 }

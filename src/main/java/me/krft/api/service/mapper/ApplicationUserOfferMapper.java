@@ -1,9 +1,10 @@
 package me.krft.api.service.mapper;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import me.krft.api.domain.ApplicationUserOffer;
+import me.krft.api.domain.Order;
+import me.krft.api.domain.Review;
 import me.krft.api.service.dto.ApplicationUserOfferDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -11,8 +12,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ApplicationUserOfferMapper implements EntityDTOMapper<ApplicationUserOffer, ApplicationUserOfferDTO> {
-
-    private final ReviewMapper reviewMapper;
 
     private final ShowcaseMapper showcaseMapper;
 
@@ -26,14 +25,12 @@ public class ApplicationUserOfferMapper implements EntityDTOMapper<ApplicationUs
 
     @Autowired
     public ApplicationUserOfferMapper(
-        @Lazy ReviewMapper reviewMapper,
         @Lazy ShowcaseMapper showcaseMapper,
         @Lazy OrderMapper orderMapper,
         @Lazy TagMapper tagMapper,
         @Lazy ApplicationUserMapper applicationUserMapper,
         @Lazy OfferMapper offerMapper
     ) {
-        this.reviewMapper = reviewMapper;
         this.showcaseMapper = showcaseMapper;
         this.orderMapper = orderMapper;
         this.tagMapper = tagMapper;
@@ -52,9 +49,8 @@ public class ApplicationUserOfferMapper implements EntityDTOMapper<ApplicationUs
             .builder()
             .id(entity.getId())
             .description(entity.getDescription())
-            .price(entity.getPrice())
+            .price(transformPrice(entity.getPrice()))
             .active(entity.getActive())
-            .reviews(this.reviewMapper.toDTOId(entity.getReviews()))
             .showcases(this.showcaseMapper.toDTOId(entity.getShowcases()))
             .orders(this.orderMapper.toDTOId(entity.getOrders()))
             .tags(this.tagMapper.toDTOId(entity.getTags()))
@@ -77,16 +73,30 @@ public class ApplicationUserOfferMapper implements EntityDTOMapper<ApplicationUs
     }
 
     public ApplicationUserOfferDTO toDTOCard(ApplicationUserOffer applicationUserOffer) {
+        Set<Review> reviews = getReviews(applicationUserOffer.getOrders());
         return ApplicationUserOfferDTO
             .builder()
             .id(applicationUserOffer.getId())
-            .price(applicationUserOffer.getPrice())
+            .price(transformPrice(applicationUserOffer.getPrice()))
             .description(applicationUserOffer.getDescription())
-            .reviews(this.reviewMapper.toDTORating(applicationUserOffer.getReviews()))
+            .rating(getRating(reviews))
+            .numberOfReviews(reviews.size())
             .tags(this.tagMapper.toDTOLabel(applicationUserOffer.getTags()))
             .provider(this.applicationUserMapper.toDTOUsernameCityName(applicationUserOffer.getProvider()))
             .offer(this.offerMapper.toDTOMachineName(applicationUserOffer.getOffer()))
             .showcases(this.showcaseMapper.toDTOImageId(applicationUserOffer.getShowcases()))
             .build();
+    }
+
+    private Set<Review> getReviews(Set<Order> orders) {
+        return orders.stream().map(Order::getReview).collect(Collectors.toSet());
+    }
+
+    private Double getRating(Set<Review> reviews) {
+        return reviews.stream().mapToInt(Review::getRating).average().stream().map(Math::round).findFirst().orElse(0) / 10;
+    }
+
+    private Double transformPrice(Integer price) {
+        return price / 100.0;
     }
 }

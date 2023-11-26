@@ -23,7 +23,7 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link me.krft.api.domain.Region}.
  */
 @RestController
-@RequestMapping("/api/regions")
+@RequestMapping("/api")
 public class RegionResource {
 
     private final Logger log = LoggerFactory.getLogger(RegionResource.class);
@@ -49,7 +49,7 @@ public class RegionResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new region, or with status {@code 400 (Bad Request)} if the region has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("")
+    @PostMapping("/regions")
     public ResponseEntity<Region> createRegion(@Valid @RequestBody Region region) throws URISyntaxException {
         log.debug("REST request to save Region : {}", region);
         if (region.getId() != null) {
@@ -72,7 +72,7 @@ public class RegionResource {
      * or with status {@code 500 (Internal Server Error)} if the region couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/{id}")
+    @PutMapping("/regions/{id}")
     public ResponseEntity<Region> updateRegion(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody Region region
@@ -107,7 +107,7 @@ public class RegionResource {
      * or with status {@code 500 (Internal Server Error)} if the region couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/regions/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<Region> partialUpdateRegion(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody Region region
@@ -137,7 +137,7 @@ public class RegionResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of regions in body.
      */
-    @GetMapping("")
+    @GetMapping("/regions")
     public List<Region> getAllRegions() {
         log.debug("REST request to get all Regions");
         return regionService.findAll();
@@ -149,7 +149,7 @@ public class RegionResource {
      * @param id the id of the region to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the region, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/{id}")
+    @GetMapping("/regions/{id}")
     public ResponseEntity<Region> getRegion(@PathVariable Long id) {
         log.debug("REST request to get Region : {}", id);
         Optional<Region> region = regionService.findOne(id);
@@ -162,7 +162,7 @@ public class RegionResource {
      * @param id the id of the region to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/regions/{id}")
     public ResponseEntity<Void> deleteRegion(@PathVariable Long id) {
         log.debug("REST request to delete Region : {}", id);
         regionService.delete(id);

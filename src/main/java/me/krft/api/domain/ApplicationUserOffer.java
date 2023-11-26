@@ -6,9 +6,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -56,22 +54,17 @@ public class ApplicationUserOffer implements Serializable {
     @Column(name = "active", nullable = false)
     private Boolean active;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "offer")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "offer" }, allowSetters = true)
-    private Set<Review> reviews = new HashSet<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "offer")
+    @OneToMany(mappedBy = "offer")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "offer" }, allowSetters = true)
     private Set<Showcase> showcases = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "offer")
+    @OneToMany(mappedBy = "offer")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "offer", "customer" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "review", "offer", "customer" }, allowSetters = true)
     private Set<Order> orders = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany
     @JoinTable(
         name = "rel_application_user_offer__tags",
         joinColumns = @JoinColumn(name = "application_user_offer_id"),
@@ -143,37 +136,6 @@ public class ApplicationUserOffer implements Serializable {
 
     public void setActive(Boolean active) {
         this.active = active;
-    }
-
-    public Set<Review> getReviews() {
-        return this.reviews;
-    }
-
-    public void setReviews(Set<Review> reviews) {
-        if (this.reviews != null) {
-            this.reviews.forEach(i -> i.setOffer(null));
-        }
-        if (reviews != null) {
-            reviews.forEach(i -> i.setOffer(this));
-        }
-        this.reviews = reviews;
-    }
-
-    public ApplicationUserOffer reviews(Set<Review> reviews) {
-        this.setReviews(reviews);
-        return this;
-    }
-
-    public ApplicationUserOffer addReviews(Review review) {
-        this.reviews.add(review);
-        review.setOffer(this);
-        return this;
-    }
-
-    public ApplicationUserOffer removeReviews(Review review) {
-        this.reviews.remove(review);
-        review.setOffer(null);
-        return this;
     }
 
     public Set<Showcase> getShowcases() {
@@ -253,11 +215,13 @@ public class ApplicationUserOffer implements Serializable {
 
     public ApplicationUserOffer addTags(Tag tag) {
         this.tags.add(tag);
+        tag.getOffers().add(this);
         return this;
     }
 
     public ApplicationUserOffer removeTags(Tag tag) {
         this.tags.remove(tag);
+        tag.getOffers().remove(this);
         return this;
     }
 
@@ -297,7 +261,7 @@ public class ApplicationUserOffer implements Serializable {
         if (!(o instanceof ApplicationUserOffer)) {
             return false;
         }
-        return getId() != null && getId().equals(((ApplicationUserOffer) o).getId());
+        return id != null && id.equals(((ApplicationUserOffer) o).id);
     }
 
     @Override

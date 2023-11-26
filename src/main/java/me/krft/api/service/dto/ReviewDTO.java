@@ -17,5 +17,5 @@ public class ReviewDTO extends AbstractDTO implements Serializable {
     private Long id;
     private Integer rating;
     private String comment;
-    private ApplicationUserOfferDTO offer;
+    private OrderDTO order;
 }

@@ -23,7 +23,7 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link me.krft.api.domain.ApplicationUserBadge}.
  */
 @RestController
-@RequestMapping("/api/application-user-badges")
+@RequestMapping("/api")
 public class ApplicationUserBadgeResource {
 
     private final Logger log = LoggerFactory.getLogger(ApplicationUserBadgeResource.class);
@@ -52,7 +52,7 @@ public class ApplicationUserBadgeResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new applicationUserBadge, or with status {@code 400 (Bad Request)} if the applicationUserBadge has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("")
+    @PostMapping("/application-user-badges")
     public ResponseEntity<ApplicationUserBadge> createApplicationUserBadge(@Valid @RequestBody ApplicationUserBadge applicationUserBadge)
         throws URISyntaxException {
         log.debug("REST request to save ApplicationUserBadge : {}", applicationUserBadge);
@@ -76,7 +76,7 @@ public class ApplicationUserBadgeResource {
      * or with status {@code 500 (Internal Server Error)} if the applicationUserBadge couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/{id}")
+    @PutMapping("/application-user-badges/{id}")
     public ResponseEntity<ApplicationUserBadge> updateApplicationUserBadge(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody ApplicationUserBadge applicationUserBadge
@@ -111,7 +111,7 @@ public class ApplicationUserBadgeResource {
      * or with status {@code 500 (Internal Server Error)} if the applicationUserBadge couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/application-user-badges/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<ApplicationUserBadge> partialUpdateApplicationUserBadge(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody ApplicationUserBadge applicationUserBadge
@@ -141,7 +141,7 @@ public class ApplicationUserBadgeResource {
      *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of applicationUserBadges in body.
      */
-    @GetMapping("")
+    @GetMapping("/application-user-badges")
     public List<ApplicationUserBadge> getAllApplicationUserBadges() {
         log.debug("REST request to get all ApplicationUserBadges");
         return applicationUserBadgeService.findAll();
@@ -153,7 +153,7 @@ public class ApplicationUserBadgeResource {
      * @param id the id of the applicationUserBadge to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the applicationUserBadge, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/{id}")
+    @GetMapping("/application-user-badges/{id}")
     public ResponseEntity<ApplicationUserBadge> getApplicationUserBadge(@PathVariable Long id) {
         log.debug("REST request to get ApplicationUserBadge : {}", id);
         Optional<ApplicationUserBadge> applicationUserBadge = applicationUserBadgeService.findOne(id);
@@ -166,7 +166,7 @@ public class ApplicationUserBadgeResource {
      * @param id the id of the applicationUserBadge to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/application-user-badges/{id}")
     public ResponseEntity<Void> deleteApplicationUserBadge(@PathVariable Long id) {
         log.debug("REST request to delete ApplicationUserBadge : {}", id);
         applicationUserBadgeService.delete(id);
