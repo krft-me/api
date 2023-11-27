@@ -12,6 +12,6 @@
                                  baseTableName="review"
                                  constraintName="fk_review__order_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="application_user_offer"/>
+                                 referencedTableName="krftme_order"/>
     </changeSet>
 </databaseChangeLog>

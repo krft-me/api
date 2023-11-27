@@ -33,7 +33,7 @@
     {
       "otherEntityName": "order",
       "otherEntityRelationshipName": "review",
-      "ownerSide": false,
+      "ownerSide": true,
       "relationshipName": "order",
       "relationshipType": "one-to-one",
       "relationshipValidateRules": "required"

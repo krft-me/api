@@ -14,10 +14,10 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="first_name" type="varchar(255)" remarks="The user&apos;s first name">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="last_name" type="varchar(255)" remarks="The user&apos;s last name name">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="username" type="varchar(255)" remarks="The user&apos;s username">
                 <constraints nullable="false" />

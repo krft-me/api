@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 /**
  * Spring Data JPA repository for the ApplicationUserOffer entity.
- * <p>
+ *
  * When extending this class, extend ApplicationUserOfferRepositoryWithBagRelationships too.
  * For more information refer to https://github.com/jhipster/generator-jhipster/issues/17990.
  */

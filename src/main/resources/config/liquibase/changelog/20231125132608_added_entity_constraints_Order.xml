@@ -8,12 +8,6 @@
     -->
     <changeSet id="20231125132608-2" author="jhipster">
 
-        <addForeignKeyConstraint baseColumnNames="review_id"
-                                 baseTableName="krftme_order"
-                                 constraintName="fk_krftme_order__review_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="review"/>
-
         <addForeignKeyConstraint baseColumnNames="offer_id"
                                  baseTableName="krftme_order"
                                  constraintName="fk_krftme_order__offer_id"
