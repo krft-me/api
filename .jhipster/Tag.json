@@ -1,9 +1,8 @@
 {
   "applications": "*",
-  "changelogDate": "20231125132609",
+  "changelogDate": "20231127190259",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
-  "documentation": "Tag entity\\nRepresents a preset keyword for an offer",
   "dto": "no",
   "embedded": false,
   "entityTableName": "tag",
@@ -31,6 +30,5 @@
       "relationshipType": "many-to-many"
     }
   ],
-  "searchEngine": false,
   "service": "serviceImpl"
 }
