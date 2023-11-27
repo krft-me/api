@@ -1,8 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231127190254",
+  "changelogDate": "20231125132604",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "Relationship entity between user, offer and machine",
   "dto": "no",
   "embedded": false,
   "entityTableName": "application_user_offer",
@@ -71,5 +72,6 @@
       "relationshipValidateRules": "required"
     }
   ],
+  "searchEngine": false,
   "service": "serviceImpl"
 }

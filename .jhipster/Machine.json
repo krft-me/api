@@ -1,8 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231127190252",
+  "changelogDate": "20231125132602",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "Machine entity",
   "dto": "no",
   "embedded": false,
   "entityTableName": "machine",
@@ -36,5 +37,6 @@
       "relationshipValidateRules": "required"
     }
   ],
+  "searchEngine": false,
   "service": "serviceImpl"
 }

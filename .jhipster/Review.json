@@ -1,8 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231127190300",
+  "changelogDate": "20231125132610",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "Review entity\\nRepresents a user's opinion of a service they have purchased",
   "dto": "no",
   "embedded": false,
   "entityTableName": "review",
@@ -37,5 +38,6 @@
       "relationshipType": "one-to-one"
     }
   ],
+  "searchEngine": false,
   "service": "serviceImpl"
 }

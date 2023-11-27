@@ -1,8 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231127190248",
+  "changelogDate": "20231125132558",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "City entity",
   "dto": "no",
   "embedded": false,
   "entityTableName": "city",
@@ -43,5 +44,6 @@
       "relationshipValidateRules": "required"
     }
   ],
+  "searchEngine": false,
   "service": "serviceImpl"
 }

@@ -1,8 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231127190257",
+  "changelogDate": "20231125132607",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "Relationship entity between users and badges",
   "dto": "no",
   "embedded": false,
   "entityTableName": "application_user_badge",
@@ -37,5 +38,6 @@
       "relationshipValidateRules": "required"
     }
   ],
+  "searchEngine": false,
   "service": "serviceImpl"
 }

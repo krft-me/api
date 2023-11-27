@@ -1,8 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231127190256",
+  "changelogDate": "20231125132606",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "Badge entity\\nRepresents a certification (example: 100 completed orders)",
   "dto": "no",
   "embedded": false,
   "entityTableName": "badge",
@@ -35,5 +36,6 @@
       "relationshipType": "one-to-many"
     }
   ],
+  "searchEngine": false,
   "service": "serviceImpl"
 }

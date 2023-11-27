@@ -1,8 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231127190258",
+  "changelogDate": "20231125132608",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "Order entity\\nRepresents an order placed by a customer for an offer",
   "dto": "no",
   "embedded": false,
   "entityTableName": "krftme_order",
@@ -52,5 +53,6 @@
       "relationshipValidateRules": "required"
     }
   ],
+  "searchEngine": false,
   "service": "serviceImpl"
 }

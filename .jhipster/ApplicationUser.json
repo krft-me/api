@@ -1,8 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231127190251",
+  "changelogDate": "20231125132601",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "User entity extending the inter {@code User} entity\\nProvides additional information about the user",
   "dto": "no",
   "embedded": false,
   "entityTableName": "application_user",
@@ -74,5 +75,6 @@
       "relationshipType": "many-to-one"
     }
   ],
+  "searchEngine": false,
   "service": "serviceImpl"
 }

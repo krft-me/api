@@ -1,8 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231127190302",
+  "changelogDate": "20231125132612",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "OfferCategory entity\\nRepresents a preset offer type",
   "dto": "no",
   "embedded": false,
   "entityTableName": "offer_category",
@@ -29,5 +30,6 @@
       "relationshipType": "one-to-many"
     }
   ],
+  "searchEngine": false,
   "service": "serviceImpl"
 }
