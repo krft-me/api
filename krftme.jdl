@@ -208,7 +208,7 @@ enum State {
 
 relationship OneToOne {
     ApplicationUser{internalUser} to User
-    Order{review} to Review{order required}
+    Review{order required} to Order{review}
 }
 
 // FIRST CONTAINS MANY SECOND, AND SECOND CONTAINS ONE FIRST
