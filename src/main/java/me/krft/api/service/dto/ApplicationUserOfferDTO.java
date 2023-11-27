@@ -19,7 +19,6 @@ public class ApplicationUserOfferDTO extends AbstractDTO implements Serializable
     private String description;
     private Integer price;
     private Boolean active;
-    private Set<ReviewDTO> reviews;
     private Set<ShowcaseDTO> showcases;
     private Set<OrderDTO> orders;
     private Set<TagDTO> tags;

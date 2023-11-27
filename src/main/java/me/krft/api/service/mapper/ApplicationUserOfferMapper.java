@@ -1,6 +1,5 @@
 package me.krft.api.service.mapper;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import me.krft.api.domain.ApplicationUserOffer;
@@ -11,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ApplicationUserOfferMapper implements EntityDTOMapper<ApplicationUserOffer, ApplicationUserOfferDTO> {
-
-    private final ReviewMapper reviewMapper;
 
     private final ShowcaseMapper showcaseMapper;
 
@@ -26,14 +23,12 @@ public class ApplicationUserOfferMapper implements EntityDTOMapper<ApplicationUs
 
     @Autowired
     public ApplicationUserOfferMapper(
-        @Lazy ReviewMapper reviewMapper,
         @Lazy ShowcaseMapper showcaseMapper,
         @Lazy OrderMapper orderMapper,
         @Lazy TagMapper tagMapper,
         @Lazy ApplicationUserMapper applicationUserMapper,
         @Lazy OfferMapper offerMapper
     ) {
-        this.reviewMapper = reviewMapper;
         this.showcaseMapper = showcaseMapper;
         this.orderMapper = orderMapper;
         this.tagMapper = tagMapper;
@@ -54,7 +49,6 @@ public class ApplicationUserOfferMapper implements EntityDTOMapper<ApplicationUs
             .description(entity.getDescription())
             .price(entity.getPrice())
             .active(entity.getActive())
-            .reviews(this.reviewMapper.toDTOId(entity.getReviews()))
             .showcases(this.showcaseMapper.toDTOId(entity.getShowcases()))
             .orders(this.orderMapper.toDTOId(entity.getOrders()))
             .tags(this.tagMapper.toDTOId(entity.getTags()))
@@ -82,7 +76,6 @@ public class ApplicationUserOfferMapper implements EntityDTOMapper<ApplicationUs
             .id(applicationUserOffer.getId())
             .price(applicationUserOffer.getPrice())
             .description(applicationUserOffer.getDescription())
-            .reviews(this.reviewMapper.toDTORating(applicationUserOffer.getReviews()))
             .tags(this.tagMapper.toDTOLabel(applicationUserOffer.getTags()))
             .provider(this.applicationUserMapper.toDTOUsernameCityName(applicationUserOffer.getProvider()))
             .offer(this.offerMapper.toDTOMachineName(applicationUserOffer.getOffer()))
