@@ -5,13 +5,12 @@ import java.util.Optional;
 import me.krft.api.domain.ApplicationUserOffer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.*;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
  * Spring Data JPA repository for the ApplicationUserOffer entity.
- *
+ * <p>
  * When extending this class, extend ApplicationUserOfferRepositoryWithBagRelationships too.
  * For more information refer to https://github.com/jhipster/generator-jhipster/issues/17990.
  */

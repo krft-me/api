@@ -20,9 +20,6 @@
                     remarks="Optional comment about the service or the service provider">
                 <constraints nullable="true"/>
             </column>
-            <column name="order_id" type="bigint" remarks="The order that the review is associated with">
-                <constraints nullable="false"/>
-            </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
     </changeSet>
