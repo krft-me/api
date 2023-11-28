@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
+import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.domain.Showcase;
 import me.krft.api.repository.ShowcaseRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,8 +38,8 @@ class ShowcaseResourceIT {
     private static final String ENTITY_API_URL = "/api/showcases";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong count = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
 
     @Autowired
     private ShowcaseRepository showcaseRepository;
@@ -59,6 +60,16 @@ class ShowcaseResourceIT {
      */
     public static Showcase createEntity(EntityManager em) {
         Showcase showcase = new Showcase().imageId(DEFAULT_IMAGE_ID);
+        // Add required entity
+        ApplicationUserOffer applicationUserOffer;
+        if (TestUtil.findAll(em, ApplicationUserOffer.class).isEmpty()) {
+            applicationUserOffer = ApplicationUserOfferResourceIT.createEntity(em);
+            em.persist(applicationUserOffer);
+            em.flush();
+        } else {
+            applicationUserOffer = TestUtil.findAll(em, ApplicationUserOffer.class).get(0);
+        }
+        showcase.setOffer(applicationUserOffer);
         return showcase;
     }
 
@@ -70,6 +81,16 @@ class ShowcaseResourceIT {
      */
     public static Showcase createUpdatedEntity(EntityManager em) {
         Showcase showcase = new Showcase().imageId(UPDATED_IMAGE_ID);
+        // Add required entity
+        ApplicationUserOffer applicationUserOffer;
+        if (TestUtil.findAll(em, ApplicationUserOffer.class).isEmpty()) {
+            applicationUserOffer = ApplicationUserOfferResourceIT.createUpdatedEntity(em);
+            em.persist(applicationUserOffer);
+            em.flush();
+        } else {
+            applicationUserOffer = TestUtil.findAll(em, ApplicationUserOffer.class).get(0);
+        }
+        showcase.setOffer(applicationUserOffer);
         return showcase;
     }
 

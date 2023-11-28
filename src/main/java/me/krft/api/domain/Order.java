@@ -1,19 +1,21 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.time.Instant;
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
 import me.krft.api.domain.enumeration.State;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Order.
+ * Order entity\nRepresents an order placed by a customer for an offer
  */
+@Schema(description = "Order entity\nRepresents an order placed by a customer for an offer")
 @Entity
-@Table(name = "jhi_order")
+@Table(name = "krftme_order")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Order implements Serializable {
@@ -26,25 +28,36 @@ public class Order implements Serializable {
     @Column(name = "id")
     private Long id;
 
+    /**
+     * Date the order was placed
+     */
+    @Schema(description = "Date the order was placed", required = true)
     @NotNull
     @Column(name = "date", nullable = false)
     private Instant date;
 
+    /**
+     * State of the order
+     */
+    @Schema(description = "State of the order", required = true)
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "state", nullable = false)
     private State state;
 
-    @ManyToOne
-    @JsonIgnoreProperties(value = { "ratings", "showcases", "tags", "offer", "applicationUser" }, allowSetters = true)
-    private ApplicationUserOffer provider;
+    @JsonIgnoreProperties(value = { "order" }, allowSetters = true)
+    @OneToOne(mappedBy = "order")
+    private Review review;
 
-    @ManyToOne
-    @JsonIgnoreProperties(
-        value = { "internalUser", "city", "favoriteApplicationUsers", "favoriteOffers", "followers" },
-        allowSetters = true
-    )
-    private ApplicationUser client;
+    @ManyToOne(optional = false)
+    @NotNull
+    @JsonIgnoreProperties(value = { "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
+    private ApplicationUserOffer offer;
+
+    @ManyToOne(optional = false)
+    @NotNull
+    @JsonIgnoreProperties(value = { "internalUser", "offers", "badges", "orders", "city" }, allowSetters = true)
+    private ApplicationUser customer;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -87,29 +100,48 @@ public class Order implements Serializable {
         this.state = state;
     }
 
-    public ApplicationUserOffer getProvider() {
-        return this.provider;
+    public Review getReview() {
+        return this.review;
     }
 
-    public void setProvider(ApplicationUserOffer applicationUserOffer) {
-        this.provider = applicationUserOffer;
+    public void setReview(Review review) {
+        if (this.review != null) {
+            this.review.setOrder(null);
+        }
+        if (review != null) {
+            review.setOrder(this);
+        }
+        this.review = review;
     }
 
-    public Order provider(ApplicationUserOffer applicationUserOffer) {
-        this.setProvider(applicationUserOffer);
+    public Order review(Review review) {
+        this.setReview(review);
         return this;
     }
 
-    public ApplicationUser getClient() {
-        return this.client;
+    public ApplicationUserOffer getOffer() {
+        return this.offer;
     }
 
-    public void setClient(ApplicationUser applicationUser) {
-        this.client = applicationUser;
+    public void setOffer(ApplicationUserOffer applicationUserOffer) {
+        this.offer = applicationUserOffer;
     }
 
-    public Order client(ApplicationUser applicationUser) {
-        this.setClient(applicationUser);
+    public Order offer(ApplicationUserOffer applicationUserOffer) {
+        this.setOffer(applicationUserOffer);
+        return this;
+    }
+
+    public ApplicationUser getCustomer() {
+        return this.customer;
+    }
+
+    public void setCustomer(ApplicationUser applicationUser) {
+        this.customer = applicationUser;
+    }
+
+    public Order customer(ApplicationUser applicationUser) {
+        this.setCustomer(applicationUser);
         return this;
     }
 

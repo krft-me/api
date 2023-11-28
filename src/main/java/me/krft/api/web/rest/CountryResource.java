@@ -9,12 +9,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import me.krft.api.domain.Country;
 import me.krft.api.repository.CountryRepository;
+import me.krft.api.service.CountryService;
 import me.krft.api.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -24,7 +24,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
-@Transactional
 public class CountryResource {
 
     private final Logger log = LoggerFactory.getLogger(CountryResource.class);
@@ -34,9 +33,12 @@ public class CountryResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final CountryService countryService;
+
     private final CountryRepository countryRepository;
 
-    public CountryResource(CountryRepository countryRepository) {
+    public CountryResource(CountryService countryService, CountryRepository countryRepository) {
+        this.countryService = countryService;
         this.countryRepository = countryRepository;
     }
 
@@ -53,7 +55,7 @@ public class CountryResource {
         if (country.getId() != null) {
             throw new BadRequestAlertException("A new country cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Country result = countryRepository.save(country);
+        Country result = countryService.save(country);
         return ResponseEntity
             .created(new URI("/api/countries/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -87,7 +89,7 @@ public class CountryResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Country result = countryRepository.save(country);
+        Country result = countryService.update(country);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, country.getId().toString()))
@@ -122,16 +124,7 @@ public class CountryResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<Country> result = countryRepository
-            .findById(country.getId())
-            .map(existingCountry -> {
-                if (country.getName() != null) {
-                    existingCountry.setName(country.getName());
-                }
-
-                return existingCountry;
-            })
-            .map(countryRepository::save);
+        Optional<Country> result = countryService.partialUpdate(country);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -147,7 +140,7 @@ public class CountryResource {
     @GetMapping("/countries")
     public List<Country> getAllCountries() {
         log.debug("REST request to get all Countries");
-        return countryRepository.findAll();
+        return countryService.findAll();
     }
 
     /**
@@ -159,7 +152,7 @@ public class CountryResource {
     @GetMapping("/countries/{id}")
     public ResponseEntity<Country> getCountry(@PathVariable Long id) {
         log.debug("REST request to get Country : {}", id);
-        Optional<Country> country = countryRepository.findById(id);
+        Optional<Country> country = countryService.findOne(id);
         return ResponseUtil.wrapOrNotFound(country);
     }
 
@@ -172,7 +165,7 @@ public class CountryResource {
     @DeleteMapping("/countries/{id}")
     public ResponseEntity<Void> deleteCountry(@PathVariable Long id) {
         log.debug("REST request to delete Country : {}", id);
-        countryRepository.deleteById(id);
+        countryService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

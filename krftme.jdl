@@ -1,99 +1,235 @@
+/**
+ * City entity
+ */
+@service(serviceImpl)
 entity City {
-    name String required
+    /**
+     * The city's name
+     */
+    name String required minlength(1)
+    /**
+     * The city's zipcode
+     */
+    zipCode String required
 }
 
+/**
+ * Region entity
+ */
+@service(serviceImpl)
 entity Region {
-    name String required
+    /**
+     * The region's name
+     */
+    name String required minlength(1)
 }
 
+/**
+ * Country entity
+ */
+@service(serviceImpl)
 entity Country {
-    name String required
+    /**
+     * The country's name in english
+     */
+    name String
+    /**
+     * ISO 3166-1 alpha-2
+     */
+    isoCode String required unique maxlength(3)
 }
 
+/**
+ * User entity extending the inter {@code User} entity
+ * Provides additional information about the user
+ */
+@service(serviceImpl)
 entity ApplicationUser {
-    firstName String required
-    lastName String required
-    pseudo String required
-    averageRating Double required
+    /**
+     * The user's first name
+     */
+    firstName String required minlength(1)
+    /**
+     * The user's last name name
+     */
+    lastName String required minlength(1)
+    /**
+     * The user's username
+     */
+    username String required minlength(1)
+    /**
+     * The user's profile picture ID
+     */
+    profilePictureId UUID unique
 }
 
-entity Rating {
-    rate Double required
+/**
+ * Review entity
+ * Represents a user's opinion of a service they have purchased
+ */
+@service(serviceImpl)
+entity Review {
+    /**
+     * The rating of the service from 0.0 to 5.0
+     */
+    rating Integer required min(0) max(50)
+    /**
+     * Optional comment about the service or the service provider
+     */
     comment String
 }
 
+/**
+ * Machine entity
+ */
+@service(serviceImpl)
 entity Machine {
-    name String required
+    name String required minlength(1) unique
 }
 
+/**
+ * Offer entity representing a service stereotype
+ */
+@service(serviceImpl)
 entity Offer {
-    name String required
+    name String required minlength(1) unique
 }
 
+/**
+ * Relationship entity between user, offer and machine
+ */
+@service(serviceImpl)
 entity ApplicationUserOffer {
-    description String required
+    /**
+     * Description of the service provided, written by the user providing it
+     */
+    description String required minlength(1) maxlength(512)
+    /**
+     * The price of the service, set by the user providing it
+     */
+    price Integer required min(0)
+    /**
+     * Active means the offer is visible to the users, we shouldn't delete it
+     */
+    active Boolean required
 }
 
+/**
+ * Showcase image
+ * Represents an image of a service to illustrate it
+ */
+@service(serviceImpl)
 entity Showcase {
-    imageId UUID required
+    /**
+     *
+     */
+    imageId UUID required unique
 }
 
+/**
+ * Badge entity
+ * Represents a certification (example: 100 completed orders)
+ */
+@service(serviceImpl)
 entity Badge {
-    label String required
-    picture ImageBlob required
+    label String required minlength(1) unique
+    /**
+     * The badge's icon, should be a blob later
+     */
+    picture String required unique
 }
 
+/**
+ * Relationship entity between users and badges
+ */
+@service(serviceImpl)
 entity ApplicationUserBadge {
-    obtentionDate Instant required
+    /**
+     * Date the user obtained the badge
+     */
+    obtainedDate Instant required
 }
 
-entity Order {
+/**
+ * Order entity
+ * Represents an order placed by a customer for an offer
+ */
+@service(serviceImpl)
+entity Order (krftme_order) {
+    /**
+     * Date the order was placed
+     */
     date Instant required
+    /**
+     * State of the order
+     */
     state State required
 }
 
+/**
+ * Tag entity
+ * Represents a preset keyword for an offer
+ */
+@service(serviceImpl)
 entity Tag {
-    label String required
+    label String required unique minlength(1)
 }
 
-entity Category {
-    label String required
+/**
+ * MachineCategory entity
+ * Represents a preset machine type
+ */
+@service(serviceImpl)
+entity MachineCategory {
+    label String required unique minlength(1)
 }
 
+/**
+ * OfferCategory entity
+ * Represents a preset offer type
+ */
+@service(serviceImpl)
+entity OfferCategory {
+    label String required unique minlength(1)
+}
+
+/**
+ * State enum
+ * Represents the state of an order
+ */
 enum State {
     WAITING,
     UNSIGNED,
     SIGNED,
-    INPROGRESS,
+    IN_PROGRESS,
     CANCELLED,
     DONE
 }
 
 relationship OneToOne {
     ApplicationUser{internalUser} to User
+    Review{order required} to Order{review}
 }
 
+// FIRST CONTAINS MANY SECOND, AND SECOND CONTAINS ONE FIRST
 relationship OneToMany {
-    ApplicationUserOffer{rating} to Rating
-    ApplicationUserOffer{showcase} to Showcase
-    Offer{machine} to Machine
-    Machine{category} to Category
-    ApplicationUserOffer{tag} to Tag
-}
-
-relationship ManyToOne {
-    ApplicationUserOffer{offer} to Offer
-    ApplicationUserOffer{applicationUser} to ApplicationUser
-    ApplicationUserBadge{applicationUser} to ApplicationUser
-    ApplicationUserBadge{badge} to Badge
-    Order{provider} to ApplicationUserOffer
-    Order{client} to ApplicationUser
-    ApplicationUser{city} to City
-    City{region} to Region
-    Region{country} to Country
+    ApplicationUserOffer{showcases} to Showcase{offer required}
+    Country{regions} to Region{country required}
+    Region{cities} to City{region required}
+    ApplicationUser{offers} to ApplicationUserOffer{provider required}
+    ApplicationUser{badges} to ApplicationUserBadge{user required}
+    Badge{users} to ApplicationUserBadge{badge required}
+    ApplicationUserOffer{orders} to Order{offer required}
+    Offer{userOffers} to ApplicationUserOffer{offer required}
+    // An offer may not have a machine
+    Machine{offers} to Offer{machine}
+    ApplicationUser{orders} to Order{customer required}
+    // A user may not have a city
+    City{users} to ApplicationUser{city}
+    OfferCategory{offers} to Offer{category required}
+    MachineCategory{machines} to Machine{category required}
 }
 
 relationship ManyToMany {
-    ApplicationUser{favoriteApplicationUser} to ApplicationUser{followers}
-    ApplicationUser{favoriteOffer} to Offer{followers}
+    ApplicationUserOffer{tags} to Tag{offers}
 }

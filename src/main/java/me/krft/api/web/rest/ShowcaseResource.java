@@ -9,12 +9,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import me.krft.api.domain.Showcase;
 import me.krft.api.repository.ShowcaseRepository;
+import me.krft.api.service.ShowcaseService;
 import me.krft.api.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -24,7 +24,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
-@Transactional
 public class ShowcaseResource {
 
     private final Logger log = LoggerFactory.getLogger(ShowcaseResource.class);
@@ -34,9 +33,12 @@ public class ShowcaseResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final ShowcaseService showcaseService;
+
     private final ShowcaseRepository showcaseRepository;
 
-    public ShowcaseResource(ShowcaseRepository showcaseRepository) {
+    public ShowcaseResource(ShowcaseService showcaseService, ShowcaseRepository showcaseRepository) {
+        this.showcaseService = showcaseService;
         this.showcaseRepository = showcaseRepository;
     }
 
@@ -53,7 +55,7 @@ public class ShowcaseResource {
         if (showcase.getId() != null) {
             throw new BadRequestAlertException("A new showcase cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Showcase result = showcaseRepository.save(showcase);
+        Showcase result = showcaseService.save(showcase);
         return ResponseEntity
             .created(new URI("/api/showcases/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -87,7 +89,7 @@ public class ShowcaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Showcase result = showcaseRepository.save(showcase);
+        Showcase result = showcaseService.update(showcase);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, showcase.getId().toString()))
@@ -122,16 +124,7 @@ public class ShowcaseResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<Showcase> result = showcaseRepository
-            .findById(showcase.getId())
-            .map(existingShowcase -> {
-                if (showcase.getImageId() != null) {
-                    existingShowcase.setImageId(showcase.getImageId());
-                }
-
-                return existingShowcase;
-            })
-            .map(showcaseRepository::save);
+        Optional<Showcase> result = showcaseService.partialUpdate(showcase);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -147,7 +140,7 @@ public class ShowcaseResource {
     @GetMapping("/showcases")
     public List<Showcase> getAllShowcases() {
         log.debug("REST request to get all Showcases");
-        return showcaseRepository.findAll();
+        return showcaseService.findAll();
     }
 
     /**
@@ -159,7 +152,7 @@ public class ShowcaseResource {
     @GetMapping("/showcases/{id}")
     public ResponseEntity<Showcase> getShowcase(@PathVariable Long id) {
         log.debug("REST request to get Showcase : {}", id);
-        Optional<Showcase> showcase = showcaseRepository.findById(id);
+        Optional<Showcase> showcase = showcaseService.findOne(id);
         return ResponseUtil.wrapOrNotFound(showcase);
     }
 
@@ -172,7 +165,7 @@ public class ShowcaseResource {
     @DeleteMapping("/showcases/{id}")
     public ResponseEntity<Void> deleteShowcase(@PathVariable Long id) {
         log.debug("REST request to delete Showcase : {}", id);
-        showcaseRepository.deleteById(id);
+        showcaseService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.Machine;
+import me.krft.api.domain.MachineCategory;
 import me.krft.api.repository.MachineRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,8 +37,8 @@ class MachineResourceIT {
     private static final String ENTITY_API_URL = "/api/machines";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong count = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
 
     @Autowired
     private MachineRepository machineRepository;
@@ -58,6 +59,16 @@ class MachineResourceIT {
      */
     public static Machine createEntity(EntityManager em) {
         Machine machine = new Machine().name(DEFAULT_NAME);
+        // Add required entity
+        MachineCategory machineCategory;
+        if (TestUtil.findAll(em, MachineCategory.class).isEmpty()) {
+            machineCategory = MachineCategoryResourceIT.createEntity(em);
+            em.persist(machineCategory);
+            em.flush();
+        } else {
+            machineCategory = TestUtil.findAll(em, MachineCategory.class).get(0);
+        }
+        machine.setCategory(machineCategory);
         return machine;
     }
 
@@ -69,6 +80,16 @@ class MachineResourceIT {
      */
     public static Machine createUpdatedEntity(EntityManager em) {
         Machine machine = new Machine().name(UPDATED_NAME);
+        // Add required entity
+        MachineCategory machineCategory;
+        if (TestUtil.findAll(em, MachineCategory.class).isEmpty()) {
+            machineCategory = MachineCategoryResourceIT.createUpdatedEntity(em);
+            em.persist(machineCategory);
+            em.flush();
+        } else {
+            machineCategory = TestUtil.findAll(em, MachineCategory.class).get(0);
+        }
+        machine.setCategory(machineCategory);
         return machine;
     }
 

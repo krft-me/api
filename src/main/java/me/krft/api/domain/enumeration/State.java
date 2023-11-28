@@ -1,13 +1,13 @@
 package me.krft.api.domain.enumeration;
 
 /**
- * The State enumeration.
+ * State enum\nRepresents the state of an order
  */
 public enum State {
     WAITING,
     UNSIGNED,
     SIGNED,
-    INPROGRESS,
+    IN_PROGRESS,
     CANCELLED,
     DONE,
 }

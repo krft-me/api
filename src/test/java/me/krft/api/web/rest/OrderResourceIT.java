@@ -13,6 +13,8 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
+import me.krft.api.domain.ApplicationUser;
+import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.domain.Order;
 import me.krft.api.domain.enumeration.State;
 import me.krft.api.repository.OrderRepository;
@@ -42,8 +44,8 @@ class OrderResourceIT {
     private static final String ENTITY_API_URL = "/api/orders";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong count = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
 
     @Autowired
     private OrderRepository orderRepository;
@@ -64,6 +66,26 @@ class OrderResourceIT {
      */
     public static Order createEntity(EntityManager em) {
         Order order = new Order().date(DEFAULT_DATE).state(DEFAULT_STATE);
+        // Add required entity
+        ApplicationUserOffer applicationUserOffer;
+        if (TestUtil.findAll(em, ApplicationUserOffer.class).isEmpty()) {
+            applicationUserOffer = ApplicationUserOfferResourceIT.createEntity(em);
+            em.persist(applicationUserOffer);
+            em.flush();
+        } else {
+            applicationUserOffer = TestUtil.findAll(em, ApplicationUserOffer.class).get(0);
+        }
+        order.setOffer(applicationUserOffer);
+        // Add required entity
+        ApplicationUser applicationUser;
+        if (TestUtil.findAll(em, ApplicationUser.class).isEmpty()) {
+            applicationUser = ApplicationUserResourceIT.createEntity(em);
+            em.persist(applicationUser);
+            em.flush();
+        } else {
+            applicationUser = TestUtil.findAll(em, ApplicationUser.class).get(0);
+        }
+        order.setCustomer(applicationUser);
         return order;
     }
 
@@ -75,6 +97,26 @@ class OrderResourceIT {
      */
     public static Order createUpdatedEntity(EntityManager em) {
         Order order = new Order().date(UPDATED_DATE).state(UPDATED_STATE);
+        // Add required entity
+        ApplicationUserOffer applicationUserOffer;
+        if (TestUtil.findAll(em, ApplicationUserOffer.class).isEmpty()) {
+            applicationUserOffer = ApplicationUserOfferResourceIT.createUpdatedEntity(em);
+            em.persist(applicationUserOffer);
+            em.flush();
+        } else {
+            applicationUserOffer = TestUtil.findAll(em, ApplicationUserOffer.class).get(0);
+        }
+        order.setOffer(applicationUserOffer);
+        // Add required entity
+        ApplicationUser applicationUser;
+        if (TestUtil.findAll(em, ApplicationUser.class).isEmpty()) {
+            applicationUser = ApplicationUserResourceIT.createUpdatedEntity(em);
+            em.persist(applicationUser);
+            em.flush();
+        } else {
+            applicationUser = TestUtil.findAll(em, ApplicationUser.class).get(0);
+        }
+        order.setCustomer(applicationUser);
         return order;
     }
 

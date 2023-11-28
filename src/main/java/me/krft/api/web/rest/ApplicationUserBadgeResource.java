@@ -9,12 +9,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import me.krft.api.domain.ApplicationUserBadge;
 import me.krft.api.repository.ApplicationUserBadgeRepository;
+import me.krft.api.service.ApplicationUserBadgeService;
 import me.krft.api.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -24,7 +24,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
-@Transactional
 public class ApplicationUserBadgeResource {
 
     private final Logger log = LoggerFactory.getLogger(ApplicationUserBadgeResource.class);
@@ -34,9 +33,15 @@ public class ApplicationUserBadgeResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final ApplicationUserBadgeService applicationUserBadgeService;
+
     private final ApplicationUserBadgeRepository applicationUserBadgeRepository;
 
-    public ApplicationUserBadgeResource(ApplicationUserBadgeRepository applicationUserBadgeRepository) {
+    public ApplicationUserBadgeResource(
+        ApplicationUserBadgeService applicationUserBadgeService,
+        ApplicationUserBadgeRepository applicationUserBadgeRepository
+    ) {
+        this.applicationUserBadgeService = applicationUserBadgeService;
         this.applicationUserBadgeRepository = applicationUserBadgeRepository;
     }
 
@@ -54,7 +59,7 @@ public class ApplicationUserBadgeResource {
         if (applicationUserBadge.getId() != null) {
             throw new BadRequestAlertException("A new applicationUserBadge cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        ApplicationUserBadge result = applicationUserBadgeRepository.save(applicationUserBadge);
+        ApplicationUserBadge result = applicationUserBadgeService.save(applicationUserBadge);
         return ResponseEntity
             .created(new URI("/api/application-user-badges/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -88,7 +93,7 @@ public class ApplicationUserBadgeResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        ApplicationUserBadge result = applicationUserBadgeRepository.save(applicationUserBadge);
+        ApplicationUserBadge result = applicationUserBadgeService.update(applicationUserBadge);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, applicationUserBadge.getId().toString()))
@@ -123,16 +128,7 @@ public class ApplicationUserBadgeResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<ApplicationUserBadge> result = applicationUserBadgeRepository
-            .findById(applicationUserBadge.getId())
-            .map(existingApplicationUserBadge -> {
-                if (applicationUserBadge.getObtentionDate() != null) {
-                    existingApplicationUserBadge.setObtentionDate(applicationUserBadge.getObtentionDate());
-                }
-
-                return existingApplicationUserBadge;
-            })
-            .map(applicationUserBadgeRepository::save);
+        Optional<ApplicationUserBadge> result = applicationUserBadgeService.partialUpdate(applicationUserBadge);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -148,7 +144,7 @@ public class ApplicationUserBadgeResource {
     @GetMapping("/application-user-badges")
     public List<ApplicationUserBadge> getAllApplicationUserBadges() {
         log.debug("REST request to get all ApplicationUserBadges");
-        return applicationUserBadgeRepository.findAll();
+        return applicationUserBadgeService.findAll();
     }
 
     /**
@@ -160,7 +156,7 @@ public class ApplicationUserBadgeResource {
     @GetMapping("/application-user-badges/{id}")
     public ResponseEntity<ApplicationUserBadge> getApplicationUserBadge(@PathVariable Long id) {
         log.debug("REST request to get ApplicationUserBadge : {}", id);
-        Optional<ApplicationUserBadge> applicationUserBadge = applicationUserBadgeRepository.findById(id);
+        Optional<ApplicationUserBadge> applicationUserBadge = applicationUserBadgeService.findOne(id);
         return ResponseUtil.wrapOrNotFound(applicationUserBadge);
     }
 
@@ -173,7 +169,7 @@ public class ApplicationUserBadgeResource {
     @DeleteMapping("/application-user-badges/{id}")
     public ResponseEntity<Void> deleteApplicationUserBadge(@PathVariable Long id) {
         log.debug("REST request to delete ApplicationUserBadge : {}", id);
-        applicationUserBadgeRepository.deleteById(id);
+        applicationUserBadgeService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

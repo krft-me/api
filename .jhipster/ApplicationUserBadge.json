@@ -1,19 +1,22 @@
 {
   "applications": "*",
-  "changelogDate": "20231002172903",
+  "changelogDate": "20231125132607",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "Relationship entity between users and badges",
   "dto": "no",
   "embedded": false,
   "entityTableName": "application_user_badge",
   "fields": [
     {
-      "fieldName": "obtentionDate",
+      "fieldName": "obtainedDate",
       "fieldType": "Instant",
-      "fieldValidateRules": ["required"]
+      "fieldValidateRules": ["required"],
+      "javadoc": "Date the user obtained the badge"
     }
   ],
   "fluentMethods": true,
+  "javadoc": "Relationship entity between users and badges",
   "jpaMetamodelFiltering": false,
   "microserviceName": "krftme",
   "name": "ApplicationUserBadge",
@@ -22,14 +25,19 @@
   "relationships": [
     {
       "otherEntityName": "applicationUser",
-      "relationshipName": "applicationUser",
-      "relationshipType": "many-to-one"
+      "otherEntityRelationshipName": "badges",
+      "relationshipName": "user",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
     },
     {
       "otherEntityName": "badge",
+      "otherEntityRelationshipName": "users",
       "relationshipName": "badge",
-      "relationshipType": "many-to-one"
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
     }
   ],
-  "service": "no"
+  "searchEngine": false,
+  "service": "serviceImpl"
 }

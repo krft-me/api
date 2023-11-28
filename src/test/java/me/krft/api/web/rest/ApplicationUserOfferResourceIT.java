@@ -2,21 +2,31 @@ package me.krft.api.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
+import me.krft.api.domain.ApplicationUser;
 import me.krft.api.domain.ApplicationUserOffer;
+import me.krft.api.domain.Offer;
 import me.krft.api.repository.ApplicationUserOfferRepository;
+import me.krft.api.service.ApplicationUserOfferService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Integration tests for the {@link ApplicationUserOfferResource} REST controller.
  */
 @IntegrationTest
+@ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockUser
 class ApplicationUserOfferResourceIT {
@@ -33,14 +44,26 @@ class ApplicationUserOfferResourceIT {
     private static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
     private static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
 
+    private static final Integer DEFAULT_PRICE = 0;
+    private static final Integer UPDATED_PRICE = 1;
+
+    private static final Boolean DEFAULT_ACTIVE = false;
+    private static final Boolean UPDATED_ACTIVE = true;
+
     private static final String ENTITY_API_URL = "/api/application-user-offers";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong count = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
 
     @Autowired
     private ApplicationUserOfferRepository applicationUserOfferRepository;
+
+    @Mock
+    private ApplicationUserOfferRepository applicationUserOfferRepositoryMock;
+
+    @Mock
+    private ApplicationUserOfferService applicationUserOfferServiceMock;
 
     @Autowired
     private EntityManager em;
@@ -57,7 +80,30 @@ class ApplicationUserOfferResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ApplicationUserOffer createEntity(EntityManager em) {
-        ApplicationUserOffer applicationUserOffer = new ApplicationUserOffer().description(DEFAULT_DESCRIPTION);
+        ApplicationUserOffer applicationUserOffer = new ApplicationUserOffer()
+            .description(DEFAULT_DESCRIPTION)
+            .price(DEFAULT_PRICE)
+            .active(DEFAULT_ACTIVE);
+        // Add required entity
+        ApplicationUser applicationUser;
+        if (TestUtil.findAll(em, ApplicationUser.class).isEmpty()) {
+            applicationUser = ApplicationUserResourceIT.createEntity(em);
+            em.persist(applicationUser);
+            em.flush();
+        } else {
+            applicationUser = TestUtil.findAll(em, ApplicationUser.class).get(0);
+        }
+        applicationUserOffer.setProvider(applicationUser);
+        // Add required entity
+        Offer offer;
+        if (TestUtil.findAll(em, Offer.class).isEmpty()) {
+            offer = OfferResourceIT.createEntity(em);
+            em.persist(offer);
+            em.flush();
+        } else {
+            offer = TestUtil.findAll(em, Offer.class).get(0);
+        }
+        applicationUserOffer.setOffer(offer);
         return applicationUserOffer;
     }
 
@@ -68,7 +114,30 @@ class ApplicationUserOfferResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ApplicationUserOffer createUpdatedEntity(EntityManager em) {
-        ApplicationUserOffer applicationUserOffer = new ApplicationUserOffer().description(UPDATED_DESCRIPTION);
+        ApplicationUserOffer applicationUserOffer = new ApplicationUserOffer()
+            .description(UPDATED_DESCRIPTION)
+            .price(UPDATED_PRICE)
+            .active(UPDATED_ACTIVE);
+        // Add required entity
+        ApplicationUser applicationUser;
+        if (TestUtil.findAll(em, ApplicationUser.class).isEmpty()) {
+            applicationUser = ApplicationUserResourceIT.createUpdatedEntity(em);
+            em.persist(applicationUser);
+            em.flush();
+        } else {
+            applicationUser = TestUtil.findAll(em, ApplicationUser.class).get(0);
+        }
+        applicationUserOffer.setProvider(applicationUser);
+        // Add required entity
+        Offer offer;
+        if (TestUtil.findAll(em, Offer.class).isEmpty()) {
+            offer = OfferResourceIT.createUpdatedEntity(em);
+            em.persist(offer);
+            em.flush();
+        } else {
+            offer = TestUtil.findAll(em, Offer.class).get(0);
+        }
+        applicationUserOffer.setOffer(offer);
         return applicationUserOffer;
     }
 
@@ -96,6 +165,8 @@ class ApplicationUserOfferResourceIT {
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeCreate + 1);
         ApplicationUserOffer testApplicationUserOffer = applicationUserOfferList.get(applicationUserOfferList.size() - 1);
         assertThat(testApplicationUserOffer.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
+        assertThat(testApplicationUserOffer.getPrice()).isEqualTo(DEFAULT_PRICE);
+        assertThat(testApplicationUserOffer.getActive()).isEqualTo(DEFAULT_ACTIVE);
     }
 
     @Test
@@ -145,6 +216,50 @@ class ApplicationUserOfferResourceIT {
 
     @Test
     @Transactional
+    void checkPriceIsRequired() throws Exception {
+        int databaseSizeBeforeTest = applicationUserOfferRepository.findAll().size();
+        // set the field null
+        applicationUserOffer.setPrice(null);
+
+        // Create the ApplicationUserOffer, which fails.
+
+        restApplicationUserOfferMockMvc
+            .perform(
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOffer))
+            )
+            .andExpect(status().isBadRequest());
+
+        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
+        assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkActiveIsRequired() throws Exception {
+        int databaseSizeBeforeTest = applicationUserOfferRepository.findAll().size();
+        // set the field null
+        applicationUserOffer.setActive(null);
+
+        // Create the ApplicationUserOffer, which fails.
+
+        restApplicationUserOfferMockMvc
+            .perform(
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(applicationUserOffer))
+            )
+            .andExpect(status().isBadRequest());
+
+        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
+        assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     void getAllApplicationUserOffers() throws Exception {
         // Initialize the database
         applicationUserOfferRepository.saveAndFlush(applicationUserOffer);
@@ -155,7 +270,26 @@ class ApplicationUserOfferResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(applicationUserOffer.getId().intValue())))
-            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)));
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
+            .andExpect(jsonPath("$.[*].price").value(hasItem(DEFAULT_PRICE)))
+            .andExpect(jsonPath("$.[*].active").value(hasItem(DEFAULT_ACTIVE.booleanValue())));
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllApplicationUserOffersWithEagerRelationshipsIsEnabled() throws Exception {
+        when(applicationUserOfferServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+
+        restApplicationUserOfferMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
+
+        verify(applicationUserOfferServiceMock, times(1)).findAllWithEagerRelationships(any());
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllApplicationUserOffersWithEagerRelationshipsIsNotEnabled() throws Exception {
+        when(applicationUserOfferServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+
+        restApplicationUserOfferMockMvc.perform(get(ENTITY_API_URL + "?eagerload=false")).andExpect(status().isOk());
+        verify(applicationUserOfferRepositoryMock, times(1)).findAll(any(Pageable.class));
     }
 
     @Test
@@ -170,7 +304,9 @@ class ApplicationUserOfferResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(applicationUserOffer.getId().intValue()))
-            .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION));
+            .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
+            .andExpect(jsonPath("$.price").value(DEFAULT_PRICE))
+            .andExpect(jsonPath("$.active").value(DEFAULT_ACTIVE.booleanValue()));
     }
 
     @Test
@@ -192,7 +328,7 @@ class ApplicationUserOfferResourceIT {
         ApplicationUserOffer updatedApplicationUserOffer = applicationUserOfferRepository.findById(applicationUserOffer.getId()).get();
         // Disconnect from session so that the updates on updatedApplicationUserOffer are not directly saved in db
         em.detach(updatedApplicationUserOffer);
-        updatedApplicationUserOffer.description(UPDATED_DESCRIPTION);
+        updatedApplicationUserOffer.description(UPDATED_DESCRIPTION).price(UPDATED_PRICE).active(UPDATED_ACTIVE);
 
         restApplicationUserOfferMockMvc
             .perform(
@@ -208,6 +344,8 @@ class ApplicationUserOfferResourceIT {
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeUpdate);
         ApplicationUserOffer testApplicationUserOffer = applicationUserOfferList.get(applicationUserOfferList.size() - 1);
         assertThat(testApplicationUserOffer.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+        assertThat(testApplicationUserOffer.getPrice()).isEqualTo(UPDATED_PRICE);
+        assertThat(testApplicationUserOffer.getActive()).isEqualTo(UPDATED_ACTIVE);
     }
 
     @Test
@@ -285,7 +423,7 @@ class ApplicationUserOfferResourceIT {
         ApplicationUserOffer partialUpdatedApplicationUserOffer = new ApplicationUserOffer();
         partialUpdatedApplicationUserOffer.setId(applicationUserOffer.getId());
 
-        partialUpdatedApplicationUserOffer.description(UPDATED_DESCRIPTION);
+        partialUpdatedApplicationUserOffer.description(UPDATED_DESCRIPTION).price(UPDATED_PRICE).active(UPDATED_ACTIVE);
 
         restApplicationUserOfferMockMvc
             .perform(
@@ -301,6 +439,8 @@ class ApplicationUserOfferResourceIT {
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeUpdate);
         ApplicationUserOffer testApplicationUserOffer = applicationUserOfferList.get(applicationUserOfferList.size() - 1);
         assertThat(testApplicationUserOffer.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+        assertThat(testApplicationUserOffer.getPrice()).isEqualTo(UPDATED_PRICE);
+        assertThat(testApplicationUserOffer.getActive()).isEqualTo(UPDATED_ACTIVE);
     }
 
     @Test
@@ -315,7 +455,7 @@ class ApplicationUserOfferResourceIT {
         ApplicationUserOffer partialUpdatedApplicationUserOffer = new ApplicationUserOffer();
         partialUpdatedApplicationUserOffer.setId(applicationUserOffer.getId());
 
-        partialUpdatedApplicationUserOffer.description(UPDATED_DESCRIPTION);
+        partialUpdatedApplicationUserOffer.description(UPDATED_DESCRIPTION).price(UPDATED_PRICE).active(UPDATED_ACTIVE);
 
         restApplicationUserOfferMockMvc
             .perform(
@@ -331,6 +471,8 @@ class ApplicationUserOfferResourceIT {
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeUpdate);
         ApplicationUserOffer testApplicationUserOffer = applicationUserOfferList.get(applicationUserOfferList.size() - 1);
         assertThat(testApplicationUserOffer.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+        assertThat(testApplicationUserOffer.getPrice()).isEqualTo(UPDATED_PRICE);
+        assertThat(testApplicationUserOffer.getActive()).isEqualTo(UPDATED_ACTIVE);
     }
 
     @Test

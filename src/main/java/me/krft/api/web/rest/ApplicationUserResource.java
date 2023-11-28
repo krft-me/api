@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import me.krft.api.domain.ApplicationUser;
 import me.krft.api.repository.ApplicationUserRepository;
 import me.krft.api.repository.UserRepository;
+import me.krft.api.service.ApplicationUserService;
 import me.krft.api.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +34,18 @@ public class ApplicationUserResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final ApplicationUserService applicationUserService;
+
     private final ApplicationUserRepository applicationUserRepository;
 
     private final UserRepository userRepository;
 
-    public ApplicationUserResource(ApplicationUserRepository applicationUserRepository, UserRepository userRepository) {
+    public ApplicationUserResource(
+        ApplicationUserService applicationUserService,
+        ApplicationUserRepository applicationUserRepository,
+        UserRepository userRepository
+    ) {
+        this.applicationUserService = applicationUserService;
         this.applicationUserRepository = applicationUserRepository;
         this.userRepository = userRepository;
     }
@@ -62,7 +70,7 @@ public class ApplicationUserResource {
             userRepository.save(applicationUser.getInternalUser());
         }
 
-        ApplicationUser result = applicationUserRepository.save(applicationUser);
+        ApplicationUser result = applicationUserService.save(applicationUser);
         return ResponseEntity
             .created(new URI("/api/application-users/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -101,7 +109,7 @@ public class ApplicationUserResource {
             userRepository.save(applicationUser.getInternalUser());
         }
 
-        ApplicationUser result = applicationUserRepository.save(applicationUser);
+        ApplicationUser result = applicationUserService.update(applicationUser);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, applicationUser.getId().toString()))
@@ -141,25 +149,7 @@ public class ApplicationUserResource {
             userRepository.save(applicationUser.getInternalUser());
         }
 
-        Optional<ApplicationUser> result = applicationUserRepository
-            .findById(applicationUser.getId())
-            .map(existingApplicationUser -> {
-                if (applicationUser.getFirstName() != null) {
-                    existingApplicationUser.setFirstName(applicationUser.getFirstName());
-                }
-                if (applicationUser.getLastName() != null) {
-                    existingApplicationUser.setLastName(applicationUser.getLastName());
-                }
-                if (applicationUser.getPseudo() != null) {
-                    existingApplicationUser.setPseudo(applicationUser.getPseudo());
-                }
-                if (applicationUser.getAverageRating() != null) {
-                    existingApplicationUser.setAverageRating(applicationUser.getAverageRating());
-                }
-
-                return existingApplicationUser;
-            })
-            .map(applicationUserRepository::save);
+        Optional<ApplicationUser> result = applicationUserService.partialUpdate(applicationUser);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -170,17 +160,12 @@ public class ApplicationUserResource {
     /**
      * {@code GET  /application-users} : get all the applicationUsers.
      *
-     * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of applicationUsers in body.
      */
     @GetMapping("/application-users")
-    public List<ApplicationUser> getAllApplicationUsers(@RequestParam(required = false, defaultValue = "false") boolean eagerload) {
+    public List<ApplicationUser> getAllApplicationUsers() {
         log.debug("REST request to get all ApplicationUsers");
-        if (eagerload) {
-            return applicationUserRepository.findAllWithEagerRelationships();
-        } else {
-            return applicationUserRepository.findAll();
-        }
+        return applicationUserService.findAll();
     }
 
     /**
@@ -192,7 +177,7 @@ public class ApplicationUserResource {
     @GetMapping("/application-users/{id}")
     public ResponseEntity<ApplicationUser> getApplicationUser(@PathVariable Long id) {
         log.debug("REST request to get ApplicationUser : {}", id);
-        Optional<ApplicationUser> applicationUser = applicationUserRepository.findOneWithEagerRelationships(id);
+        Optional<ApplicationUser> applicationUser = applicationUserService.findOne(id);
         return ResponseUtil.wrapOrNotFound(applicationUser);
     }
 
@@ -205,7 +190,7 @@ public class ApplicationUserResource {
     @DeleteMapping("/application-users/{id}")
     public ResponseEntity<Void> deleteApplicationUser(@PathVariable Long id) {
         log.debug("REST request to delete ApplicationUser : {}", id);
-        applicationUserRepository.deleteById(id);
+        applicationUserService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

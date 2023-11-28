@@ -1,17 +1,20 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Machine.
+ * Machine entity
  */
+@Schema(description = "Machine entity")
 @Entity
 @Table(name = "machine")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -27,17 +30,19 @@ public class Machine implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "name", nullable = false)
+    @Size(min = 1)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     @OneToMany(mappedBy = "machine")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "machine" }, allowSetters = true)
-    private Set<Category> categories = new HashSet<>();
+    @JsonIgnoreProperties(value = { "userOffers", "machine", "category" }, allowSetters = true)
+    private Set<Offer> offers = new HashSet<>();
 
-    @ManyToOne
-    @JsonIgnoreProperties(value = { "machines", "followers" }, allowSetters = true)
-    private Offer offer;
+    @ManyToOne(optional = false)
+    @NotNull
+    @JsonIgnoreProperties(value = { "machines" }, allowSetters = true)
+    private MachineCategory category;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -67,47 +72,47 @@ public class Machine implements Serializable {
         this.name = name;
     }
 
-    public Set<Category> getCategories() {
-        return this.categories;
+    public Set<Offer> getOffers() {
+        return this.offers;
     }
 
-    public void setCategories(Set<Category> categories) {
-        if (this.categories != null) {
-            this.categories.forEach(i -> i.setMachine(null));
+    public void setOffers(Set<Offer> offers) {
+        if (this.offers != null) {
+            this.offers.forEach(i -> i.setMachine(null));
         }
-        if (categories != null) {
-            categories.forEach(i -> i.setMachine(this));
+        if (offers != null) {
+            offers.forEach(i -> i.setMachine(this));
         }
-        this.categories = categories;
+        this.offers = offers;
     }
 
-    public Machine categories(Set<Category> categories) {
-        this.setCategories(categories);
+    public Machine offers(Set<Offer> offers) {
+        this.setOffers(offers);
         return this;
     }
 
-    public Machine addCategory(Category category) {
-        this.categories.add(category);
-        category.setMachine(this);
+    public Machine addOffers(Offer offer) {
+        this.offers.add(offer);
+        offer.setMachine(this);
         return this;
     }
 
-    public Machine removeCategory(Category category) {
-        this.categories.remove(category);
-        category.setMachine(null);
+    public Machine removeOffers(Offer offer) {
+        this.offers.remove(offer);
+        offer.setMachine(null);
         return this;
     }
 
-    public Offer getOffer() {
-        return this.offer;
+    public MachineCategory getCategory() {
+        return this.category;
     }
 
-    public void setOffer(Offer offer) {
-        this.offer = offer;
+    public void setCategory(MachineCategory machineCategory) {
+        this.category = machineCategory;
     }
 
-    public Machine offer(Offer offer) {
-        this.setOffer(offer);
+    public Machine category(MachineCategory machineCategory) {
+        this.setCategory(machineCategory);
         return this;
     }
 

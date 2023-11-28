@@ -13,7 +13,9 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
+import me.krft.api.domain.ApplicationUser;
 import me.krft.api.domain.ApplicationUserBadge;
+import me.krft.api.domain.Badge;
 import me.krft.api.repository.ApplicationUserBadgeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,14 +34,14 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class ApplicationUserBadgeResourceIT {
 
-    private static final Instant DEFAULT_OBTENTION_DATE = Instant.ofEpochMilli(0L);
-    private static final Instant UPDATED_OBTENTION_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+    private static final Instant DEFAULT_OBTAINED_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_OBTAINED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final String ENTITY_API_URL = "/api/application-user-badges";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong count = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
 
     @Autowired
     private ApplicationUserBadgeRepository applicationUserBadgeRepository;
@@ -59,7 +61,27 @@ class ApplicationUserBadgeResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ApplicationUserBadge createEntity(EntityManager em) {
-        ApplicationUserBadge applicationUserBadge = new ApplicationUserBadge().obtentionDate(DEFAULT_OBTENTION_DATE);
+        ApplicationUserBadge applicationUserBadge = new ApplicationUserBadge().obtainedDate(DEFAULT_OBTAINED_DATE);
+        // Add required entity
+        ApplicationUser applicationUser;
+        if (TestUtil.findAll(em, ApplicationUser.class).isEmpty()) {
+            applicationUser = ApplicationUserResourceIT.createEntity(em);
+            em.persist(applicationUser);
+            em.flush();
+        } else {
+            applicationUser = TestUtil.findAll(em, ApplicationUser.class).get(0);
+        }
+        applicationUserBadge.setUser(applicationUser);
+        // Add required entity
+        Badge badge;
+        if (TestUtil.findAll(em, Badge.class).isEmpty()) {
+            badge = BadgeResourceIT.createEntity(em);
+            em.persist(badge);
+            em.flush();
+        } else {
+            badge = TestUtil.findAll(em, Badge.class).get(0);
+        }
+        applicationUserBadge.setBadge(badge);
         return applicationUserBadge;
     }
 
@@ -70,7 +92,27 @@ class ApplicationUserBadgeResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ApplicationUserBadge createUpdatedEntity(EntityManager em) {
-        ApplicationUserBadge applicationUserBadge = new ApplicationUserBadge().obtentionDate(UPDATED_OBTENTION_DATE);
+        ApplicationUserBadge applicationUserBadge = new ApplicationUserBadge().obtainedDate(UPDATED_OBTAINED_DATE);
+        // Add required entity
+        ApplicationUser applicationUser;
+        if (TestUtil.findAll(em, ApplicationUser.class).isEmpty()) {
+            applicationUser = ApplicationUserResourceIT.createUpdatedEntity(em);
+            em.persist(applicationUser);
+            em.flush();
+        } else {
+            applicationUser = TestUtil.findAll(em, ApplicationUser.class).get(0);
+        }
+        applicationUserBadge.setUser(applicationUser);
+        // Add required entity
+        Badge badge;
+        if (TestUtil.findAll(em, Badge.class).isEmpty()) {
+            badge = BadgeResourceIT.createUpdatedEntity(em);
+            em.persist(badge);
+            em.flush();
+        } else {
+            badge = TestUtil.findAll(em, Badge.class).get(0);
+        }
+        applicationUserBadge.setBadge(badge);
         return applicationUserBadge;
     }
 
@@ -97,7 +139,7 @@ class ApplicationUserBadgeResourceIT {
         List<ApplicationUserBadge> applicationUserBadgeList = applicationUserBadgeRepository.findAll();
         assertThat(applicationUserBadgeList).hasSize(databaseSizeBeforeCreate + 1);
         ApplicationUserBadge testApplicationUserBadge = applicationUserBadgeList.get(applicationUserBadgeList.size() - 1);
-        assertThat(testApplicationUserBadge.getObtentionDate()).isEqualTo(DEFAULT_OBTENTION_DATE);
+        assertThat(testApplicationUserBadge.getObtainedDate()).isEqualTo(DEFAULT_OBTAINED_DATE);
     }
 
     @Test
@@ -125,10 +167,10 @@ class ApplicationUserBadgeResourceIT {
 
     @Test
     @Transactional
-    void checkObtentionDateIsRequired() throws Exception {
+    void checkObtainedDateIsRequired() throws Exception {
         int databaseSizeBeforeTest = applicationUserBadgeRepository.findAll().size();
         // set the field null
-        applicationUserBadge.setObtentionDate(null);
+        applicationUserBadge.setObtainedDate(null);
 
         // Create the ApplicationUserBadge, which fails.
 
@@ -157,7 +199,7 @@ class ApplicationUserBadgeResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(applicationUserBadge.getId().intValue())))
-            .andExpect(jsonPath("$.[*].obtentionDate").value(hasItem(DEFAULT_OBTENTION_DATE.toString())));
+            .andExpect(jsonPath("$.[*].obtainedDate").value(hasItem(DEFAULT_OBTAINED_DATE.toString())));
     }
 
     @Test
@@ -172,7 +214,7 @@ class ApplicationUserBadgeResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(applicationUserBadge.getId().intValue()))
-            .andExpect(jsonPath("$.obtentionDate").value(DEFAULT_OBTENTION_DATE.toString()));
+            .andExpect(jsonPath("$.obtainedDate").value(DEFAULT_OBTAINED_DATE.toString()));
     }
 
     @Test
@@ -194,7 +236,7 @@ class ApplicationUserBadgeResourceIT {
         ApplicationUserBadge updatedApplicationUserBadge = applicationUserBadgeRepository.findById(applicationUserBadge.getId()).get();
         // Disconnect from session so that the updates on updatedApplicationUserBadge are not directly saved in db
         em.detach(updatedApplicationUserBadge);
-        updatedApplicationUserBadge.obtentionDate(UPDATED_OBTENTION_DATE);
+        updatedApplicationUserBadge.obtainedDate(UPDATED_OBTAINED_DATE);
 
         restApplicationUserBadgeMockMvc
             .perform(
@@ -209,7 +251,7 @@ class ApplicationUserBadgeResourceIT {
         List<ApplicationUserBadge> applicationUserBadgeList = applicationUserBadgeRepository.findAll();
         assertThat(applicationUserBadgeList).hasSize(databaseSizeBeforeUpdate);
         ApplicationUserBadge testApplicationUserBadge = applicationUserBadgeList.get(applicationUserBadgeList.size() - 1);
-        assertThat(testApplicationUserBadge.getObtentionDate()).isEqualTo(UPDATED_OBTENTION_DATE);
+        assertThat(testApplicationUserBadge.getObtainedDate()).isEqualTo(UPDATED_OBTAINED_DATE);
     }
 
     @Test
@@ -287,7 +329,7 @@ class ApplicationUserBadgeResourceIT {
         ApplicationUserBadge partialUpdatedApplicationUserBadge = new ApplicationUserBadge();
         partialUpdatedApplicationUserBadge.setId(applicationUserBadge.getId());
 
-        partialUpdatedApplicationUserBadge.obtentionDate(UPDATED_OBTENTION_DATE);
+        partialUpdatedApplicationUserBadge.obtainedDate(UPDATED_OBTAINED_DATE);
 
         restApplicationUserBadgeMockMvc
             .perform(
@@ -302,7 +344,7 @@ class ApplicationUserBadgeResourceIT {
         List<ApplicationUserBadge> applicationUserBadgeList = applicationUserBadgeRepository.findAll();
         assertThat(applicationUserBadgeList).hasSize(databaseSizeBeforeUpdate);
         ApplicationUserBadge testApplicationUserBadge = applicationUserBadgeList.get(applicationUserBadgeList.size() - 1);
-        assertThat(testApplicationUserBadge.getObtentionDate()).isEqualTo(UPDATED_OBTENTION_DATE);
+        assertThat(testApplicationUserBadge.getObtainedDate()).isEqualTo(UPDATED_OBTAINED_DATE);
     }
 
     @Test
@@ -317,7 +359,7 @@ class ApplicationUserBadgeResourceIT {
         ApplicationUserBadge partialUpdatedApplicationUserBadge = new ApplicationUserBadge();
         partialUpdatedApplicationUserBadge.setId(applicationUserBadge.getId());
 
-        partialUpdatedApplicationUserBadge.obtentionDate(UPDATED_OBTENTION_DATE);
+        partialUpdatedApplicationUserBadge.obtainedDate(UPDATED_OBTAINED_DATE);
 
         restApplicationUserBadgeMockMvc
             .perform(
@@ -332,7 +374,7 @@ class ApplicationUserBadgeResourceIT {
         List<ApplicationUserBadge> applicationUserBadgeList = applicationUserBadgeRepository.findAll();
         assertThat(applicationUserBadgeList).hasSize(databaseSizeBeforeUpdate);
         ApplicationUserBadge testApplicationUserBadge = applicationUserBadgeList.get(applicationUserBadgeList.size() - 1);
-        assertThat(testApplicationUserBadge.getObtentionDate()).isEqualTo(UPDATED_OBTENTION_DATE);
+        assertThat(testApplicationUserBadge.getObtainedDate()).isEqualTo(UPDATED_OBTAINED_DATE);
     }
 
     @Test

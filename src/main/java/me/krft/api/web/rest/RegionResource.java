@@ -9,12 +9,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import me.krft.api.domain.Region;
 import me.krft.api.repository.RegionRepository;
+import me.krft.api.service.RegionService;
 import me.krft.api.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -24,7 +24,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
-@Transactional
 public class RegionResource {
 
     private final Logger log = LoggerFactory.getLogger(RegionResource.class);
@@ -34,9 +33,12 @@ public class RegionResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final RegionService regionService;
+
     private final RegionRepository regionRepository;
 
-    public RegionResource(RegionRepository regionRepository) {
+    public RegionResource(RegionService regionService, RegionRepository regionRepository) {
+        this.regionService = regionService;
         this.regionRepository = regionRepository;
     }
 
@@ -53,7 +55,7 @@ public class RegionResource {
         if (region.getId() != null) {
             throw new BadRequestAlertException("A new region cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Region result = regionRepository.save(region);
+        Region result = regionService.save(region);
         return ResponseEntity
             .created(new URI("/api/regions/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -87,7 +89,7 @@ public class RegionResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Region result = regionRepository.save(region);
+        Region result = regionService.update(region);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, region.getId().toString()))
@@ -122,16 +124,7 @@ public class RegionResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<Region> result = regionRepository
-            .findById(region.getId())
-            .map(existingRegion -> {
-                if (region.getName() != null) {
-                    existingRegion.setName(region.getName());
-                }
-
-                return existingRegion;
-            })
-            .map(regionRepository::save);
+        Optional<Region> result = regionService.partialUpdate(region);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -147,7 +140,7 @@ public class RegionResource {
     @GetMapping("/regions")
     public List<Region> getAllRegions() {
         log.debug("REST request to get all Regions");
-        return regionRepository.findAll();
+        return regionService.findAll();
     }
 
     /**
@@ -159,7 +152,7 @@ public class RegionResource {
     @GetMapping("/regions/{id}")
     public ResponseEntity<Region> getRegion(@PathVariable Long id) {
         log.debug("REST request to get Region : {}", id);
-        Optional<Region> region = regionRepository.findById(id);
+        Optional<Region> region = regionService.findOne(id);
         return ResponseUtil.wrapOrNotFound(region);
     }
 
@@ -172,7 +165,7 @@ public class RegionResource {
     @DeleteMapping("/regions/{id}")
     public ResponseEntity<Void> deleteRegion(@PathVariable Long id) {
         log.debug("REST request to delete Region : {}", id);
-        regionRepository.deleteById(id);
+        regionService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

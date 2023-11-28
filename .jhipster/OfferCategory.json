@@ -1,0 +1,35 @@
+{
+  "applications": "*",
+  "changelogDate": "20231125132612",
+  "clientRootFolder": "krftme",
+  "databaseType": "sql",
+  "documentation": "OfferCategory entity\\nRepresents a preset offer type",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "offer_category",
+  "fields": [
+    {
+      "fieldName": "label",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique", "minlength"],
+      "fieldValidateRulesMinlength": "1"
+    }
+  ],
+  "fluentMethods": true,
+  "javadoc": "OfferCategory entity\\nRepresents a preset offer type",
+  "jpaMetamodelFiltering": false,
+  "microserviceName": "krftme",
+  "name": "OfferCategory",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "offer",
+      "otherEntityRelationshipName": "category",
+      "relationshipName": "offers",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": false,
+  "service": "serviceImpl"
+}

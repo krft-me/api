@@ -1,16 +1,18 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.UUID;
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Showcase.
+ * Showcase image\nRepresents an image of a service to illustrate it
  */
+@Schema(description = "Showcase image\nRepresents an image of a service to illustrate it")
 @Entity
 @Table(name = "showcase")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -26,12 +28,13 @@ public class Showcase implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "image_id", nullable = false)
+    @Column(name = "image_id", nullable = false, unique = true)
     private UUID imageId;
 
-    @ManyToOne
-    @JsonIgnoreProperties(value = { "ratings", "showcases", "tags", "offer", "applicationUser" }, allowSetters = true)
-    private ApplicationUserOffer applicationUserOffer;
+    @ManyToOne(optional = false)
+    @NotNull
+    @JsonIgnoreProperties(value = { "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
+    private ApplicationUserOffer offer;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -61,16 +64,16 @@ public class Showcase implements Serializable {
         this.imageId = imageId;
     }
 
-    public ApplicationUserOffer getApplicationUserOffer() {
-        return this.applicationUserOffer;
+    public ApplicationUserOffer getOffer() {
+        return this.offer;
     }
 
-    public void setApplicationUserOffer(ApplicationUserOffer applicationUserOffer) {
-        this.applicationUserOffer = applicationUserOffer;
+    public void setOffer(ApplicationUserOffer applicationUserOffer) {
+        this.offer = applicationUserOffer;
     }
 
-    public Showcase applicationUserOffer(ApplicationUserOffer applicationUserOffer) {
-        this.setApplicationUserOffer(applicationUserOffer);
+    public Showcase offer(ApplicationUserOffer applicationUserOffer) {
+        this.setOffer(applicationUserOffer);
         return this;
     }
 

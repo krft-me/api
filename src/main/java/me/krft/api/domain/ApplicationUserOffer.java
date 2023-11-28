@@ -1,17 +1,21 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A ApplicationUserOffer.
+ * Relationship entity between user, offer and machine
  */
+@Schema(description = "Relationship entity between user, offer and machine")
 @Entity
 @Table(name = "application_user_offer")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -26,35 +30,61 @@ public class ApplicationUserOffer implements Serializable {
     @Column(name = "id")
     private Long id;
 
+    /**
+     * Description of the service provided, written by the user providing it
+     */
+    @Schema(description = "Description of the service provided, written by the user providing it", required = true)
     @NotNull
-    @Column(name = "description", nullable = false)
+    @Size(min = 1, max = 512)
+    @Column(name = "description", length = 512, nullable = false)
     private String description;
 
-    @OneToMany(mappedBy = "applicationUserOffer")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "applicationUserOffer" }, allowSetters = true)
-    private Set<Rating> ratings = new HashSet<>();
+    /**
+     * The price of the service, set by the user providing it
+     */
+    @Schema(description = "The price of the service, set by the user providing it", required = true)
+    @NotNull
+    @Min(value = 0)
+    @Column(name = "price", nullable = false)
+    private Integer price;
 
-    @OneToMany(mappedBy = "applicationUserOffer")
+    /**
+     * Active means the offer is visible to the users, we shouldn't delete it
+     */
+    @Schema(description = "Active means the offer is visible to the users, we shouldn't delete it", required = true)
+    @NotNull
+    @Column(name = "active", nullable = false)
+    private Boolean active;
+
+    @OneToMany(mappedBy = "offer")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "applicationUserOffer" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "offer" }, allowSetters = true)
     private Set<Showcase> showcases = new HashSet<>();
 
-    @OneToMany(mappedBy = "applicationUserOffer")
+    @OneToMany(mappedBy = "offer")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "applicationUserOffer" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "review", "offer", "customer" }, allowSetters = true)
+    private Set<Order> orders = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+        name = "rel_application_user_offer__tags",
+        joinColumns = @JoinColumn(name = "application_user_offer_id"),
+        inverseJoinColumns = @JoinColumn(name = "tags_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "offers" }, allowSetters = true)
     private Set<Tag> tags = new HashSet<>();
 
-    @ManyToOne
-    @JsonIgnoreProperties(value = { "machines", "followers" }, allowSetters = true)
-    private Offer offer;
+    @ManyToOne(optional = false)
+    @NotNull
+    @JsonIgnoreProperties(value = { "internalUser", "offers", "badges", "orders", "city" }, allowSetters = true)
+    private ApplicationUser provider;
 
-    @ManyToOne
-    @JsonIgnoreProperties(
-        value = { "internalUser", "city", "favoriteApplicationUsers", "favoriteOffers", "followers" },
-        allowSetters = true
-    )
-    private ApplicationUser applicationUser;
+    @ManyToOne(optional = false)
+    @NotNull
+    @JsonIgnoreProperties(value = { "userOffers", "machine", "category" }, allowSetters = true)
+    private Offer offer;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -84,35 +114,30 @@ public class ApplicationUserOffer implements Serializable {
         this.description = description;
     }
 
-    public Set<Rating> getRatings() {
-        return this.ratings;
+    public Integer getPrice() {
+        return this.price;
     }
 
-    public void setRatings(Set<Rating> ratings) {
-        if (this.ratings != null) {
-            this.ratings.forEach(i -> i.setApplicationUserOffer(null));
-        }
-        if (ratings != null) {
-            ratings.forEach(i -> i.setApplicationUserOffer(this));
-        }
-        this.ratings = ratings;
-    }
-
-    public ApplicationUserOffer ratings(Set<Rating> ratings) {
-        this.setRatings(ratings);
+    public ApplicationUserOffer price(Integer price) {
+        this.setPrice(price);
         return this;
     }
 
-    public ApplicationUserOffer addRating(Rating rating) {
-        this.ratings.add(rating);
-        rating.setApplicationUserOffer(this);
+    public void setPrice(Integer price) {
+        this.price = price;
+    }
+
+    public Boolean getActive() {
+        return this.active;
+    }
+
+    public ApplicationUserOffer active(Boolean active) {
+        this.setActive(active);
         return this;
     }
 
-    public ApplicationUserOffer removeRating(Rating rating) {
-        this.ratings.remove(rating);
-        rating.setApplicationUserOffer(null);
-        return this;
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     public Set<Showcase> getShowcases() {
@@ -121,10 +146,10 @@ public class ApplicationUserOffer implements Serializable {
 
     public void setShowcases(Set<Showcase> showcases) {
         if (this.showcases != null) {
-            this.showcases.forEach(i -> i.setApplicationUserOffer(null));
+            this.showcases.forEach(i -> i.setOffer(null));
         }
         if (showcases != null) {
-            showcases.forEach(i -> i.setApplicationUserOffer(this));
+            showcases.forEach(i -> i.setOffer(this));
         }
         this.showcases = showcases;
     }
@@ -134,15 +159,46 @@ public class ApplicationUserOffer implements Serializable {
         return this;
     }
 
-    public ApplicationUserOffer addShowcase(Showcase showcase) {
+    public ApplicationUserOffer addShowcases(Showcase showcase) {
         this.showcases.add(showcase);
-        showcase.setApplicationUserOffer(this);
+        showcase.setOffer(this);
         return this;
     }
 
-    public ApplicationUserOffer removeShowcase(Showcase showcase) {
+    public ApplicationUserOffer removeShowcases(Showcase showcase) {
         this.showcases.remove(showcase);
-        showcase.setApplicationUserOffer(null);
+        showcase.setOffer(null);
+        return this;
+    }
+
+    public Set<Order> getOrders() {
+        return this.orders;
+    }
+
+    public void setOrders(Set<Order> orders) {
+        if (this.orders != null) {
+            this.orders.forEach(i -> i.setOffer(null));
+        }
+        if (orders != null) {
+            orders.forEach(i -> i.setOffer(this));
+        }
+        this.orders = orders;
+    }
+
+    public ApplicationUserOffer orders(Set<Order> orders) {
+        this.setOrders(orders);
+        return this;
+    }
+
+    public ApplicationUserOffer addOrders(Order order) {
+        this.orders.add(order);
+        order.setOffer(this);
+        return this;
+    }
+
+    public ApplicationUserOffer removeOrders(Order order) {
+        this.orders.remove(order);
+        order.setOffer(null);
         return this;
     }
 
@@ -151,12 +207,6 @@ public class ApplicationUserOffer implements Serializable {
     }
 
     public void setTags(Set<Tag> tags) {
-        if (this.tags != null) {
-            this.tags.forEach(i -> i.setApplicationUserOffer(null));
-        }
-        if (tags != null) {
-            tags.forEach(i -> i.setApplicationUserOffer(this));
-        }
         this.tags = tags;
     }
 
@@ -165,15 +215,28 @@ public class ApplicationUserOffer implements Serializable {
         return this;
     }
 
-    public ApplicationUserOffer addTag(Tag tag) {
+    public ApplicationUserOffer addTags(Tag tag) {
         this.tags.add(tag);
-        tag.setApplicationUserOffer(this);
+        tag.getOffers().add(this);
         return this;
     }
 
-    public ApplicationUserOffer removeTag(Tag tag) {
+    public ApplicationUserOffer removeTags(Tag tag) {
         this.tags.remove(tag);
-        tag.setApplicationUserOffer(null);
+        tag.getOffers().remove(this);
+        return this;
+    }
+
+    public ApplicationUser getProvider() {
+        return this.provider;
+    }
+
+    public void setProvider(ApplicationUser applicationUser) {
+        this.provider = applicationUser;
+    }
+
+    public ApplicationUserOffer provider(ApplicationUser applicationUser) {
+        this.setProvider(applicationUser);
         return this;
     }
 
@@ -187,19 +250,6 @@ public class ApplicationUserOffer implements Serializable {
 
     public ApplicationUserOffer offer(Offer offer) {
         this.setOffer(offer);
-        return this;
-    }
-
-    public ApplicationUser getApplicationUser() {
-        return this.applicationUser;
-    }
-
-    public void setApplicationUser(ApplicationUser applicationUser) {
-        this.applicationUser = applicationUser;
-    }
-
-    public ApplicationUserOffer applicationUser(ApplicationUser applicationUser) {
-        this.setApplicationUser(applicationUser);
         return this;
     }
 
@@ -228,6 +278,8 @@ public class ApplicationUserOffer implements Serializable {
         return "ApplicationUserOffer{" +
             "id=" + getId() +
             ", description='" + getDescription() + "'" +
+            ", price=" + getPrice() +
+            ", active='" + getActive() + "'" +
             "}";
     }
 }

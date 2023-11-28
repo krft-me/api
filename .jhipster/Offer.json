@@ -1,8 +1,9 @@
 {
   "applications": "*",
-  "changelogDate": "20231002172859",
+  "changelogDate": "20231125132603",
   "clientRootFolder": "krftme",
   "databaseType": "sql",
+  "documentation": "Offer entity representing a service stereotype",
   "dto": "no",
   "embedded": false,
   "entityTableName": "offer",
@@ -10,10 +11,12 @@
     {
       "fieldName": "name",
       "fieldType": "String",
-      "fieldValidateRules": ["required"]
+      "fieldValidateRules": ["required", "minlength", "unique"],
+      "fieldValidateRulesMinlength": "1"
     }
   ],
   "fluentMethods": true,
+  "javadoc": "Offer entity representing a service stereotype",
   "jpaMetamodelFiltering": false,
   "microserviceName": "krftme",
   "name": "Offer",
@@ -21,18 +24,25 @@
   "readOnly": false,
   "relationships": [
     {
-      "otherEntityName": "machine",
+      "otherEntityName": "applicationUserOffer",
       "otherEntityRelationshipName": "offer",
-      "relationshipName": "machine",
+      "relationshipName": "userOffers",
       "relationshipType": "one-to-many"
     },
     {
-      "otherEntityName": "applicationUser",
-      "otherEntityRelationshipName": "favoriteOffer",
-      "ownerSide": false,
-      "relationshipName": "followers",
-      "relationshipType": "many-to-many"
+      "otherEntityName": "machine",
+      "otherEntityRelationshipName": "offers",
+      "relationshipName": "machine",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "offerCategory",
+      "otherEntityRelationshipName": "offers",
+      "relationshipName": "category",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
     }
   ],
-  "service": "no"
+  "searchEngine": false,
+  "service": "serviceImpl"
 }

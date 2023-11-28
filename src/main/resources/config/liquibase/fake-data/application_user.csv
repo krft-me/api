@@ -1,11 +1,11 @@
-id;first_name;last_name;pseudo;average_rating
-1;Fulbert;Laurent;standardization Mandatory;15534
-2;Annonciade;Lopez;Account array and;57278
-3;Victorien;Mercier;quantify Designer;69428
-4;Antonin;Laine;CSS benchmark d'Argenteuil;21576
-5;Johan;Julien;mobile;54461
-6;Emmelie;Schmitt;a;61196
-7;Aphélie;Martin;solutions;70361
-8;Hubert;Henry;la JSON array;53372
-9;Euphrasie;Vasseur;Movies database users;41861
-10;Aricie;Barre;Jordanian;61168
+id;first_name;last_name;username;profile_picture_id
+1;Fulbert;Laurent;standardization Mandatory;214a99eb-56bc-449f-a5c9-4f94b9fed3b6
+2;Bernard;Moulin;Bacon Self-enabling;48381f0b-9100-4645-bc4a-76aee3b5f83d
+3;Enguerrand;Richard;empowering;26cf61f2-a619-4eed-b298-d3bdf33a694c
+4;Marguerite;Hubert;Panoramas Lorraine Licensed;11118797-ace5-4d3e-a2e3-c8de9c12e263
+5;Elsa;Dumas;Shirt Tools;ae9ff9bc-d0a2-486b-a841-c0006e75b6de
+6;Béatrice;Guerin;wireless;e05aaf06-9285-4aeb-b99b-bd3c87bf4640
+7;Corentin;Barre;Corse Shirt;7b8d758d-cd72-454b-8a4f-9112405a8b4a
+8;Corentine;Robin;Borders efficient Loan;832f24ad-70b1-4f53-9508-4d02f7b61274
+9;Aurélie;Adam;Buckinghamshire Bahreïn Robust;f948673b-51ac-4f56-856e-ac53f0ab0f74
+10;Adonise;Morel;full-range Investment;5ebe01c9-9f53-49c2-ad14-8484ae20a8d7

@@ -33,11 +33,14 @@ class CountryResourceIT {
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
+    private static final String DEFAULT_ISO_CODE = "AAA";
+    private static final String UPDATED_ISO_CODE = "BBB";
+
     private static final String ENTITY_API_URL = "/api/countries";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong count = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
 
     @Autowired
     private CountryRepository countryRepository;
@@ -57,7 +60,7 @@ class CountryResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Country createEntity(EntityManager em) {
-        Country country = new Country().name(DEFAULT_NAME);
+        Country country = new Country().name(DEFAULT_NAME).isoCode(DEFAULT_ISO_CODE);
         return country;
     }
 
@@ -68,7 +71,7 @@ class CountryResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Country createUpdatedEntity(EntityManager em) {
-        Country country = new Country().name(UPDATED_NAME);
+        Country country = new Country().name(UPDATED_NAME).isoCode(UPDATED_ISO_CODE);
         return country;
     }
 
@@ -96,6 +99,7 @@ class CountryResourceIT {
         assertThat(countryList).hasSize(databaseSizeBeforeCreate + 1);
         Country testCountry = countryList.get(countryList.size() - 1);
         assertThat(testCountry.getName()).isEqualTo(DEFAULT_NAME);
+        assertThat(testCountry.getIsoCode()).isEqualTo(DEFAULT_ISO_CODE);
     }
 
     @Test
@@ -123,10 +127,10 @@ class CountryResourceIT {
 
     @Test
     @Transactional
-    void checkNameIsRequired() throws Exception {
+    void checkIsoCodeIsRequired() throws Exception {
         int databaseSizeBeforeTest = countryRepository.findAll().size();
         // set the field null
-        country.setName(null);
+        country.setIsoCode(null);
 
         // Create the Country, which fails.
 
@@ -155,7 +159,8 @@ class CountryResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(country.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)));
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
+            .andExpect(jsonPath("$.[*].isoCode").value(hasItem(DEFAULT_ISO_CODE)));
     }
 
     @Test
@@ -170,7 +175,8 @@ class CountryResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(country.getId().intValue()))
-            .andExpect(jsonPath("$.name").value(DEFAULT_NAME));
+            .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
+            .andExpect(jsonPath("$.isoCode").value(DEFAULT_ISO_CODE));
     }
 
     @Test
@@ -192,7 +198,7 @@ class CountryResourceIT {
         Country updatedCountry = countryRepository.findById(country.getId()).get();
         // Disconnect from session so that the updates on updatedCountry are not directly saved in db
         em.detach(updatedCountry);
-        updatedCountry.name(UPDATED_NAME);
+        updatedCountry.name(UPDATED_NAME).isoCode(UPDATED_ISO_CODE);
 
         restCountryMockMvc
             .perform(
@@ -208,6 +214,7 @@ class CountryResourceIT {
         assertThat(countryList).hasSize(databaseSizeBeforeUpdate);
         Country testCountry = countryList.get(countryList.size() - 1);
         assertThat(testCountry.getName()).isEqualTo(UPDATED_NAME);
+        assertThat(testCountry.getIsoCode()).isEqualTo(UPDATED_ISO_CODE);
     }
 
     @Test
@@ -282,7 +289,7 @@ class CountryResourceIT {
         Country partialUpdatedCountry = new Country();
         partialUpdatedCountry.setId(country.getId());
 
-        partialUpdatedCountry.name(UPDATED_NAME);
+        partialUpdatedCountry.name(UPDATED_NAME).isoCode(UPDATED_ISO_CODE);
 
         restCountryMockMvc
             .perform(
@@ -298,6 +305,7 @@ class CountryResourceIT {
         assertThat(countryList).hasSize(databaseSizeBeforeUpdate);
         Country testCountry = countryList.get(countryList.size() - 1);
         assertThat(testCountry.getName()).isEqualTo(UPDATED_NAME);
+        assertThat(testCountry.getIsoCode()).isEqualTo(UPDATED_ISO_CODE);
     }
 
     @Test
@@ -312,7 +320,7 @@ class CountryResourceIT {
         Country partialUpdatedCountry = new Country();
         partialUpdatedCountry.setId(country.getId());
 
-        partialUpdatedCountry.name(UPDATED_NAME);
+        partialUpdatedCountry.name(UPDATED_NAME).isoCode(UPDATED_ISO_CODE);
 
         restCountryMockMvc
             .perform(
@@ -328,6 +336,7 @@ class CountryResourceIT {
         assertThat(countryList).hasSize(databaseSizeBeforeUpdate);
         Country testCountry = countryList.get(countryList.size() - 1);
         assertThat(testCountry.getName()).isEqualTo(UPDATED_NAME);
+        assertThat(testCountry.getIsoCode()).isEqualTo(UPDATED_ISO_CODE);
     }
 
     @Test

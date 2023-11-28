@@ -9,12 +9,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import me.krft.api.domain.City;
 import me.krft.api.repository.CityRepository;
+import me.krft.api.service.CityService;
 import me.krft.api.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -24,7 +24,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
-@Transactional
 public class CityResource {
 
     private final Logger log = LoggerFactory.getLogger(CityResource.class);
@@ -34,9 +33,12 @@ public class CityResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final CityService cityService;
+
     private final CityRepository cityRepository;
 
-    public CityResource(CityRepository cityRepository) {
+    public CityResource(CityService cityService, CityRepository cityRepository) {
+        this.cityService = cityService;
         this.cityRepository = cityRepository;
     }
 
@@ -53,7 +55,7 @@ public class CityResource {
         if (city.getId() != null) {
             throw new BadRequestAlertException("A new city cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        City result = cityRepository.save(city);
+        City result = cityService.save(city);
         return ResponseEntity
             .created(new URI("/api/cities/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -85,7 +87,7 @@ public class CityResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        City result = cityRepository.save(city);
+        City result = cityService.update(city);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, city.getId().toString()))
@@ -120,16 +122,7 @@ public class CityResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<City> result = cityRepository
-            .findById(city.getId())
-            .map(existingCity -> {
-                if (city.getName() != null) {
-                    existingCity.setName(city.getName());
-                }
-
-                return existingCity;
-            })
-            .map(cityRepository::save);
+        Optional<City> result = cityService.partialUpdate(city);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -145,7 +138,7 @@ public class CityResource {
     @GetMapping("/cities")
     public List<City> getAllCities() {
         log.debug("REST request to get all Cities");
-        return cityRepository.findAll();
+        return cityService.findAll();
     }
 
     /**
@@ -157,7 +150,7 @@ public class CityResource {
     @GetMapping("/cities/{id}")
     public ResponseEntity<City> getCity(@PathVariable Long id) {
         log.debug("REST request to get City : {}", id);
-        Optional<City> city = cityRepository.findById(id);
+        Optional<City> city = cityService.findOne(id);
         return ResponseUtil.wrapOrNotFound(city);
     }
 
@@ -170,7 +163,7 @@ public class CityResource {
     @DeleteMapping("/cities/{id}")
     public ResponseEntity<Void> deleteCity(@PathVariable Long id) {
         log.debug("REST request to delete City : {}", id);
-        cityRepository.deleteById(id);
+        cityService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

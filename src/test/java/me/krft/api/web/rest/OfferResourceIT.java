@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
 import me.krft.api.domain.Offer;
+import me.krft.api.domain.OfferCategory;
 import me.krft.api.repository.OfferRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,8 +37,8 @@ class OfferResourceIT {
     private static final String ENTITY_API_URL = "/api/offers";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong count = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
 
     @Autowired
     private OfferRepository offerRepository;
@@ -58,6 +59,16 @@ class OfferResourceIT {
      */
     public static Offer createEntity(EntityManager em) {
         Offer offer = new Offer().name(DEFAULT_NAME);
+        // Add required entity
+        OfferCategory offerCategory;
+        if (TestUtil.findAll(em, OfferCategory.class).isEmpty()) {
+            offerCategory = OfferCategoryResourceIT.createEntity(em);
+            em.persist(offerCategory);
+            em.flush();
+        } else {
+            offerCategory = TestUtil.findAll(em, OfferCategory.class).get(0);
+        }
+        offer.setCategory(offerCategory);
         return offer;
     }
 
@@ -69,6 +80,16 @@ class OfferResourceIT {
      */
     public static Offer createUpdatedEntity(EntityManager em) {
         Offer offer = new Offer().name(UPDATED_NAME);
+        // Add required entity
+        OfferCategory offerCategory;
+        if (TestUtil.findAll(em, OfferCategory.class).isEmpty()) {
+            offerCategory = OfferCategoryResourceIT.createUpdatedEntity(em);
+            em.persist(offerCategory);
+            em.flush();
+        } else {
+            offerCategory = TestUtil.findAll(em, OfferCategory.class).get(0);
+        }
+        offer.setCategory(offerCategory);
         return offer;
     }
 

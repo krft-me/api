@@ -1,17 +1,21 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A ApplicationUser.
+ * User entity extending the inter {@code User} entity\nProvides additional information about the user
  */
+@Schema(description = "User entity extending the inter {@code User} entity\nProvides additional information about the user")
 @Entity
 @Table(name = "application_user")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -26,60 +30,62 @@ public class ApplicationUser implements Serializable {
     @Column(name = "id")
     private Long id;
 
+    /**
+     * The user's first name
+     */
+    @Schema(description = "The user's first name", required = true)
     @NotNull
+    @Size(min = 1)
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
+    /**
+     * The user's last name name
+     */
+    @Schema(description = "The user's last name name", required = true)
     @NotNull
+    @Size(min = 1)
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
+    /**
+     * The user's username
+     */
+    @Schema(description = "The user's username", required = true)
     @NotNull
-    @Column(name = "pseudo", nullable = false)
-    private String pseudo;
+    @Size(min = 1)
+    @Column(name = "username", nullable = false)
+    private String username;
 
-    @NotNull
-    @Column(name = "average_rating", nullable = false)
-    private Double averageRating;
+    /**
+     * The user's profile picture ID
+     */
+    @Schema(description = "The user's profile picture ID")
+    @Column(name = "profile_picture_id", unique = true)
+    private UUID profilePictureId;
 
     @OneToOne
     @JoinColumn(unique = true)
     private User internalUser;
 
+    @OneToMany(mappedBy = "provider")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
+    private Set<ApplicationUserOffer> offers = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "user", "badge" }, allowSetters = true)
+    private Set<ApplicationUserBadge> badges = new HashSet<>();
+
+    @OneToMany(mappedBy = "customer")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "review", "offer", "customer" }, allowSetters = true)
+    private Set<Order> orders = new HashSet<>();
+
     @ManyToOne
-    @JsonIgnoreProperties(value = { "region" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "users", "region" }, allowSetters = true)
     private City city;
-
-    @ManyToMany
-    @JoinTable(
-        name = "rel_application_user__favorite_application_user",
-        joinColumns = @JoinColumn(name = "application_user_id"),
-        inverseJoinColumns = @JoinColumn(name = "favorite_application_user_id")
-    )
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(
-        value = { "internalUser", "city", "favoriteApplicationUsers", "favoriteOffers", "followers" },
-        allowSetters = true
-    )
-    private Set<ApplicationUser> favoriteApplicationUsers = new HashSet<>();
-
-    @ManyToMany
-    @JoinTable(
-        name = "rel_application_user__favorite_offer",
-        joinColumns = @JoinColumn(name = "application_user_id"),
-        inverseJoinColumns = @JoinColumn(name = "favorite_offer_id")
-    )
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "machines", "followers" }, allowSetters = true)
-    private Set<Offer> favoriteOffers = new HashSet<>();
-
-    @ManyToMany(mappedBy = "favoriteApplicationUsers")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(
-        value = { "internalUser", "city", "favoriteApplicationUsers", "favoriteOffers", "followers" },
-        allowSetters = true
-    )
-    private Set<ApplicationUser> followers = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -122,30 +128,30 @@ public class ApplicationUser implements Serializable {
         this.lastName = lastName;
     }
 
-    public String getPseudo() {
-        return this.pseudo;
+    public String getUsername() {
+        return this.username;
     }
 
-    public ApplicationUser pseudo(String pseudo) {
-        this.setPseudo(pseudo);
+    public ApplicationUser username(String username) {
+        this.setUsername(username);
         return this;
     }
 
-    public void setPseudo(String pseudo) {
-        this.pseudo = pseudo;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public Double getAverageRating() {
-        return this.averageRating;
+    public UUID getProfilePictureId() {
+        return this.profilePictureId;
     }
 
-    public ApplicationUser averageRating(Double averageRating) {
-        this.setAverageRating(averageRating);
+    public ApplicationUser profilePictureId(UUID profilePictureId) {
+        this.setProfilePictureId(profilePictureId);
         return this;
     }
 
-    public void setAverageRating(Double averageRating) {
-        this.averageRating = averageRating;
+    public void setProfilePictureId(UUID profilePictureId) {
+        this.profilePictureId = profilePictureId;
     }
 
     public User getInternalUser() {
@@ -161,6 +167,99 @@ public class ApplicationUser implements Serializable {
         return this;
     }
 
+    public Set<ApplicationUserOffer> getOffers() {
+        return this.offers;
+    }
+
+    public void setOffers(Set<ApplicationUserOffer> applicationUserOffers) {
+        if (this.offers != null) {
+            this.offers.forEach(i -> i.setProvider(null));
+        }
+        if (applicationUserOffers != null) {
+            applicationUserOffers.forEach(i -> i.setProvider(this));
+        }
+        this.offers = applicationUserOffers;
+    }
+
+    public ApplicationUser offers(Set<ApplicationUserOffer> applicationUserOffers) {
+        this.setOffers(applicationUserOffers);
+        return this;
+    }
+
+    public ApplicationUser addOffers(ApplicationUserOffer applicationUserOffer) {
+        this.offers.add(applicationUserOffer);
+        applicationUserOffer.setProvider(this);
+        return this;
+    }
+
+    public ApplicationUser removeOffers(ApplicationUserOffer applicationUserOffer) {
+        this.offers.remove(applicationUserOffer);
+        applicationUserOffer.setProvider(null);
+        return this;
+    }
+
+    public Set<ApplicationUserBadge> getBadges() {
+        return this.badges;
+    }
+
+    public void setBadges(Set<ApplicationUserBadge> applicationUserBadges) {
+        if (this.badges != null) {
+            this.badges.forEach(i -> i.setUser(null));
+        }
+        if (applicationUserBadges != null) {
+            applicationUserBadges.forEach(i -> i.setUser(this));
+        }
+        this.badges = applicationUserBadges;
+    }
+
+    public ApplicationUser badges(Set<ApplicationUserBadge> applicationUserBadges) {
+        this.setBadges(applicationUserBadges);
+        return this;
+    }
+
+    public ApplicationUser addBadges(ApplicationUserBadge applicationUserBadge) {
+        this.badges.add(applicationUserBadge);
+        applicationUserBadge.setUser(this);
+        return this;
+    }
+
+    public ApplicationUser removeBadges(ApplicationUserBadge applicationUserBadge) {
+        this.badges.remove(applicationUserBadge);
+        applicationUserBadge.setUser(null);
+        return this;
+    }
+
+    public Set<Order> getOrders() {
+        return this.orders;
+    }
+
+    public void setOrders(Set<Order> orders) {
+        if (this.orders != null) {
+            this.orders.forEach(i -> i.setCustomer(null));
+        }
+        if (orders != null) {
+            orders.forEach(i -> i.setCustomer(this));
+        }
+        this.orders = orders;
+    }
+
+    public ApplicationUser orders(Set<Order> orders) {
+        this.setOrders(orders);
+        return this;
+    }
+
+    public ApplicationUser addOrders(Order order) {
+        this.orders.add(order);
+        order.setCustomer(this);
+        return this;
+    }
+
+    public ApplicationUser removeOrders(Order order) {
+        this.orders.remove(order);
+        order.setCustomer(null);
+        return this;
+    }
+
     public City getCity() {
         return this.city;
     }
@@ -171,87 +270,6 @@ public class ApplicationUser implements Serializable {
 
     public ApplicationUser city(City city) {
         this.setCity(city);
-        return this;
-    }
-
-    public Set<ApplicationUser> getFavoriteApplicationUsers() {
-        return this.favoriteApplicationUsers;
-    }
-
-    public void setFavoriteApplicationUsers(Set<ApplicationUser> applicationUsers) {
-        this.favoriteApplicationUsers = applicationUsers;
-    }
-
-    public ApplicationUser favoriteApplicationUsers(Set<ApplicationUser> applicationUsers) {
-        this.setFavoriteApplicationUsers(applicationUsers);
-        return this;
-    }
-
-    public ApplicationUser addFavoriteApplicationUser(ApplicationUser applicationUser) {
-        this.favoriteApplicationUsers.add(applicationUser);
-        applicationUser.getFollowers().add(this);
-        return this;
-    }
-
-    public ApplicationUser removeFavoriteApplicationUser(ApplicationUser applicationUser) {
-        this.favoriteApplicationUsers.remove(applicationUser);
-        applicationUser.getFollowers().remove(this);
-        return this;
-    }
-
-    public Set<Offer> getFavoriteOffers() {
-        return this.favoriteOffers;
-    }
-
-    public void setFavoriteOffers(Set<Offer> offers) {
-        this.favoriteOffers = offers;
-    }
-
-    public ApplicationUser favoriteOffers(Set<Offer> offers) {
-        this.setFavoriteOffers(offers);
-        return this;
-    }
-
-    public ApplicationUser addFavoriteOffer(Offer offer) {
-        this.favoriteOffers.add(offer);
-        offer.getFollowers().add(this);
-        return this;
-    }
-
-    public ApplicationUser removeFavoriteOffer(Offer offer) {
-        this.favoriteOffers.remove(offer);
-        offer.getFollowers().remove(this);
-        return this;
-    }
-
-    public Set<ApplicationUser> getFollowers() {
-        return this.followers;
-    }
-
-    public void setFollowers(Set<ApplicationUser> applicationUsers) {
-        if (this.followers != null) {
-            this.followers.forEach(i -> i.removeFavoriteApplicationUser(this));
-        }
-        if (applicationUsers != null) {
-            applicationUsers.forEach(i -> i.addFavoriteApplicationUser(this));
-        }
-        this.followers = applicationUsers;
-    }
-
-    public ApplicationUser followers(Set<ApplicationUser> applicationUsers) {
-        this.setFollowers(applicationUsers);
-        return this;
-    }
-
-    public ApplicationUser addFollowers(ApplicationUser applicationUser) {
-        this.followers.add(applicationUser);
-        applicationUser.getFavoriteApplicationUsers().add(this);
-        return this;
-    }
-
-    public ApplicationUser removeFollowers(ApplicationUser applicationUser) {
-        this.followers.remove(applicationUser);
-        applicationUser.getFavoriteApplicationUsers().remove(this);
         return this;
     }
 
@@ -281,8 +299,8 @@ public class ApplicationUser implements Serializable {
             "id=" + getId() +
             ", firstName='" + getFirstName() + "'" +
             ", lastName='" + getLastName() + "'" +
-            ", pseudo='" + getPseudo() + "'" +
-            ", averageRating=" + getAverageRating() +
+            ", username='" + getUsername() + "'" +
+            ", profilePictureId='" + getProfilePictureId() + "'" +
             "}";
     }
 }

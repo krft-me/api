@@ -9,12 +9,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import me.krft.api.domain.Offer;
 import me.krft.api.repository.OfferRepository;
+import me.krft.api.service.OfferService;
 import me.krft.api.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -24,7 +24,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
-@Transactional
 public class OfferResource {
 
     private final Logger log = LoggerFactory.getLogger(OfferResource.class);
@@ -34,9 +33,12 @@ public class OfferResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final OfferService offerService;
+
     private final OfferRepository offerRepository;
 
-    public OfferResource(OfferRepository offerRepository) {
+    public OfferResource(OfferService offerService, OfferRepository offerRepository) {
+        this.offerService = offerService;
         this.offerRepository = offerRepository;
     }
 
@@ -53,7 +55,7 @@ public class OfferResource {
         if (offer.getId() != null) {
             throw new BadRequestAlertException("A new offer cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Offer result = offerRepository.save(offer);
+        Offer result = offerService.save(offer);
         return ResponseEntity
             .created(new URI("/api/offers/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -85,7 +87,7 @@ public class OfferResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Offer result = offerRepository.save(offer);
+        Offer result = offerService.update(offer);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, offer.getId().toString()))
@@ -120,16 +122,7 @@ public class OfferResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<Offer> result = offerRepository
-            .findById(offer.getId())
-            .map(existingOffer -> {
-                if (offer.getName() != null) {
-                    existingOffer.setName(offer.getName());
-                }
-
-                return existingOffer;
-            })
-            .map(offerRepository::save);
+        Optional<Offer> result = offerService.partialUpdate(offer);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -145,7 +138,7 @@ public class OfferResource {
     @GetMapping("/offers")
     public List<Offer> getAllOffers() {
         log.debug("REST request to get all Offers");
-        return offerRepository.findAll();
+        return offerService.findAll();
     }
 
     /**
@@ -157,7 +150,7 @@ public class OfferResource {
     @GetMapping("/offers/{id}")
     public ResponseEntity<Offer> getOffer(@PathVariable Long id) {
         log.debug("REST request to get Offer : {}", id);
-        Optional<Offer> offer = offerRepository.findById(id);
+        Optional<Offer> offer = offerService.findOne(id);
         return ResponseUtil.wrapOrNotFound(offer);
     }
 
@@ -170,7 +163,7 @@ public class OfferResource {
     @DeleteMapping("/offers/{id}")
     public ResponseEntity<Void> deleteOffer(@PathVariable Long id) {
         log.debug("REST request to delete Offer : {}", id);
-        offerRepository.deleteById(id);
+        offerService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

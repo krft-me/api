@@ -9,12 +9,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import me.krft.api.domain.Order;
 import me.krft.api.repository.OrderRepository;
+import me.krft.api.service.OrderService;
 import me.krft.api.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -24,7 +24,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
-@Transactional
 public class OrderResource {
 
     private final Logger log = LoggerFactory.getLogger(OrderResource.class);
@@ -34,9 +33,12 @@ public class OrderResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final OrderService orderService;
+
     private final OrderRepository orderRepository;
 
-    public OrderResource(OrderRepository orderRepository) {
+    public OrderResource(OrderService orderService, OrderRepository orderRepository) {
+        this.orderService = orderService;
         this.orderRepository = orderRepository;
     }
 
@@ -53,7 +55,7 @@ public class OrderResource {
         if (order.getId() != null) {
             throw new BadRequestAlertException("A new order cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Order result = orderRepository.save(order);
+        Order result = orderService.save(order);
         return ResponseEntity
             .created(new URI("/api/orders/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -85,7 +87,7 @@ public class OrderResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Order result = orderRepository.save(order);
+        Order result = orderService.update(order);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, order.getId().toString()))
@@ -120,19 +122,7 @@ public class OrderResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<Order> result = orderRepository
-            .findById(order.getId())
-            .map(existingOrder -> {
-                if (order.getDate() != null) {
-                    existingOrder.setDate(order.getDate());
-                }
-                if (order.getState() != null) {
-                    existingOrder.setState(order.getState());
-                }
-
-                return existingOrder;
-            })
-            .map(orderRepository::save);
+        Optional<Order> result = orderService.partialUpdate(order);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -143,12 +133,17 @@ public class OrderResource {
     /**
      * {@code GET  /orders} : get all the orders.
      *
+     * @param filter the filter of the request.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of orders in body.
      */
     @GetMapping("/orders")
-    public List<Order> getAllOrders() {
+    public List<Order> getAllOrders(@RequestParam(required = false) String filter) {
+        if ("review-is-null".equals(filter)) {
+            log.debug("REST request to get all Orders where review is null");
+            return orderService.findAllWhereReviewIsNull();
+        }
         log.debug("REST request to get all Orders");
-        return orderRepository.findAll();
+        return orderService.findAll();
     }
 
     /**
@@ -160,7 +155,7 @@ public class OrderResource {
     @GetMapping("/orders/{id}")
     public ResponseEntity<Order> getOrder(@PathVariable Long id) {
         log.debug("REST request to get Order : {}", id);
-        Optional<Order> order = orderRepository.findById(id);
+        Optional<Order> order = orderService.findOne(id);
         return ResponseUtil.wrapOrNotFound(order);
     }
 
@@ -173,7 +168,7 @@ public class OrderResource {
     @DeleteMapping("/orders/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
         log.debug("REST request to delete Order : {}", id);
-        orderRepository.deleteById(id);
+        orderService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

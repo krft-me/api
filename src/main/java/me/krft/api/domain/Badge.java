@@ -1,14 +1,20 @@
 package me.krft.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Badge.
+ * Badge entity\nRepresents a certification (example: 100 completed orders)
  */
+@Schema(description = "Badge entity\nRepresents a certification (example: 100 completed orders)")
 @Entity
 @Table(name = "badge")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -24,16 +30,22 @@ public class Badge implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "label", nullable = false)
+    @Size(min = 1)
+    @Column(name = "label", nullable = false, unique = true)
     private String label;
 
-    @Lob
-    @Column(name = "picture", nullable = false)
-    private byte[] picture;
-
+    /**
+     * The badge's icon, should be a blob later
+     */
+    @Schema(description = "The badge's icon, should be a blob later", required = true)
     @NotNull
-    @Column(name = "picture_content_type", nullable = false)
-    private String pictureContentType;
+    @Column(name = "picture", nullable = false, unique = true)
+    private String picture;
+
+    @OneToMany(mappedBy = "badge")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "user", "badge" }, allowSetters = true)
+    private Set<ApplicationUserBadge> users = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -63,30 +75,48 @@ public class Badge implements Serializable {
         this.label = label;
     }
 
-    public byte[] getPicture() {
+    public String getPicture() {
         return this.picture;
     }
 
-    public Badge picture(byte[] picture) {
+    public Badge picture(String picture) {
         this.setPicture(picture);
         return this;
     }
 
-    public void setPicture(byte[] picture) {
+    public void setPicture(String picture) {
         this.picture = picture;
     }
 
-    public String getPictureContentType() {
-        return this.pictureContentType;
+    public Set<ApplicationUserBadge> getUsers() {
+        return this.users;
     }
 
-    public Badge pictureContentType(String pictureContentType) {
-        this.pictureContentType = pictureContentType;
+    public void setUsers(Set<ApplicationUserBadge> applicationUserBadges) {
+        if (this.users != null) {
+            this.users.forEach(i -> i.setBadge(null));
+        }
+        if (applicationUserBadges != null) {
+            applicationUserBadges.forEach(i -> i.setBadge(this));
+        }
+        this.users = applicationUserBadges;
+    }
+
+    public Badge users(Set<ApplicationUserBadge> applicationUserBadges) {
+        this.setUsers(applicationUserBadges);
         return this;
     }
 
-    public void setPictureContentType(String pictureContentType) {
-        this.pictureContentType = pictureContentType;
+    public Badge addUsers(ApplicationUserBadge applicationUserBadge) {
+        this.users.add(applicationUserBadge);
+        applicationUserBadge.setBadge(this);
+        return this;
+    }
+
+    public Badge removeUsers(ApplicationUserBadge applicationUserBadge) {
+        this.users.remove(applicationUserBadge);
+        applicationUserBadge.setBadge(null);
+        return this;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -115,7 +145,6 @@ public class Badge implements Serializable {
             "id=" + getId() +
             ", label='" + getLabel() + "'" +
             ", picture='" + getPicture() + "'" +
-            ", pictureContentType='" + getPictureContentType() + "'" +
             "}";
     }
 }

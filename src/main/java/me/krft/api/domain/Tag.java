@@ -1,15 +1,20 @@
 package me.krft.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Tag.
+ * Tag entity\nRepresents a preset keyword for an offer
  */
+@Schema(description = "Tag entity\nRepresents a preset keyword for an offer")
 @Entity
 @Table(name = "tag")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -25,12 +30,14 @@ public class Tag implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "label", nullable = false)
+    @Size(min = 1)
+    @Column(name = "label", nullable = false, unique = true)
     private String label;
 
-    @ManyToOne
-    @JsonIgnoreProperties(value = { "ratings", "showcases", "tags", "offer", "applicationUser" }, allowSetters = true)
-    private ApplicationUserOffer applicationUserOffer;
+    @ManyToMany(mappedBy = "tags")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "showcases", "orders", "tags", "provider", "offer" }, allowSetters = true)
+    private Set<ApplicationUserOffer> offers = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -60,16 +67,34 @@ public class Tag implements Serializable {
         this.label = label;
     }
 
-    public ApplicationUserOffer getApplicationUserOffer() {
-        return this.applicationUserOffer;
+    public Set<ApplicationUserOffer> getOffers() {
+        return this.offers;
     }
 
-    public void setApplicationUserOffer(ApplicationUserOffer applicationUserOffer) {
-        this.applicationUserOffer = applicationUserOffer;
+    public void setOffers(Set<ApplicationUserOffer> applicationUserOffers) {
+        if (this.offers != null) {
+            this.offers.forEach(i -> i.removeTags(this));
+        }
+        if (applicationUserOffers != null) {
+            applicationUserOffers.forEach(i -> i.addTags(this));
+        }
+        this.offers = applicationUserOffers;
     }
 
-    public Tag applicationUserOffer(ApplicationUserOffer applicationUserOffer) {
-        this.setApplicationUserOffer(applicationUserOffer);
+    public Tag offers(Set<ApplicationUserOffer> applicationUserOffers) {
+        this.setOffers(applicationUserOffers);
+        return this;
+    }
+
+    public Tag addOffers(ApplicationUserOffer applicationUserOffer) {
+        this.offers.add(applicationUserOffer);
+        applicationUserOffer.getTags().add(this);
+        return this;
+    }
+
+    public Tag removeOffers(ApplicationUserOffer applicationUserOffer) {
+        this.offers.remove(applicationUserOffer);
+        applicationUserOffer.getTags().remove(this);
         return this;
     }
 

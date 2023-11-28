@@ -9,12 +9,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import me.krft.api.domain.Badge;
 import me.krft.api.repository.BadgeRepository;
+import me.krft.api.service.BadgeService;
 import me.krft.api.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -24,7 +24,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
-@Transactional
 public class BadgeResource {
 
     private final Logger log = LoggerFactory.getLogger(BadgeResource.class);
@@ -34,9 +33,12 @@ public class BadgeResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final BadgeService badgeService;
+
     private final BadgeRepository badgeRepository;
 
-    public BadgeResource(BadgeRepository badgeRepository) {
+    public BadgeResource(BadgeService badgeService, BadgeRepository badgeRepository) {
+        this.badgeService = badgeService;
         this.badgeRepository = badgeRepository;
     }
 
@@ -53,7 +55,7 @@ public class BadgeResource {
         if (badge.getId() != null) {
             throw new BadRequestAlertException("A new badge cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Badge result = badgeRepository.save(badge);
+        Badge result = badgeService.save(badge);
         return ResponseEntity
             .created(new URI("/api/badges/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -85,7 +87,7 @@ public class BadgeResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Badge result = badgeRepository.save(badge);
+        Badge result = badgeService.update(badge);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, badge.getId().toString()))
@@ -120,22 +122,7 @@ public class BadgeResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<Badge> result = badgeRepository
-            .findById(badge.getId())
-            .map(existingBadge -> {
-                if (badge.getLabel() != null) {
-                    existingBadge.setLabel(badge.getLabel());
-                }
-                if (badge.getPicture() != null) {
-                    existingBadge.setPicture(badge.getPicture());
-                }
-                if (badge.getPictureContentType() != null) {
-                    existingBadge.setPictureContentType(badge.getPictureContentType());
-                }
-
-                return existingBadge;
-            })
-            .map(badgeRepository::save);
+        Optional<Badge> result = badgeService.partialUpdate(badge);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -151,7 +138,7 @@ public class BadgeResource {
     @GetMapping("/badges")
     public List<Badge> getAllBadges() {
         log.debug("REST request to get all Badges");
-        return badgeRepository.findAll();
+        return badgeService.findAll();
     }
 
     /**
@@ -163,7 +150,7 @@ public class BadgeResource {
     @GetMapping("/badges/{id}")
     public ResponseEntity<Badge> getBadge(@PathVariable Long id) {
         log.debug("REST request to get Badge : {}", id);
-        Optional<Badge> badge = badgeRepository.findById(id);
+        Optional<Badge> badge = badgeService.findOne(id);
         return ResponseUtil.wrapOrNotFound(badge);
     }
 
@@ -176,7 +163,7 @@ public class BadgeResource {
     @DeleteMapping("/badges/{id}")
     public ResponseEntity<Void> deleteBadge(@PathVariable Long id) {
         log.debug("REST request to delete Badge : {}", id);
-        badgeRepository.deleteById(id);
+        badgeService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

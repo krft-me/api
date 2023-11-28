@@ -9,12 +9,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import me.krft.api.domain.Machine;
 import me.krft.api.repository.MachineRepository;
+import me.krft.api.service.MachineService;
 import me.krft.api.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -24,7 +24,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
-@Transactional
 public class MachineResource {
 
     private final Logger log = LoggerFactory.getLogger(MachineResource.class);
@@ -34,9 +33,12 @@ public class MachineResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final MachineService machineService;
+
     private final MachineRepository machineRepository;
 
-    public MachineResource(MachineRepository machineRepository) {
+    public MachineResource(MachineService machineService, MachineRepository machineRepository) {
+        this.machineService = machineService;
         this.machineRepository = machineRepository;
     }
 
@@ -53,7 +55,7 @@ public class MachineResource {
         if (machine.getId() != null) {
             throw new BadRequestAlertException("A new machine cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Machine result = machineRepository.save(machine);
+        Machine result = machineService.save(machine);
         return ResponseEntity
             .created(new URI("/api/machines/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -87,7 +89,7 @@ public class MachineResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Machine result = machineRepository.save(machine);
+        Machine result = machineService.update(machine);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, machine.getId().toString()))
@@ -122,16 +124,7 @@ public class MachineResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<Machine> result = machineRepository
-            .findById(machine.getId())
-            .map(existingMachine -> {
-                if (machine.getName() != null) {
-                    existingMachine.setName(machine.getName());
-                }
-
-                return existingMachine;
-            })
-            .map(machineRepository::save);
+        Optional<Machine> result = machineService.partialUpdate(machine);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -147,7 +140,7 @@ public class MachineResource {
     @GetMapping("/machines")
     public List<Machine> getAllMachines() {
         log.debug("REST request to get all Machines");
-        return machineRepository.findAll();
+        return machineService.findAll();
     }
 
     /**
@@ -159,7 +152,7 @@ public class MachineResource {
     @GetMapping("/machines/{id}")
     public ResponseEntity<Machine> getMachine(@PathVariable Long id) {
         log.debug("REST request to get Machine : {}", id);
-        Optional<Machine> machine = machineRepository.findById(id);
+        Optional<Machine> machine = machineService.findOne(id);
         return ResponseUtil.wrapOrNotFound(machine);
     }
 
@@ -172,7 +165,7 @@ public class MachineResource {
     @DeleteMapping("/machines/{id}")
     public ResponseEntity<Void> deleteMachine(@PathVariable Long id) {
         log.debug("REST request to delete Machine : {}", id);
-        machineRepository.deleteById(id);
+        machineService.delete(id);
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
