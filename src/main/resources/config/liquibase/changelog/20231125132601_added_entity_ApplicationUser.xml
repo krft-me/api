@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
-                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <!--
         Added the entity ApplicationUser.
     -->
     <changeSet id="20231125132601-1" author="jhipster">
-        <createTable tableName="application_user" remarks="User entity extending the inter {@code User} entity\nProvides additional information about the user">
+        <createTable tableName="application_user"
+                     remarks="User entity extending the inter {@code User} entity\nProvides additional information about the user">
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="first_name" type="varchar(255)" remarks="The user&apos;s first name">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="last_name" type="varchar(255)" remarks="The user&apos;s last name name">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="username" type="varchar(255)" remarks="The user&apos;s username">
                 <constraints nullable="false" />

@@ -36,8 +36,8 @@ class OfferCategoryResourceIT {
     private static final String ENTITY_API_URL = "/api/offer-categories";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong count = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
 
     @Autowired
     private OfferCategoryRepository offerCategoryRepository;

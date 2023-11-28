@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
-                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <!--
         Added the entity Review.
     -->
     <changeSet id="20231125132610-1" author="jhipster">
-        <createTable tableName="review" remarks="Review entity\nRepresents a user&apos;s opinion of a service they have purchased">
+        <createTable tableName="review"
+                     remarks="Review entity\nRepresents a user&apos;s opinion of a service they have purchased">
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="rating" type="integer" remarks="The rating of the service from 0.0 to 5.0">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
-            <column name="comment" type="varchar(255)" remarks="Optional comment about the service or the service provider">
-                <constraints nullable="true" />
+            <column name="comment" type="varchar(255)"
+                    remarks="Optional comment about the service or the service provider">
+                <constraints nullable="true"/>
+            </column>
+            <column name="order_id" type="bigint">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_review__order_id"/>
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
@@ -43,6 +46,7 @@
             <column name="id" type="numeric"/>
             <column name="rating" type="numeric"/>
             <column name="comment" type="string"/>
+            <column name="order_id" type="numeric"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

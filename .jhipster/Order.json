@@ -34,7 +34,7 @@
     {
       "otherEntityName": "review",
       "otherEntityRelationshipName": "order",
-      "ownerSide": true,
+      "ownerSide": false,
       "relationshipName": "review",
       "relationshipType": "one-to-one"
     },

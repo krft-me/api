@@ -15,7 +15,7 @@ public @interface AuthorizedFeignClient {
 
     /**
      * A custom {@code @Configuration} for the feign client.
-     * <p>
+     *
      * Can contain override {@code @Bean} definition for the pieces that
      * make up the client, for instance {@link feign.codec.Decoder},
      * {@link feign.codec.Encoder}, {@link feign.Contract}.

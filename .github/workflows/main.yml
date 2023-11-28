@@ -14,7 +14,11 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 11
+      - name: Run backend test
+        run: |
+          chmod +x mvnw
+           npm run ci:backend:test
       - name: Analyze code with SonarQube
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

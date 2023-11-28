@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import me.krft.api.domain.Review;
@@ -136,15 +135,10 @@ public class ReviewResource {
     /**
      * {@code GET  /reviews} : get all the reviews.
      *
-     * @param filter the filter of the request.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of reviews in body.
      */
     @GetMapping("/reviews")
-    public List<Review> getAllReviews(@RequestParam(required = false) String filter) {
-        if ("order-is-null".equals(filter)) {
-            log.debug("REST request to get all Reviews where order is null");
-            return reviewService.findAllWhereOrderIsNull();
-        }
+    public List<Review> getAllReviews() {
         log.debug("REST request to get all Reviews");
         return reviewService.findAll();
     }

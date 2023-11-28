@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
-
 import me.krft.api.config.ApplicationProperties;
 import me.krft.api.config.CRLFLogConverter;
 import org.apache.commons.lang3.StringUtils;
@@ -88,10 +87,10 @@ public class KrftmeApp {
         log.info(
             CRLFLogConverter.CRLF_SAFE_MARKER,
             "\n----------------------------------------------------------\n\t" +
-                "Application '{}' is running! Access URLs:\n\t" +
-                "Local: \t\t{}://localhost:{}{}\n\t" +
-                "External: \t{}://{}:{}{}\n\t" +
-                "Profile(s): \t{}\n----------------------------------------------------------",
+            "Application '{}' is running! Access URLs:\n\t" +
+            "Local: \t\t{}://localhost:{}{}\n\t" +
+            "External: \t{}://{}:{}{}\n\t" +
+            "Profile(s): \t{}\n----------------------------------------------------------",
             env.getProperty("spring.application.name"),
             protocol,
             serverPort,

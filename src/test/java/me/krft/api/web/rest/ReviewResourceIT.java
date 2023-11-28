@@ -11,6 +11,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
+import me.krft.api.domain.Order;
 import me.krft.api.domain.Review;
 import me.krft.api.repository.ReviewRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,8 +40,8 @@ class ReviewResourceIT {
     private static final String ENTITY_API_URL = "/api/reviews";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
-    private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final Random random = new Random();
+    private static final AtomicLong count = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
 
     @Autowired
     private ReviewRepository reviewRepository;
@@ -61,6 +62,16 @@ class ReviewResourceIT {
      */
     public static Review createEntity(EntityManager em) {
         Review review = new Review().rating(DEFAULT_RATING).comment(DEFAULT_COMMENT);
+        // Add required entity
+        Order order;
+        if (TestUtil.findAll(em, Order.class).isEmpty()) {
+            order = OrderResourceIT.createEntity(em);
+            em.persist(order);
+            em.flush();
+        } else {
+            order = TestUtil.findAll(em, Order.class).get(0);
+        }
+        review.setOrder(order);
         return review;
     }
 
@@ -72,6 +83,16 @@ class ReviewResourceIT {
      */
     public static Review createUpdatedEntity(EntityManager em) {
         Review review = new Review().rating(UPDATED_RATING).comment(UPDATED_COMMENT);
+        // Add required entity
+        Order order;
+        if (TestUtil.findAll(em, Order.class).isEmpty()) {
+            order = OrderResourceIT.createUpdatedEntity(em);
+            em.persist(order);
+            em.flush();
+        } else {
+            order = TestUtil.findAll(em, Order.class).get(0);
+        }
+        review.setOrder(order);
         return review;
     }
 

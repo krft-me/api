@@ -23,6 +23,7 @@ spring:
         instanceId: ${spring.application.name}:${spring.application.instance-id:${random.value}}
       config:
         enabled: false
+      enabled: false
   # Replace by 'prod, faker' to add the faker context and have sample data loaded in production
   liquibase:
     contexts: test
@@ -51,7 +52,7 @@ spring:
         size: 20
   thymeleaf:
     mode: HTML
-    # Allow SecurityConfiguration to initialize w/o specifying an empty issuer-uri is OK
+  # Allow SecurityConfiguration to initialize w/o specifying an empty issuer-uri is OK
   security:
     oauth2:
       client:

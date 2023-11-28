@@ -46,12 +46,4 @@ public class ReviewMapper implements EntityDTOMapper<Review, ReviewDTO> {
     public Set<ReviewDTO> toDTOId(Set<Review> entities) {
         return entities.stream().map(this::toDTOId).collect(Collectors.toSet());
     }
-
-    public ReviewDTO toDTORating(Review review) {
-        return ReviewDTO.builder().id(review.getId()).rating(review.getRating()).build();
-    }
-
-    public Set<ReviewDTO> toDTORating(Set<Review> reviews) {
-        return reviews.stream().map(this::toDTORating).collect(Collectors.toSet());
-    }
 }

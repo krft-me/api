@@ -2,8 +2,6 @@ package me.krft.api.service.impl;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import me.krft.api.domain.Review;
 import me.krft.api.repository.ReviewRepository;
 import me.krft.api.service.ReviewService;
@@ -63,19 +61,6 @@ public class ReviewServiceImpl implements ReviewService {
     public List<Review> findAll() {
         log.debug("Request to get all Reviews");
         return reviewRepository.findAll();
-    }
-
-    /**
-     *  Get all the reviews where Order is {@code null}.
-     *  @return the list of entities.
-     */
-    @Transactional(readOnly = true)
-    public List<Review> findAllWhereOrderIsNull() {
-        log.debug("Request to get all reviews where Order is null");
-        return StreamSupport
-            .stream(reviewRepository.findAll().spliterator(), false)
-            .filter(review -> review.getOrder() == null)
-            .collect(Collectors.toList());
     }
 
     @Override

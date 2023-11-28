@@ -42,40 +42,36 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        if (System.getenv("ENVIRONMENT_NAME") != null && System.getenv("ENVIRONMENT_NAME").equals("local")) {
-            http.csrf().disable().authorizeRequests().antMatchers("/**").permitAll();
-        } else {
-            // @formatter:off
-            http
-                .csrf()
-                .disable()
-                .exceptionHandling()
+        // @formatter:off
+        http
+            .csrf()
+            .disable()
+            .exceptionHandling()
                 .authenticationEntryPoint(problemSupport)
                 .accessDeniedHandler(problemSupport)
-                .and()
-                .sessionManagement()
+        .and()
+            .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-                .antMatchers("/api/authenticate").permitAll()
-                .antMatchers("/api/auth-info").permitAll()
-                .antMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
-                .antMatchers("/api/**").authenticated()
-                .antMatchers("/management/health").permitAll()
-                .antMatchers("/management/health/**").permitAll()
-                .antMatchers("/management/info").permitAll()
-                .antMatchers("/management/prometheus").permitAll()
-                .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
-                .and()
-                .oauth2ResourceServer()
+        .and()
+            .authorizeRequests()
+            .antMatchers("/api/authenticate").permitAll()
+            .antMatchers("/api/auth-info").permitAll()
+            .antMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
+            .antMatchers("/api/**").authenticated()
+            .antMatchers("/management/health").permitAll()
+            .antMatchers("/management/health/**").permitAll()
+            .antMatchers("/management/info").permitAll()
+            .antMatchers("/management/prometheus").permitAll()
+            .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
+        .and()
+            .oauth2ResourceServer()
                 .jwt()
                 .jwtAuthenticationConverter(authenticationConverter())
                 .and()
-                .and()
+            .and()
                 .oauth2Client();
-            // @formatter:on
-        }
         return http.build();
+        // @formatter:on
     }
 
     Converter<Jwt, AbstractAuthenticationToken> authenticationConverter() {

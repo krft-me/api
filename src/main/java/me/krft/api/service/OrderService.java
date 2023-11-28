@@ -40,6 +40,13 @@ public interface OrderService {
     List<Order> findAll();
 
     /**
+     * Get all the Order where Review is {@code null}.
+     *
+     * @return the {@link List} of entities.
+     */
+    List<Order> findAllWhereReviewIsNull();
+
+    /**
      * Get the "id" order.
      *
      * @param id the id of the entity.

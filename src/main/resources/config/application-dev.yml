@@ -72,6 +72,7 @@ spring:
     # https://github.com/spring-cloud/spring-cloud-sleuth/issues/2094
     async:
       enabled: false
+    enabled: false
     sampler:
       probability: 1 # report 100% of traces
   zipkin: # Use the "zipkin" Maven profile to have the Spring Cloud Zipkin dependencies
@@ -80,6 +81,7 @@ spring:
     locator:
       discovery:
         enabled: true
+
 server:
   port: 8081
 

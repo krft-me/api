@@ -133,10 +133,15 @@ public class OrderResource {
     /**
      * {@code GET  /orders} : get all the orders.
      *
+     * @param filter the filter of the request.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of orders in body.
      */
     @GetMapping("/orders")
-    public List<Order> getAllOrders() {
+    public List<Order> getAllOrders(@RequestParam(required = false) String filter) {
+        if ("review-is-null".equals(filter)) {
+            log.debug("REST request to get all Orders where review is null");
+            return orderService.findAllWhereReviewIsNull();
+        }
         log.debug("REST request to get all Orders");
         return orderService.findAll();
     }

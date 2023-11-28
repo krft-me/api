@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -44,7 +46,9 @@ public class Review implements Serializable {
     private String comment;
 
     @JsonIgnoreProperties(value = { "review", "offer", "customer" }, allowSetters = true)
-    @OneToOne(mappedBy = "review")
+    @OneToOne(optional = false)
+    @NotNull
+    @JoinColumn(unique = true)
     private Order order;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -93,12 +97,6 @@ public class Review implements Serializable {
     }
 
     public void setOrder(Order order) {
-        if (this.order != null) {
-            this.order.setReview(null);
-        }
-        if (order != null) {
-            order.setReview(this);
-        }
         this.order = order;
     }
 

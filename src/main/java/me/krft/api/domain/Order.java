@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.time.Instant;
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
 import me.krft.api.domain.enumeration.State;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -46,8 +46,7 @@ public class Order implements Serializable {
     private State state;
 
     @JsonIgnoreProperties(value = { "order" }, allowSetters = true)
-    @OneToOne
-    @JoinColumn(unique = true)
+    @OneToOne(mappedBy = "order")
     private Review review;
 
     @ManyToOne(optional = false)
@@ -106,6 +105,12 @@ public class Order implements Serializable {
     }
 
     public void setReview(Review review) {
+        if (this.review != null) {
+            this.review.setOrder(null);
+        }
+        if (review != null) {
+            review.setOrder(this);
+        }
         this.review = review;
     }
 

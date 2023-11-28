@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import javax.persistence.EntityManager;
-
 import me.krft.api.IntegrationTest;
 import me.krft.api.config.TestSecurityConfiguration;
 import me.krft.api.domain.User;
