@@ -47,7 +47,7 @@ public class ApplicationUserOfferMapper implements EntityDTOMapper<ApplicationUs
             .builder()
             .id(entity.getId())
             .description(entity.getDescription())
-            .price(entity.getPrice())
+            .price(transformPrice(entity.getPrice()))
             .active(entity.getActive())
             .showcases(this.showcaseMapper.toDTOId(entity.getShowcases()))
             .orders(this.orderMapper.toDTOId(entity.getOrders()))
@@ -74,12 +74,16 @@ public class ApplicationUserOfferMapper implements EntityDTOMapper<ApplicationUs
         return ApplicationUserOfferDTO
             .builder()
             .id(applicationUserOffer.getId())
-            .price(applicationUserOffer.getPrice())
+            .price(transformPrice(applicationUserOffer.getPrice()))
             .description(applicationUserOffer.getDescription())
             .tags(this.tagMapper.toDTOLabel(applicationUserOffer.getTags()))
             .provider(this.applicationUserMapper.toDTOUsernameCityName(applicationUserOffer.getProvider()))
             .offer(this.offerMapper.toDTOMachineName(applicationUserOffer.getOffer()))
             .showcases(this.showcaseMapper.toDTOImageId(applicationUserOffer.getShowcases()))
             .build();
+    }
+
+    private Double transformPrice(Integer price) {
+        return price / 100.0;
     }
 }
