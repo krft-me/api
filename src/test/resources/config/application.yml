@@ -15,7 +15,7 @@
 
 spring:
   application:
-    name: krftme
+    name: krftme-microservice
   cloud:
     consul:
       discovery:

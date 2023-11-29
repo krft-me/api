@@ -100,13 +100,13 @@ management:
 
 spring:
   application:
-    name: krftme
+    name: krftme-microservice
   cloud:
     consul:
       discovery:
         healthCheckPath: /management/health
-        instanceId: krftme:${spring.application.instance-id:${random.value}}
-        service-name: krftme
+        instanceId: krftme-microservice:${spring.application.instance-id:${random.value}}
+        service-name: krftme-microservice
       config:
         watch:
           enabled: false
