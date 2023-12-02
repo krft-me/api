@@ -75,7 +75,6 @@ class ApplicationUserOfferResourceIT {
 
     /**
      * Create an entity for this test.
-     *
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
@@ -109,7 +108,6 @@ class ApplicationUserOfferResourceIT {
 
     /**
      * Create an updated entity for this test.
-     *
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
@@ -149,7 +147,7 @@ class ApplicationUserOfferResourceIT {
     @Test
     @Transactional
     void createApplicationUserOffer() throws Exception {
-        int databaseSizeBeforeCreate = applicationUserOfferRepository.findAll().size();
+        int databaseSizeBeforeCreate = applicationUserOfferRepository.findAllWithEagerRelationships().size();
         // Create the ApplicationUserOffer
         restApplicationUserOfferMockMvc
             .perform(
@@ -161,7 +159,7 @@ class ApplicationUserOfferResourceIT {
             .andExpect(status().isCreated());
 
         // Validate the ApplicationUserOffer in the database
-        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
+        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAllWithEagerRelationships();
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeCreate + 1);
         ApplicationUserOffer testApplicationUserOffer = applicationUserOfferList.get(applicationUserOfferList.size() - 1);
         assertThat(testApplicationUserOffer.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
@@ -175,7 +173,7 @@ class ApplicationUserOfferResourceIT {
         // Create the ApplicationUserOffer with an existing ID
         applicationUserOffer.setId(1L);
 
-        int databaseSizeBeforeCreate = applicationUserOfferRepository.findAll().size();
+        int databaseSizeBeforeCreate = applicationUserOfferRepository.findAllWithEagerRelationships().size();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restApplicationUserOfferMockMvc
@@ -188,14 +186,14 @@ class ApplicationUserOfferResourceIT {
             .andExpect(status().isBadRequest());
 
         // Validate the ApplicationUserOffer in the database
-        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
+        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAllWithEagerRelationships();
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeCreate);
     }
 
     @Test
     @Transactional
     void checkDescriptionIsRequired() throws Exception {
-        int databaseSizeBeforeTest = applicationUserOfferRepository.findAll().size();
+        int databaseSizeBeforeTest = applicationUserOfferRepository.findAllWithEagerRelationships().size();
         // set the field null
         applicationUserOffer.setDescription(null);
 
@@ -210,14 +208,14 @@ class ApplicationUserOfferResourceIT {
             )
             .andExpect(status().isBadRequest());
 
-        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
+        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAllWithEagerRelationships();
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void checkPriceIsRequired() throws Exception {
-        int databaseSizeBeforeTest = applicationUserOfferRepository.findAll().size();
+        int databaseSizeBeforeTest = applicationUserOfferRepository.findAllWithEagerRelationships().size();
         // set the field null
         applicationUserOffer.setPrice(null);
 
@@ -232,14 +230,14 @@ class ApplicationUserOfferResourceIT {
             )
             .andExpect(status().isBadRequest());
 
-        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
+        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAllWithEagerRelationships();
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void checkActiveIsRequired() throws Exception {
-        int databaseSizeBeforeTest = applicationUserOfferRepository.findAll().size();
+        int databaseSizeBeforeTest = applicationUserOfferRepository.findAllWithEagerRelationships().size();
         // set the field null
         applicationUserOffer.setActive(null);
 
@@ -254,7 +252,7 @@ class ApplicationUserOfferResourceIT {
             )
             .andExpect(status().isBadRequest());
 
-        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
+        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAllWithEagerRelationships();
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeTest);
     }
 
@@ -262,7 +260,7 @@ class ApplicationUserOfferResourceIT {
     @Transactional
     void getAllApplicationUserOffers() throws Exception {
         // Initialize the database
-        applicationUserOfferRepository.saveAndFlush(applicationUserOffer);
+        applicationUserOfferRepository.save(applicationUserOffer);
 
         // Get all the applicationUserOfferList
         restApplicationUserOfferMockMvc
@@ -272,12 +270,12 @@ class ApplicationUserOfferResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(applicationUserOffer.getId().intValue())))
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
             .andExpect(jsonPath("$.[*].price").value(hasItem(DEFAULT_PRICE)))
-            .andExpect(jsonPath("$.[*].active").value(hasItem(DEFAULT_ACTIVE.booleanValue())));
+            .andExpect(jsonPath("$.[*].active").value(hasItem(DEFAULT_ACTIVE)));
     }
 
     @SuppressWarnings({ "unchecked" })
     void getAllApplicationUserOffersWithEagerRelationshipsIsEnabled() throws Exception {
-        when(applicationUserOfferServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+        when(applicationUserOfferServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl<>(new ArrayList<>()));
 
         restApplicationUserOfferMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
 
@@ -286,7 +284,7 @@ class ApplicationUserOfferResourceIT {
 
     @SuppressWarnings({ "unchecked" })
     void getAllApplicationUserOffersWithEagerRelationshipsIsNotEnabled() throws Exception {
-        when(applicationUserOfferServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+        when(applicationUserOfferServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl<>(new ArrayList<>()));
 
         restApplicationUserOfferMockMvc.perform(get(ENTITY_API_URL + "?eagerload=false")).andExpect(status().isOk());
         verify(applicationUserOfferRepositoryMock, times(1)).findAll(any(Pageable.class));
@@ -296,7 +294,7 @@ class ApplicationUserOfferResourceIT {
     @Transactional
     void getApplicationUserOffer() throws Exception {
         // Initialize the database
-        applicationUserOfferRepository.saveAndFlush(applicationUserOffer);
+        applicationUserOfferRepository.save(applicationUserOffer);
 
         // Get the applicationUserOffer
         restApplicationUserOfferMockMvc
@@ -306,7 +304,7 @@ class ApplicationUserOfferResourceIT {
             .andExpect(jsonPath("$.id").value(applicationUserOffer.getId().intValue()))
             .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
             .andExpect(jsonPath("$.price").value(DEFAULT_PRICE))
-            .andExpect(jsonPath("$.active").value(DEFAULT_ACTIVE.booleanValue()));
+            .andExpect(jsonPath("$.active").value(DEFAULT_ACTIVE));
     }
 
     @Test
@@ -320,9 +318,9 @@ class ApplicationUserOfferResourceIT {
     @Transactional
     void putExistingApplicationUserOffer() throws Exception {
         // Initialize the database
-        applicationUserOfferRepository.saveAndFlush(applicationUserOffer);
+        applicationUserOfferRepository.save(applicationUserOffer);
 
-        int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
+        int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAllWithEagerRelationships().size();
 
         // Update the applicationUserOffer
         ApplicationUserOffer updatedApplicationUserOffer = applicationUserOfferRepository.findById(applicationUserOffer.getId()).get();
@@ -340,7 +338,7 @@ class ApplicationUserOfferResourceIT {
             .andExpect(status().isOk());
 
         // Validate the ApplicationUserOffer in the database
-        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
+        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAllWithEagerRelationships();
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeUpdate);
         ApplicationUserOffer testApplicationUserOffer = applicationUserOfferList.get(applicationUserOfferList.size() - 1);
         assertThat(testApplicationUserOffer.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
@@ -351,7 +349,7 @@ class ApplicationUserOfferResourceIT {
     @Test
     @Transactional
     void putNonExistingApplicationUserOffer() throws Exception {
-        int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
+        int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAllWithEagerRelationships().size();
         applicationUserOffer.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
@@ -365,14 +363,14 @@ class ApplicationUserOfferResourceIT {
             .andExpect(status().isBadRequest());
 
         // Validate the ApplicationUserOffer in the database
-        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
+        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAllWithEagerRelationships();
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchApplicationUserOffer() throws Exception {
-        int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
+        int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAllWithEagerRelationships().size();
         applicationUserOffer.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
@@ -386,14 +384,14 @@ class ApplicationUserOfferResourceIT {
             .andExpect(status().isBadRequest());
 
         // Validate the ApplicationUserOffer in the database
-        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
+        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAllWithEagerRelationships();
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamApplicationUserOffer() throws Exception {
-        int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
+        int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAllWithEagerRelationships().size();
         applicationUserOffer.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
@@ -407,7 +405,7 @@ class ApplicationUserOfferResourceIT {
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the ApplicationUserOffer in the database
-        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
+        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAllWithEagerRelationships();
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeUpdate);
     }
 
@@ -415,9 +413,9 @@ class ApplicationUserOfferResourceIT {
     @Transactional
     void partialUpdateApplicationUserOfferWithPatch() throws Exception {
         // Initialize the database
-        applicationUserOfferRepository.saveAndFlush(applicationUserOffer);
+        applicationUserOfferRepository.save(applicationUserOffer);
 
-        int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
+        int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAllWithEagerRelationships().size();
 
         // Update the applicationUserOffer using partial update
         ApplicationUserOffer partialUpdatedApplicationUserOffer = new ApplicationUserOffer();
@@ -435,7 +433,7 @@ class ApplicationUserOfferResourceIT {
             .andExpect(status().isOk());
 
         // Validate the ApplicationUserOffer in the database
-        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
+        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAllWithEagerRelationships();
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeUpdate);
         ApplicationUserOffer testApplicationUserOffer = applicationUserOfferList.get(applicationUserOfferList.size() - 1);
         assertThat(testApplicationUserOffer.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
@@ -447,9 +445,9 @@ class ApplicationUserOfferResourceIT {
     @Transactional
     void fullUpdateApplicationUserOfferWithPatch() throws Exception {
         // Initialize the database
-        applicationUserOfferRepository.saveAndFlush(applicationUserOffer);
+        applicationUserOfferRepository.save(applicationUserOffer);
 
-        int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
+        int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAllWithEagerRelationships().size();
 
         // Update the applicationUserOffer using partial update
         ApplicationUserOffer partialUpdatedApplicationUserOffer = new ApplicationUserOffer();
@@ -467,7 +465,7 @@ class ApplicationUserOfferResourceIT {
             .andExpect(status().isOk());
 
         // Validate the ApplicationUserOffer in the database
-        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
+        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAllWithEagerRelationships();
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeUpdate);
         ApplicationUserOffer testApplicationUserOffer = applicationUserOfferList.get(applicationUserOfferList.size() - 1);
         assertThat(testApplicationUserOffer.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
@@ -478,7 +476,7 @@ class ApplicationUserOfferResourceIT {
     @Test
     @Transactional
     void patchNonExistingApplicationUserOffer() throws Exception {
-        int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
+        int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAllWithEagerRelationships().size();
         applicationUserOffer.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
@@ -492,14 +490,14 @@ class ApplicationUserOfferResourceIT {
             .andExpect(status().isBadRequest());
 
         // Validate the ApplicationUserOffer in the database
-        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
+        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAllWithEagerRelationships();
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchApplicationUserOffer() throws Exception {
-        int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
+        int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAllWithEagerRelationships().size();
         applicationUserOffer.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
@@ -513,14 +511,14 @@ class ApplicationUserOfferResourceIT {
             .andExpect(status().isBadRequest());
 
         // Validate the ApplicationUserOffer in the database
-        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
+        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAllWithEagerRelationships();
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamApplicationUserOffer() throws Exception {
-        int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAll().size();
+        int databaseSizeBeforeUpdate = applicationUserOfferRepository.findAllWithEagerRelationships().size();
         applicationUserOffer.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
@@ -534,7 +532,7 @@ class ApplicationUserOfferResourceIT {
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the ApplicationUserOffer in the database
-        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
+        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAllWithEagerRelationships();
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeUpdate);
     }
 
@@ -542,9 +540,9 @@ class ApplicationUserOfferResourceIT {
     @Transactional
     void deleteApplicationUserOffer() throws Exception {
         // Initialize the database
-        applicationUserOfferRepository.saveAndFlush(applicationUserOffer);
+        applicationUserOfferRepository.save(applicationUserOffer);
 
-        int databaseSizeBeforeDelete = applicationUserOfferRepository.findAll().size();
+        int databaseSizeBeforeDelete = applicationUserOfferRepository.findAllWithEagerRelationships().size();
 
         // Delete the applicationUserOffer
         restApplicationUserOfferMockMvc
@@ -552,7 +550,7 @@ class ApplicationUserOfferResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAll();
+        List<ApplicationUserOffer> applicationUserOfferList = applicationUserOfferRepository.findAllWithEagerRelationships();
         assertThat(applicationUserOfferList).hasSize(databaseSizeBeforeDelete - 1);
     }
 }
