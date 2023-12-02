@@ -93,7 +93,7 @@ class AuthorizationHeaderUtilTest {
         OAuth2AuthorizedClient authorizedClient = getTestOAuth2AuthorizedClient();
 
         doReturn(oauth2Token).when(securityContext).getAuthentication();
-        doReturn(authorizedClient).when(clientService).loadAuthorizedClient(eq(VALID_REGISTRATION_ID), eq(SUB_VALUE));
+        doReturn(authorizedClient).when(clientService).loadAuthorizedClient(VALID_REGISTRATION_ID, SUB_VALUE);
 
         Assertions
             .assertThatThrownBy(() -> {
@@ -109,7 +109,7 @@ class AuthorizationHeaderUtilTest {
         OAuth2AuthorizedClient authorizedClient = getTestOAuth2AuthorizedClient();
 
         doReturn(oauth2Token).when(securityContext).getAuthentication();
-        doReturn(authorizedClient).when(clientService).loadAuthorizedClient(eq(VALID_REGISTRATION_ID), eq(SUB_VALUE));
+        doReturn(authorizedClient).when(clientService).loadAuthorizedClient(VALID_REGISTRATION_ID, SUB_VALUE);
 
         Optional<String> header = authorizationHeaderUtil.getAuthorizationHeader();
         Assertions.assertThat(header).isNotNull().isNotEmpty().get().isEqualTo("Bearer tokenVal");
@@ -121,7 +121,7 @@ class AuthorizationHeaderUtilTest {
         OAuth2AuthorizedClient authorizedClient = getTestOAuth2AuthorizedClient(true);
 
         doReturn(oauth2Token).when(securityContext).getAuthentication();
-        doReturn(authorizedClient).when(clientService).loadAuthorizedClient(eq(VALID_REGISTRATION_ID), eq(SUB_VALUE));
+        doReturn(authorizedClient).when(clientService).loadAuthorizedClient(VALID_REGISTRATION_ID, SUB_VALUE);
 
         RestTemplate restTemplate = mock(RestTemplate.class);
         ResponseEntity<OAuthIdpTokenResponseDTO> refreshResponse = ResponseEntity.of(getTestOAuthIdpTokenResponseDTO(true));
@@ -138,7 +138,7 @@ class AuthorizationHeaderUtilTest {
         OAuth2AuthorizedClient authorizedClient = getTestOAuth2AuthorizedClient(true);
 
         doReturn(oauth2Token).when(securityContext).getAuthentication();
-        doReturn(authorizedClient).when(clientService).loadAuthorizedClient(eq(VALID_REGISTRATION_ID), eq(SUB_VALUE));
+        doReturn(authorizedClient).when(clientService).loadAuthorizedClient(VALID_REGISTRATION_ID, SUB_VALUE);
 
         RestTemplate restTemplate = mock(RestTemplate.class);
         ResponseEntity<OAuthIdpTokenResponseDTO> refreshResponse = ResponseEntity.of(getTestOAuthIdpTokenResponseDTO(false));
@@ -155,7 +155,7 @@ class AuthorizationHeaderUtilTest {
         OAuth2AuthorizedClient authorizedClient = getTestOAuth2AuthorizedClient(true);
 
         doReturn(oauth2Token).when(securityContext).getAuthentication();
-        doReturn(authorizedClient).when(clientService).loadAuthorizedClient(eq(VALID_REGISTRATION_ID), eq(SUB_VALUE));
+        doReturn(authorizedClient).when(clientService).loadAuthorizedClient(VALID_REGISTRATION_ID, SUB_VALUE);
 
         RestTemplate restTemplate = mock(RestTemplate.class);
         doThrow(new OAuth2AuthorizationException(new OAuth2Error("E"), "error"))
@@ -221,10 +221,10 @@ class AuthorizationHeaderUtilTest {
         OAuthIdpTokenResponseDTO dto = new OAuthIdpTokenResponseDTO();
         dto.setAccessToken("tokenVal");
         dto.setIdToken("tokenVal");
-        dto.setNotBefore(0l);
+        dto.setNotBefore(0L);
         dto.setRefreshExpiresIn("1800");
         dto.setSessionState("ccea4a55");
-        dto.setExpiresIn(300l);
+        dto.setExpiresIn(300L);
         dto.setRefreshToken(hasRefreshToken ? "tokenVal" : null);
         dto.setScope("openid email profile offline_access");
         return Optional.of(dto);

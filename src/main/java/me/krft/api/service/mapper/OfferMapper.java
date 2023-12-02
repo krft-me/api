@@ -3,7 +3,6 @@ package me.krft.api.service.mapper;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.domain.Offer;
 import me.krft.api.service.dto.OfferDTO;
 import org.springframework.beans.factory.annotation.Autowired;

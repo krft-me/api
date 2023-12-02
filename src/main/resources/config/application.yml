@@ -220,6 +220,7 @@ jhipster:
   mail:
     from: krftme@localhost
   api-docs:
+    path: /v3/api-docs
     default-include-pattern: ${server.servlet.context-path:}/api/**
     management-include-pattern: ${server.servlet.context-path:}/management/**
     title: Krftme API

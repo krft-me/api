@@ -1,8 +1,6 @@
 package me.krft.api.config;
 
-import java.util.*;
-import me.krft.api.security.*;
-import me.krft.api.security.SecurityUtils;
+import me.krft.api.security.AuthoritiesConstants;
 import me.krft.api.security.oauth2.AudienceValidator;
 import me.krft.api.security.oauth2.JwtGrantedAuthorityConverter;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +12,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
