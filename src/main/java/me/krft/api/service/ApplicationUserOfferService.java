@@ -2,6 +2,7 @@ package me.krft.api.service;
 
 import java.util.List;
 import java.util.Optional;
+import javax.validation.constraints.NotNull;
 import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.service.dto.ApplicationUserOfferDTO;
 import org.springframework.data.domain.Page;
@@ -67,5 +68,15 @@ public interface ApplicationUserOfferService {
 
     List<ApplicationUserOfferDTO> testMapper();
 
-    List<ApplicationUserOfferDTO> getApplicationUserOffersCards();
+    List<ApplicationUserOfferDTO> getApplicationUserOffersCards(
+        Long cityId,
+        Double minPrice,
+        Double maxPrice,
+        List<Long> tagIds,
+        Long offerId,
+        int page,
+        int size,
+        @NotNull String sort,
+        boolean isDescending
+    );
 }

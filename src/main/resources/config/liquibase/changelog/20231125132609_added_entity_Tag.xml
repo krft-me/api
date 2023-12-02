@@ -40,4 +40,15 @@
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>
+    <changeSet id="20231125132609-1-data" author="jhipster" context="data">
+        <loadData
+            file="config/liquibase/data/tag.csv"
+            separator=";"
+            tableName="tag"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="label" type="string"/>
+            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
+        </loadData>
+    </changeSet>
 </databaseChangeLog>

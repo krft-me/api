@@ -31,6 +31,8 @@ public class ApplicationUserOfferResource {
 
     private static final String ENTITY_NAME = "krftmeApplicationUserOffer";
 
+    private static final Integer SIZE = 10;
+
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
@@ -188,9 +190,28 @@ public class ApplicationUserOfferResource {
     }
 
     @GetMapping("/cards")
-    public ResponseEntity<List<ApplicationUserOfferDTO>> getApplicationUserOffersCards() {
+    public ResponseEntity<List<ApplicationUserOfferDTO>> getApplicationUserOffersCards(
+        @RequestParam(required = false, defaultValue = "0") int page,
+        @RequestParam(required = false, defaultValue = "id") String sort,
+        @RequestParam(required = false, defaultValue = "false") boolean isDescending,
+        @RequestParam(required = false) Long cityId,
+        @RequestParam(required = false) Double minPrice,
+        @RequestParam(required = false) Double maxPrice,
+        @RequestParam(required = false) List<Long> tagIds,
+        @RequestParam(required = false) Long offerId
+    ) {
         log.debug("REST request to get all ApplicationUserOffers Cards");
-        List<ApplicationUserOfferDTO> list = applicationUserOfferService.getApplicationUserOffersCards();
+        List<ApplicationUserOfferDTO> list = applicationUserOfferService.getApplicationUserOffersCards(
+            cityId,
+            minPrice,
+            maxPrice,
+            tagIds,
+            offerId,
+            page,
+            SIZE,
+            sort,
+            isDescending
+        );
         return ResponseEntity.ok().body(list);
     }
 }

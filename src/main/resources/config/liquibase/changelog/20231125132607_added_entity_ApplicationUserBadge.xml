@@ -49,4 +49,17 @@
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>
+    <changeSet id="20231125132607-1-data" author="jhipster" context="data">
+        <loadData
+            file="config/liquibase/data/application_user_badge.csv"
+            separator=";"
+            tableName="application_user_badge"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="obtained_date" type="date"/>
+            <column name="user_id" type="numeric"/>
+            <column name="badge_id" type="numeric"/>
+            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
+        </loadData>
+    </changeSet>
 </databaseChangeLog>

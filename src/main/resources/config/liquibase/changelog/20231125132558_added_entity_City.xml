@@ -48,4 +48,17 @@
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>
+    <changeSet id="20231125132558-1-data" author="jhipster" context="data">
+        <loadData
+            file="config/liquibase/data/city.csv"
+            separator=";"
+            tableName="city"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="name" type="string"/>
+            <column name="zip_code" type="string"/>
+            <column name="region_id" type="numeric"/>
+            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
+        </loadData>
+    </changeSet>
 </databaseChangeLog>

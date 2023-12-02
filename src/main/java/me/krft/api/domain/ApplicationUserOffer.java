@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Formula;
 
 /**
  * Relationship entity between user, offer and machine
@@ -85,6 +86,9 @@ public class ApplicationUserOffer implements Serializable {
     @NotNull
     @JsonIgnoreProperties(value = { "userOffers", "machine", "category" }, allowSetters = true)
     private Offer offer;
+
+    @Formula("(select avg(nullif(r.rating, 0)) from review r left join krftme_order o ON r.order_id = o.id where o.offer_id = id)")
+    private Double rating;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -251,6 +255,20 @@ public class ApplicationUserOffer implements Serializable {
     public ApplicationUserOffer offer(Offer offer) {
         this.setOffer(offer);
         return this;
+    }
+
+    public Double getRating() {
+        return (
+            this.orders.stream()
+                .map(Order::getReview)
+                .mapToInt(Review::getRating)
+                .average()
+                .stream()
+                .map(Math::round)
+                .findFirst()
+                .orElse(0) /
+            10
+        );
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
