@@ -53,4 +53,18 @@
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>
+    <changeSet id="20231125132608-1-data" author="jhipster" context="data">
+        <loadData
+            file="config/liquibase/data/krftme_order.csv"
+            separator=";"
+            tableName="krftme_order"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="date" type="date"/>
+            <column name="state" type="string"/>
+            <column name="offer_id" type="numeric"/>
+            <column name="customer_id" type="numeric"/>
+            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
+        </loadData>
+    </changeSet>
 </databaseChangeLog>

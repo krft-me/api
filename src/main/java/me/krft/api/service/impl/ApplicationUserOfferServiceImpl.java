@@ -1,9 +1,12 @@
 package me.krft.api.service.impl;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import me.krft.api.domain.ApplicationUserOffer;
+import me.krft.api.domain.Tag;
 import me.krft.api.repository.ApplicationUserOfferRepository;
 import me.krft.api.service.ApplicationUserOfferService;
 import me.krft.api.service.dto.ApplicationUserOfferDTO;
@@ -11,7 +14,9 @@ import me.krft.api.service.mapper.ApplicationUserOfferMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,7 +79,7 @@ public class ApplicationUserOfferServiceImpl implements ApplicationUserOfferServ
     @Transactional(readOnly = true)
     public List<ApplicationUserOffer> findAll() {
         log.debug("Request to get all ApplicationUserOffers");
-        return applicationUserOfferRepository.findAll();
+        return StreamSupport.stream(applicationUserOfferRepository.findAll().spliterator(), false).collect(Collectors.toList());
     }
 
     public Page<ApplicationUserOffer> findAllWithEagerRelationships(Pageable pageable) {
@@ -97,15 +102,37 @@ public class ApplicationUserOfferServiceImpl implements ApplicationUserOfferServ
     @Override
     public List<ApplicationUserOfferDTO> testMapper() {
         log.debug("Request to get all ApplicationUserOfferDTO");
-        return applicationUserOfferRepository.findAll().stream().map(this.applicationUserOfferMapper::toDTO).collect(Collectors.toList());
+        return StreamSupport
+            .stream(applicationUserOfferRepository.findAll().spliterator(), false)
+            .map(this.applicationUserOfferMapper::toDTO)
+            .collect(Collectors.toList());
     }
 
     @Override
-    public List<ApplicationUserOfferDTO> getApplicationUserOffersCards() {
+    public List<ApplicationUserOfferDTO> getApplicationUserOffersCards(
+        Long cityId,
+        Double minPrice,
+        Double maxPrice,
+        List<Long> tagIds,
+        Long offerId,
+        int page,
+        int size,
+        String sort,
+        boolean isDescending
+    ) {
         log.debug("Request to get all ApplicationUserOfferDTO cards");
+        Sort sortObj = isDescending ? Sort.by(sort).descending() : Sort.by(sort);
         return applicationUserOfferRepository
-            .findAll()
+            .findByActiveTrue(PageRequest.of(page, size, sortObj))
             .stream()
+            .filter(applicationUserOffer -> cityId == null || applicationUserOffer.getProvider().getCity().getId().equals(cityId))
+            .filter(applicationUserOffer -> offerId == null || applicationUserOffer.getId().equals(offerId))
+            .filter(applicationUserOffer -> minPrice == null || applicationUserOffer.getPrice() >= minPrice / 100.0)
+            .filter(applicationUserOffer -> maxPrice == null || applicationUserOffer.getPrice() <= maxPrice / 100.0)
+            .filter(applicationUserOffer ->
+                tagIds == null ||
+                new HashSet<>(applicationUserOffer.getTags().stream().map(Tag::getId).collect(Collectors.toList())).containsAll(tagIds)
+            )
             .map(this.applicationUserOfferMapper::toDTOCard)
             .collect(Collectors.toList());
     }

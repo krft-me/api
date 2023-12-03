@@ -1,8 +1,11 @@
 package me.krft.api.service.mapper;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import me.krft.api.domain.ApplicationUserOffer;
+import me.krft.api.domain.Order;
+import me.krft.api.domain.Review;
 import me.krft.api.service.dto.ApplicationUserOfferDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -71,16 +74,27 @@ public class ApplicationUserOfferMapper implements EntityDTOMapper<ApplicationUs
     }
 
     public ApplicationUserOfferDTO toDTOCard(ApplicationUserOffer applicationUserOffer) {
+        Set<Review> reviews = getReviews(applicationUserOffer.getOrders());
         return ApplicationUserOfferDTO
             .builder()
             .id(applicationUserOffer.getId())
             .price(transformPrice(applicationUserOffer.getPrice()))
             .description(applicationUserOffer.getDescription())
+            .rating(getRating(reviews))
+            .numberOfReviews(reviews.size())
             .tags(this.tagMapper.toDTOLabel(applicationUserOffer.getTags()))
             .provider(this.applicationUserMapper.toDTOUsernameCityName(applicationUserOffer.getProvider()))
             .offer(this.offerMapper.toDTOMachineName(applicationUserOffer.getOffer()))
             .showcases(this.showcaseMapper.toDTOImageId(applicationUserOffer.getShowcases()))
             .build();
+    }
+
+    private Set<Review> getReviews(Set<Order> orders) {
+        return orders.stream().map(Order::getReview).filter(Objects::nonNull).collect(Collectors.toSet());
+    }
+
+    private Double getRating(Set<Review> reviews) {
+        return reviews.stream().mapToInt(Review::getRating).average().stream().map(Math::round).findFirst().orElse(0) / 10;
     }
 
     private Double transformPrice(Integer price) {

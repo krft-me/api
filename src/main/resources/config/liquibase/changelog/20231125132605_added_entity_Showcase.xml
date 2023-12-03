@@ -44,4 +44,16 @@
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>
+    <changeSet id="20231125132605-1-data" author="jhipster" context="data">
+        <loadData
+            file="config/liquibase/data/showcase.csv"
+            separator=";"
+            tableName="showcase"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="image_id" type="${uuidType}"/>
+            <column name="offer_id" type="numeric"/>
+            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
+        </loadData>
+    </changeSet>
 </databaseChangeLog>

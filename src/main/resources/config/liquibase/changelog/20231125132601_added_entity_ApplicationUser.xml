@@ -59,4 +59,18 @@
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>
+    <changeSet id="20231125132601-1-data" author="jhipster" context="data">
+        <loadData
+            file="config/liquibase/data/application_user.csv"
+            separator=";"
+            tableName="application_user"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="first_name" type="string"/>
+            <column name="last_name" type="string"/>
+            <column name="username" type="string"/>
+            <column name="profile_picture_id" type="${uuidType}"/>
+            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
+        </loadData>
+    </changeSet>
 </databaseChangeLog>
