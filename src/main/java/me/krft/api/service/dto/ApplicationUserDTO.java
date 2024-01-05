@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Set;
+import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -20,6 +21,7 @@ public class ApplicationUserDTO extends AbstractDTO implements Serializable {
     private String firstName;
     private String lastName;
     private String username;
+    private UUID profilePictureId;
     private UserDTO internalUser;
     private Set<ApplicationUserOfferDTO> offers;
     private Set<ApplicationUserBadgeDTO> badges;

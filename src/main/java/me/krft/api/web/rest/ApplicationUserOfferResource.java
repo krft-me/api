@@ -10,7 +10,9 @@ import javax.validation.constraints.NotNull;
 import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.repository.ApplicationUserOfferRepository;
 import me.krft.api.service.ApplicationUserOfferService;
+import me.krft.api.service.ReviewService;
 import me.krft.api.service.dto.ApplicationUserOfferDTO;
+import me.krft.api.service.dto.ReviewDTO;
 import me.krft.api.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,12 +42,16 @@ public class ApplicationUserOfferResource {
 
     private final ApplicationUserOfferRepository applicationUserOfferRepository;
 
+    private final ReviewService reviewService;
+
     public ApplicationUserOfferResource(
         ApplicationUserOfferService applicationUserOfferService,
-        ApplicationUserOfferRepository applicationUserOfferRepository
+        ApplicationUserOfferRepository applicationUserOfferRepository,
+        ReviewService reviewService
     ) {
         this.applicationUserOfferService = applicationUserOfferService;
         this.applicationUserOfferRepository = applicationUserOfferRepository;
+        this.reviewService = reviewService;
     }
 
     /**
@@ -213,5 +219,17 @@ public class ApplicationUserOfferResource {
             isDescending
         );
         return ResponseEntity.ok().body(list);
+    }
+
+    @GetMapping("/{id}/reviews")
+    public ResponseEntity<List<ReviewDTO>> getApplicationUserOfferReviews(
+        @PathVariable Long id,
+        @RequestParam(required = false, defaultValue = "0") int page,
+        @RequestParam(required = false, defaultValue = "id") String sort,
+        @RequestParam(required = false, defaultValue = "false") boolean isDescending
+    ) {
+        log.debug("REST request to get ApplicationUserOffer Reviews : {}", id);
+        List<ReviewDTO> reviews = reviewService.getApplicationUserOfferReviews(id, page, SIZE, sort, isDescending);
+        return ResponseEntity.ok().body(reviews);
     }
 }

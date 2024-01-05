@@ -21,4 +21,5 @@ public class OrderDTO extends AbstractDTO implements Serializable {
     private Instant date;
     private State state;
     private ApplicationUserOfferDTO offer;
+    private ApplicationUserDTO customer;
 }

@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 public class ReviewDTO extends AbstractDTO implements Serializable {
 
     private Long id;
-    private Integer rating;
+    private Number rating;
     private String comment;
     private OrderDTO order;
 }

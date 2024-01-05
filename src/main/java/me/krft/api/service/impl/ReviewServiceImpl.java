@@ -1,12 +1,20 @@
 package me.krft.api.service.impl;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import me.krft.api.domain.Review;
+import me.krft.api.domain.Tag;
 import me.krft.api.repository.ReviewRepository;
 import me.krft.api.service.ReviewService;
+import me.krft.api.service.dto.ReviewDTO;
+import me.krft.api.service.mapper.ReviewMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,8 +29,11 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
 
-    public ReviewServiceImpl(ReviewRepository reviewRepository) {
+    private final ReviewMapper reviewMapper;
+
+    public ReviewServiceImpl(ReviewRepository reviewRepository, ReviewMapper reviewMapper) {
         this.reviewRepository = reviewRepository;
+        this.reviewMapper = reviewMapper;
     }
 
     @Override
@@ -60,7 +71,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional(readOnly = true)
     public List<Review> findAll() {
         log.debug("Request to get all Reviews");
-        return reviewRepository.findAll();
+        return StreamSupport.stream(reviewRepository.findAll().spliterator(), false).collect(Collectors.toList());
     }
 
     @Override
@@ -74,5 +85,16 @@ public class ReviewServiceImpl implements ReviewService {
     public void delete(Long id) {
         log.debug("Request to delete Review : {}", id);
         reviewRepository.deleteById(id);
+    }
+
+    @Override
+    public List<ReviewDTO> getApplicationUserOfferReviews(Long id, int page, Integer size, String sort, boolean isDescending) {
+        log.debug("Request to get all ApplicationUserOfferDTO cards");
+        Sort sortObj = isDescending ? Sort.by(sort).descending() : Sort.by(sort);
+        return reviewRepository
+            .findByOrder_Offer_Id(id, PageRequest.of(page, size, sortObj))
+            .stream()
+            .map(this.reviewMapper::toDTOCard)
+            .collect(Collectors.toList());
     }
 }

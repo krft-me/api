@@ -2,7 +2,9 @@ package me.krft.api.service;
 
 import java.util.List;
 import java.util.Optional;
+import javax.validation.constraints.NotNull;
 import me.krft.api.domain.Review;
+import me.krft.api.service.dto.ReviewDTO;
 
 /**
  * Service Interface for managing {@link Review}.
@@ -53,4 +55,6 @@ public interface ReviewService {
      * @param id the id of the entity.
      */
     void delete(Long id);
+
+    List<ReviewDTO> getApplicationUserOfferReviews(Long id, int page, Integer size, @NotNull String sort, boolean isDescending);
 }
