@@ -9,8 +9,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import javax.persistence.EntityManager;
 import me.krft.api.IntegrationTest;
+import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.domain.Order;
 import me.krft.api.domain.Review;
 import me.krft.api.repository.ReviewRepository;
@@ -104,7 +107,7 @@ class ReviewResourceIT {
     @Test
     @Transactional
     void createReview() throws Exception {
-        int databaseSizeBeforeCreate = reviewRepository.findAll().size();
+        int databaseSizeBeforeCreate = (int) StreamSupport.stream(reviewRepository.findAll().spliterator(), false).count();
         // Create the Review
         restReviewMockMvc
             .perform(
@@ -113,7 +116,7 @@ class ReviewResourceIT {
             .andExpect(status().isCreated());
 
         // Validate the Review in the database
-        List<Review> reviewList = reviewRepository.findAll();
+        List<Review> reviewList = StreamSupport.stream(reviewRepository.findAll().spliterator(), false).collect(Collectors.toList());
         assertThat(reviewList).hasSize(databaseSizeBeforeCreate + 1);
         Review testReview = reviewList.get(reviewList.size() - 1);
         assertThat(testReview.getRating()).isEqualTo(DEFAULT_RATING);
@@ -126,7 +129,7 @@ class ReviewResourceIT {
         // Create the Review with an existing ID
         review.setId(1L);
 
-        int databaseSizeBeforeCreate = reviewRepository.findAll().size();
+        int databaseSizeBeforeCreate = (int) StreamSupport.stream(reviewRepository.findAll().spliterator(), false).count();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restReviewMockMvc
@@ -136,14 +139,14 @@ class ReviewResourceIT {
             .andExpect(status().isBadRequest());
 
         // Validate the Review in the database
-        List<Review> reviewList = reviewRepository.findAll();
+        List<Review> reviewList = StreamSupport.stream(reviewRepository.findAll().spliterator(), false).collect(Collectors.toList());
         assertThat(reviewList).hasSize(databaseSizeBeforeCreate);
     }
 
     @Test
     @Transactional
     void checkRatingIsRequired() throws Exception {
-        int databaseSizeBeforeTest = reviewRepository.findAll().size();
+        int databaseSizeBeforeTest = (int) StreamSupport.stream(reviewRepository.findAll().spliterator(), false).count();
         // set the field null
         review.setRating(null);
 
@@ -155,7 +158,7 @@ class ReviewResourceIT {
             )
             .andExpect(status().isBadRequest());
 
-        List<Review> reviewList = reviewRepository.findAll();
+        List<Review> reviewList = StreamSupport.stream(reviewRepository.findAll().spliterator(), false).collect(Collectors.toList());
         assertThat(reviewList).hasSize(databaseSizeBeforeTest);
     }
 
@@ -163,7 +166,7 @@ class ReviewResourceIT {
     @Transactional
     void getAllReviews() throws Exception {
         // Initialize the database
-        reviewRepository.saveAndFlush(review);
+        reviewRepository.save(review);
 
         // Get all the reviewList
         restReviewMockMvc
@@ -179,7 +182,7 @@ class ReviewResourceIT {
     @Transactional
     void getReview() throws Exception {
         // Initialize the database
-        reviewRepository.saveAndFlush(review);
+        reviewRepository.save(review);
 
         // Get the review
         restReviewMockMvc
@@ -202,9 +205,9 @@ class ReviewResourceIT {
     @Transactional
     void putExistingReview() throws Exception {
         // Initialize the database
-        reviewRepository.saveAndFlush(review);
+        reviewRepository.save(review);
 
-        int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
+        int databaseSizeBeforeUpdate = (int) StreamSupport.stream(reviewRepository.findAll().spliterator(), false).count();
 
         // Update the review
         Review updatedReview = reviewRepository.findById(review.getId()).get();
@@ -222,7 +225,7 @@ class ReviewResourceIT {
             .andExpect(status().isOk());
 
         // Validate the Review in the database
-        List<Review> reviewList = reviewRepository.findAll();
+        List<Review> reviewList = StreamSupport.stream(reviewRepository.findAll().spliterator(), false).collect(Collectors.toList());
         assertThat(reviewList).hasSize(databaseSizeBeforeUpdate);
         Review testReview = reviewList.get(reviewList.size() - 1);
         assertThat(testReview.getRating()).isEqualTo(UPDATED_RATING);
@@ -232,7 +235,7 @@ class ReviewResourceIT {
     @Test
     @Transactional
     void putNonExistingReview() throws Exception {
-        int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
+        int databaseSizeBeforeUpdate = (int) StreamSupport.stream(reviewRepository.findAll().spliterator(), false).count();
         review.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
@@ -246,14 +249,14 @@ class ReviewResourceIT {
             .andExpect(status().isBadRequest());
 
         // Validate the Review in the database
-        List<Review> reviewList = reviewRepository.findAll();
+        List<Review> reviewList = StreamSupport.stream(reviewRepository.findAll().spliterator(), false).collect(Collectors.toList());
         assertThat(reviewList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchReview() throws Exception {
-        int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
+        int databaseSizeBeforeUpdate = (int) StreamSupport.stream(reviewRepository.findAll().spliterator(), false).count();
         review.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
@@ -267,14 +270,14 @@ class ReviewResourceIT {
             .andExpect(status().isBadRequest());
 
         // Validate the Review in the database
-        List<Review> reviewList = reviewRepository.findAll();
+        List<Review> reviewList = StreamSupport.stream(reviewRepository.findAll().spliterator(), false).collect(Collectors.toList());
         assertThat(reviewList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamReview() throws Exception {
-        int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
+        int databaseSizeBeforeUpdate = (int) StreamSupport.stream(reviewRepository.findAll().spliterator(), false).count();
         review.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
@@ -285,7 +288,7 @@ class ReviewResourceIT {
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Review in the database
-        List<Review> reviewList = reviewRepository.findAll();
+        List<Review> reviewList = StreamSupport.stream(reviewRepository.findAll().spliterator(), false).collect(Collectors.toList());
         assertThat(reviewList).hasSize(databaseSizeBeforeUpdate);
     }
 
@@ -293,9 +296,9 @@ class ReviewResourceIT {
     @Transactional
     void partialUpdateReviewWithPatch() throws Exception {
         // Initialize the database
-        reviewRepository.saveAndFlush(review);
+        reviewRepository.save(review);
 
-        int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
+        int databaseSizeBeforeUpdate = (int) StreamSupport.stream(reviewRepository.findAll().spliterator(), false).count();
 
         // Update the review using partial update
         Review partialUpdatedReview = new Review();
@@ -311,7 +314,7 @@ class ReviewResourceIT {
             .andExpect(status().isOk());
 
         // Validate the Review in the database
-        List<Review> reviewList = reviewRepository.findAll();
+        List<Review> reviewList = StreamSupport.stream(reviewRepository.findAll().spliterator(), false).collect(Collectors.toList());
         assertThat(reviewList).hasSize(databaseSizeBeforeUpdate);
         Review testReview = reviewList.get(reviewList.size() - 1);
         assertThat(testReview.getRating()).isEqualTo(DEFAULT_RATING);
@@ -322,9 +325,9 @@ class ReviewResourceIT {
     @Transactional
     void fullUpdateReviewWithPatch() throws Exception {
         // Initialize the database
-        reviewRepository.saveAndFlush(review);
+        reviewRepository.save(review);
 
-        int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
+        int databaseSizeBeforeUpdate = (int) StreamSupport.stream(reviewRepository.findAll().spliterator(), false).count();
 
         // Update the review using partial update
         Review partialUpdatedReview = new Review();
@@ -342,7 +345,7 @@ class ReviewResourceIT {
             .andExpect(status().isOk());
 
         // Validate the Review in the database
-        List<Review> reviewList = reviewRepository.findAll();
+        List<Review> reviewList = StreamSupport.stream(reviewRepository.findAll().spliterator(), false).collect(Collectors.toList());
         assertThat(reviewList).hasSize(databaseSizeBeforeUpdate);
         Review testReview = reviewList.get(reviewList.size() - 1);
         assertThat(testReview.getRating()).isEqualTo(UPDATED_RATING);
@@ -352,7 +355,7 @@ class ReviewResourceIT {
     @Test
     @Transactional
     void patchNonExistingReview() throws Exception {
-        int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
+        int databaseSizeBeforeUpdate = (int) StreamSupport.stream(reviewRepository.findAll().spliterator(), false).count();
         review.setId(count.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
@@ -366,14 +369,14 @@ class ReviewResourceIT {
             .andExpect(status().isBadRequest());
 
         // Validate the Review in the database
-        List<Review> reviewList = reviewRepository.findAll();
+        List<Review> reviewList = StreamSupport.stream(reviewRepository.findAll().spliterator(), false).collect(Collectors.toList());
         assertThat(reviewList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchReview() throws Exception {
-        int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
+        int databaseSizeBeforeUpdate = (int) StreamSupport.stream(reviewRepository.findAll().spliterator(), false).count();
         review.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
@@ -387,14 +390,14 @@ class ReviewResourceIT {
             .andExpect(status().isBadRequest());
 
         // Validate the Review in the database
-        List<Review> reviewList = reviewRepository.findAll();
+        List<Review> reviewList = StreamSupport.stream(reviewRepository.findAll().spliterator(), false).collect(Collectors.toList());
         assertThat(reviewList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamReview() throws Exception {
-        int databaseSizeBeforeUpdate = reviewRepository.findAll().size();
+        int databaseSizeBeforeUpdate = (int) StreamSupport.stream(reviewRepository.findAll().spliterator(), false).count();
         review.setId(count.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
@@ -408,7 +411,7 @@ class ReviewResourceIT {
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Review in the database
-        List<Review> reviewList = reviewRepository.findAll();
+        List<Review> reviewList = StreamSupport.stream(reviewRepository.findAll().spliterator(), false).collect(Collectors.toList());
         assertThat(reviewList).hasSize(databaseSizeBeforeUpdate);
     }
 
@@ -416,9 +419,9 @@ class ReviewResourceIT {
     @Transactional
     void deleteReview() throws Exception {
         // Initialize the database
-        reviewRepository.saveAndFlush(review);
+        reviewRepository.save(review);
 
-        int databaseSizeBeforeDelete = reviewRepository.findAll().size();
+        int databaseSizeBeforeDelete = (int) StreamSupport.stream(reviewRepository.findAll().spliterator(), false).count();
 
         // Delete the review
         restReviewMockMvc
@@ -426,7 +429,7 @@ class ReviewResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<Review> reviewList = reviewRepository.findAll();
+        List<Review> reviewList = StreamSupport.stream(reviewRepository.findAll().spliterator(), false).collect(Collectors.toList());
         assertThat(reviewList).hasSize(databaseSizeBeforeDelete - 1);
     }
 }
