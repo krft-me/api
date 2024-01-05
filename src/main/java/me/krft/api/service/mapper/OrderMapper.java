@@ -1,5 +1,7 @@
 package me.krft.api.service.mapper;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.TSFBuilder;
 import java.util.Set;
 import me.krft.api.domain.Order;
 import me.krft.api.service.dto.OrderDTO;
@@ -12,9 +14,12 @@ public class OrderMapper implements EntityDTOMapper<Order, OrderDTO> {
 
     private final ApplicationUserOfferMapper applicationUserOfferMapper;
 
+    private final ApplicationUserMapper applicationUserMapper;
+
     @Autowired
-    public OrderMapper(@Lazy ApplicationUserOfferMapper applicationUserOfferMapper) {
+    public OrderMapper(@Lazy ApplicationUserOfferMapper applicationUserOfferMapper, @Lazy ApplicationUserMapper applicationUserMapper) {
         this.applicationUserOfferMapper = applicationUserOfferMapper;
+        this.applicationUserMapper = applicationUserMapper;
     }
 
     @Override
@@ -44,5 +49,9 @@ public class OrderMapper implements EntityDTOMapper<Order, OrderDTO> {
 
     public Set<OrderDTO> toDTOId(Set<Order> entities) {
         return entities.stream().map(this::toDTOId).collect(java.util.stream.Collectors.toSet());
+    }
+
+    public OrderDTO toReviewDTOCard(Order order) {
+        return OrderDTO.builder().date(order.getDate()).customer(this.applicationUserMapper.toReviewDTOCard(order.getCustomer())).build();
     }
 }

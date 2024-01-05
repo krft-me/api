@@ -5,6 +5,7 @@ import java.util.Optional;
 import javax.validation.constraints.NotNull;
 import me.krft.api.domain.ApplicationUserOffer;
 import me.krft.api.service.dto.ApplicationUserOfferDTO;
+import me.krft.api.service.dto.ReviewDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

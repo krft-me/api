@@ -77,4 +77,8 @@ public class ApplicationUserMapper implements EntityDTOMapper<ApplicationUser, A
 
         return applicationUserDTOBuilder.build();
     }
+
+    public ApplicationUserDTO toReviewDTOCard(ApplicationUser customer) {
+        return ApplicationUserDTO.builder().username(customer.getUsername()).profilePictureId(customer.getProfilePictureId()).build();
+    }
 }

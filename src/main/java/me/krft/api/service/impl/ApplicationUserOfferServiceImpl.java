@@ -10,6 +10,7 @@ import me.krft.api.domain.Tag;
 import me.krft.api.repository.ApplicationUserOfferRepository;
 import me.krft.api.service.ApplicationUserOfferService;
 import me.krft.api.service.dto.ApplicationUserOfferDTO;
+import me.krft.api.service.dto.ReviewDTO;
 import me.krft.api.service.mapper.ApplicationUserOfferMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
